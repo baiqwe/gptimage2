@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 @layer base {
-  /* GLM-Image Dark Theme - Slate/Indigo Color Scheme */
+  /* GPT Image 2 Generator theme - Slate/Indigo Color Scheme */
   :root {
     /* Default to dark theme */
     --background: 222.2 47.4% 6.2%;       /* slate-950 */

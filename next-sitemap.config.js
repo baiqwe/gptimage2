@@ -1,6 +1,6 @@
 /** @type {import('next-sitemap').IConfig} */
 module.exports = {
-    siteUrl: process.env.NEXT_PUBLIC_SITE_URL || 'https://your-gptimage2-domain.com',
+    siteUrl: process.env.NEXT_PUBLIC_SITE_URL || 'https://gptimage2.online',
     generateRobotsTxt: true,
     generateIndexSitemap: false,
 
@@ -21,11 +21,11 @@ module.exports = {
     // Generate alternate language links
     alternateRefs: [
         {
-            href: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://your-gptimage2-domain.com'}/en`,
+            href: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://gptimage2.online'}/en`,
             hreflang: 'en',
         },
         {
-            href: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://your-gptimage2-domain.com'}/zh`,
+            href: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://gptimage2.online'}/zh`,
             hreflang: 'zh',
         },
     ],
@@ -62,7 +62,7 @@ module.exports = {
         const blogSlugs = [
             'cogview-4-chinese-ai-image-generator-review',
             'z-image-vs-glm-4-comprehensive-review',
-            'nano-banana-ai-vs-glm-image-review',
+            'nano-banana-ai-vs-gpt-image-2-generator-review',
             'qwen-image-edit-2511-free-online-alternative',
             'qwen-image-edit-3d-camera-control-guide',
             'qwen-image-multiple-angles-3d-camera-tutorial'
@@ -143,4 +143,3 @@ module.exports = {
         };
     },
 };
-

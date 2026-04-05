@@ -1,5 +1,5 @@
 -- ============================================
--- GLM-Image: 完整数据库设置脚本
+-- GPT Image 2 Generator: 完整数据库设置脚本
 -- 在 Supabase SQL Editor 中执行此文件
 -- ============================================
 
@@ -270,4 +270,4 @@ WHERE id NOT IN (SELECT user_id FROM public.customers)
 ON CONFLICT (user_id) DO NOTHING;
 
 -- 完成提示
-SELECT 'GLM-Image 数据库设置完成！新用户将自动获得 30 积分。' AS result;
+SELECT 'GPT Image 2 Generator 数据库设置完成！新用户将自动获得 30 积分。' AS result;

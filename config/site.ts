@@ -4,13 +4,13 @@
 export const siteConfig = {
   // === 品牌标识 ===
   name: "GPT Image 2 Generator",                        // 网站名称
-  domain: "your-gptimage2-domain.com",             // 主域名
-  url: "https://your-gptimage2-domain.com",        // 完整 URL
+  domain: "gptimage2.online",                  // 主域名
+  url: "https://gptimage2.online",             // 完整 URL
   author: "GPT Image 2 Generator Team",                 // 作者
-  supportEmail: "support@your-gptimage2-domain.com", // 联系邮箱
+  supportEmail: "support@gptimage2.online",    // 联系邮箱
 
   // === 分析追踪 ===
-  gaId: "G-PLACEHOLDER",                    // Google Analytics ID - 待用户提供
+  gaId: "G-RF6Z4S359Y",                     // Google Analytics ID
 
   // === 国际化配置 ===
   i18n: {

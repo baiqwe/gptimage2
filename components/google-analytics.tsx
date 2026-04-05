@@ -1,10 +1,15 @@
 import Script from 'next/script';
+import { siteConfig } from '@/config/site';
 
 export function GoogleAnalytics() {
+    if (!siteConfig.gaId || siteConfig.gaId === 'G-PLACEHOLDER') {
+        return null;
+    }
+
     return (
         <>
             <Script
-                src="https://www.googletagmanager.com/gtag/js?id=G-K7NSWTNSRP"
+                src={`https://www.googletagmanager.com/gtag/js?id=${siteConfig.gaId}`}
                 strategy="afterInteractive"
             />
             <Script id="google-analytics" strategy="afterInteractive">
@@ -13,7 +18,7 @@ export function GoogleAnalytics() {
                     function gtag(){dataLayer.push(arguments);}
                     gtag('js', new Date());
 
-                    gtag('config', 'G-K7NSWTNSRP');
+                    gtag('config', '${siteConfig.gaId}');
                 `}
             </Script>
         </>

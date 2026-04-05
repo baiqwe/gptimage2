@@ -250,7 +250,7 @@ export const blogPosts: BlogPost[] = [
   // 2. Nano Banana 独立评测
   // ==========================================
   {
-    slug: 'nano-banana-ai-vs-glm-image-review',
+    slug: 'nano-banana-ai-vs-gpt-image-2-generator-review',
     title: 'Nano Banana (Gemini) vs GPT Image 2 Generator: The 2026 Showdown',
     description: 'Is the Nano Banana model worth the hype? We compare Google\'s lightweight model against GPT Image 2 Generator to see which one delivers better 3D consistency.',
     keywords: ['nano banana', 'nano banana ai', 'gemini nano banana', 'nano banana 1'],

@@ -9,7 +9,7 @@ Disallow: /*/forgot-password
 Disallow: /*/dashboard
 
 # Host
-Host: https://your-gptimage2-domain.com
+Host: https://gptimage2.online
 
 # Sitemaps
-Sitemap: https://your-gptimage2-domain.com/sitemap.xml
+Sitemap: https://gptimage2.online/sitemap.xml
