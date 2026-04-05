@@ -9,7 +9,7 @@ Disallow: /*/forgot-password
 Disallow: /*/dashboard
 
 # Host
-Host: https://glmimageonline.com
+Host: https://your-gptimage2-domain.com
 
 # Sitemaps
-Sitemap: https://glmimageonline.com/sitemap.xml
+Sitemap: https://your-gptimage2-domain.com/sitemap.xml

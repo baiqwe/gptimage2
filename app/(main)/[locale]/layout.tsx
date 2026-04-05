@@ -52,7 +52,7 @@ export async function generateMetadata(props: { params: Promise<{ locale: string
                     url: `${siteConfig.url}/og-image.png`,
                     width: 1200,
                     height: 630,
-                    alt: `${siteConfig.name} - AI Image Generator`,
+                    alt: `${siteConfig.name} - GPT Image 2 Generator`,
                 },
             ],
         },

@@ -3,11 +3,11 @@
 
 export const siteConfig = {
   // === 品牌标识 ===
-  name: "GLM-Image",                        // 网站名称
-  domain: "glmimageonline.com",             // 主域名
-  url: "https://glmimageonline.com",        // 完整 URL
-  author: "GLM-Image Team",                 // 作者
-  supportEmail: "support@glmimageonline.com", // 联系邮箱
+  name: "GPT Image 2 Generator",                        // 网站名称
+  domain: "your-gptimage2-domain.com",             // 主域名
+  url: "https://your-gptimage2-domain.com",        // 完整 URL
+  author: "GPT Image 2 Generator Team",                 // 作者
+  supportEmail: "support@your-gptimage2-domain.com", // 联系邮箱
 
   // === 分析追踪 ===
   gaId: "G-PLACEHOLDER",                    // Google Analytics ID - 待用户提供

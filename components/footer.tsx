@@ -38,7 +38,7 @@ export function Footer() {
               {t('tagline')}
             </p>
             <p className="mt-3 text-xs text-slate-500">
-              Powered by CogView-4 • GLM-Image
+              GPT Image 2 Generator • Built for fast prompt-to-image creation
             </p>
           </div>
 
@@ -114,7 +114,7 @@ export function Footer() {
               />
             </a>
             <a
-              href="https://findly.tools/glm-image-generator-precision-in-every-pixel?utm_source=glm-image-generator-precision-in-every-pixel"
+              href="https://findly.tools/?utm_source=gpt-image-2-generator"
               target="_blank"
               rel="noopener noreferrer"
             >

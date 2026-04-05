@@ -14,8 +14,8 @@ export async function generateMetadata(props: { params: Promise<{ locale: string
     return {
         title: isZh ? `定价 - ${siteConfig.name}` : `Pricing - ${siteConfig.name}`,
         description: isZh
-            ? "灵活的定价方案，使用 CogView-4 进行 AI 图像生成。新用户免费获得积分。"
-            : "Flexible pricing plans for GLM-Image AI image generation. Get credits for text-to-image generation powered by CogView-4.",
+            ? "灵活的定价方案，适用于 GPT Image 2 Generator 图像生成。新用户可先免费试用。"
+            : "Flexible pricing plans for GPT Image 2 Generator. Get credits for fast, prompt-based AI image generation.",
         alternates: {
             canonical: `${siteConfig.url}/${locale}/pricing`,
             languages: {

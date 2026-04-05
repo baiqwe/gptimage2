@@ -13,19 +13,23 @@ export function Logo() {
   return (
     <Link
       href={localePrefix}
-      className="flex items-center gap-2 hover:opacity-90 transition-opacity"
+      className="flex items-center gap-3 hover:opacity-90 transition-opacity"
     >
       <Image
         src="/favicon.svg"
         alt={siteConfig.name}
-        width={32}
-        height={32}
-        className="w-8 h-8"
+        width={40}
+        height={40}
+        className="w-10 h-10 rounded-xl shadow-lg shadow-orange-500/10"
       />
-      <span className="font-bold text-lg bg-gradient-to-r from-orange-400 via-orange-500 to-orange-600 bg-clip-text text-transparent">
-        {siteConfig.name}
+      <span className="flex flex-col leading-none">
+        <span className="font-bold text-base sm:text-lg bg-gradient-to-r from-amber-300 via-orange-400 to-rose-400 bg-clip-text text-transparent">
+          GPT Image 2
+        </span>
+        <span className="text-[11px] sm:text-xs uppercase tracking-[0.28em] text-slate-400">
+          Generator
+        </span>
       </span>
     </Link>
   );
 }
-

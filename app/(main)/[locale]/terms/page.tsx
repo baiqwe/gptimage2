@@ -136,8 +136,8 @@ export default async function TermsPage(props: { params: Promise<{ locale: strin
                             <div className="space-y-4 text-slate-400">
                                 <p>
                                     {isZh
-                                        ? `${siteConfig.name} 是一个 AI 图像生成平台，由智谱 AI 的 CogView-4 模型提供技术支持。我们提供：`
-                                        : `${siteConfig.name} is an AI image generation platform powered by Zhipu AI's CogView-4 model. We provide:`}
+                                        ? `${siteConfig.name} 是一个 AI 图像生成平台，我们提供：`
+                                        : `${siteConfig.name} is an AI image generation platform. We provide:`}
                                 </p>
                                 <ul className="list-disc list-inside space-y-2 ml-4">
                                     <li>{isZh ? '文字转图像 AI 生成' : 'Text-to-image AI generation'}</li>

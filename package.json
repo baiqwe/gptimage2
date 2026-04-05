@@ -1,5 +1,5 @@
 {
-  "name": "glm-image",
+  "name": "gpt-image-2-generator",
   "private": true,
   "scripts": {
     "dev": "next dev",

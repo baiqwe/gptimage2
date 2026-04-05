@@ -1,6 +1,6 @@
 /** @type {import('next-sitemap').IConfig} */
 module.exports = {
-    siteUrl: process.env.NEXT_PUBLIC_SITE_URL || 'https://glmimageonline.com',
+    siteUrl: process.env.NEXT_PUBLIC_SITE_URL || 'https://your-gptimage2-domain.com',
     generateRobotsTxt: true,
     generateIndexSitemap: false,
 
@@ -21,11 +21,11 @@ module.exports = {
     // Generate alternate language links
     alternateRefs: [
         {
-            href: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://glmimageonline.com'}/en`,
+            href: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://your-gptimage2-domain.com'}/en`,
             hreflang: 'en',
         },
         {
-            href: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://glmimageonline.com'}/zh`,
+            href: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://your-gptimage2-domain.com'}/zh`,
             hreflang: 'zh',
         },
     ],
@@ -47,7 +47,7 @@ module.exports = {
         ],
     },
 
-    // Add additional paths for GLM-Image
+    // Add additional paths for GPT Image 2 Generator
     additionalPaths: async (config) => {
         const locales = ['en', 'zh'];
         const staticPages = [

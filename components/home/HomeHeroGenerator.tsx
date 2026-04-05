@@ -78,7 +78,7 @@ export default function HomeHeroGenerator({ onShowStaticContent, user }: HomeHer
     const { credits, refetchCredits } = useCredits();
     const { toast } = useToast();
 
-    const [prompt, setPrompt] = useState("A super cute fluffy white kitten with big blue eyes, sitting in a cozy basket with colorful yarn balls, soft studio lighting, high detail, 8k, Disney pixar style 3d render, cinematic composition");
+    const [prompt, setPrompt] = useState("A luxury editorial portrait of a woman in a sculptural silver coat, soft cinematic lighting, reflective wet pavement, ultra detailed skin texture, fashion magazine photography, shallow depth of field, high realism");
     const [selectedStyle, setSelectedStyle] = useState("default");
     const [selectedRatio, setSelectedRatio] = useState("1:1");
     const [resultImage, setResultImage] = useState<string | null>(null);
@@ -130,7 +130,7 @@ export default function HomeHeroGenerator({ onShowStaticContent, user }: HomeHer
     }, [resultImage, onShowStaticContent]);
 
     const saveStateForLater = () => {
-        localStorage.setItem("pending_glm_generation", JSON.stringify({
+        localStorage.setItem("pending_gpt_image_2_generation", JSON.stringify({
             prompt, selectedStyle, selectedRatio, timestamp: Date.now()
         }));
     };
@@ -207,7 +207,7 @@ export default function HomeHeroGenerator({ onShowStaticContent, user }: HomeHer
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `glm-image-${Date.now()}.webp`;
+            a.download = `gpt-image-2-generator-${Date.now()}.webp`;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
@@ -238,10 +238,10 @@ export default function HomeHeroGenerator({ onShowStaticContent, user }: HomeHer
                         </div>
                         <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 tracking-tight">
                             <span className="bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
-                                GLM-Image
+                                GPT Image 2 Generator
                             </span>
                             <span className="text-white/90 block mt-2 text-2xl md:text-3xl lg:text-4xl font-medium">
-                                {locale === 'zh' ? '高效图像生成' : 'AI Image Generator'}
+                                {locale === 'zh' ? '高细节 AI 图像生成器' : 'High-Detail AI Image Generator'}
                             </span>
                         </h1>
                         <p className="text-slate-400 max-w-2xl mx-auto text-base md:text-lg">
@@ -261,8 +261,8 @@ export default function HomeHeroGenerator({ onShowStaticContent, user }: HomeHer
                                     </label>
                                     <Textarea
                                         placeholder={locale === 'zh'
-                                            ? "描述你想要的画面，例如：王家卫电影风格，孤独的香港街道里独自吸烟的男人，1998 年代..."
-                                            : "Describe the image you want, e.g.: A serene Japanese garden with cherry blossoms..."}
+                                            ? "描述你想要的画面，例如：未来感大片风格，模特站在霓虹雨夜街头，银色外套，电影级灯光，超高细节..."
+                                            : "Describe the image you want, e.g.: A cinematic fashion portrait on a rainy neon street, reflective surfaces, dramatic rim light, ultra detailed..."}
                                         value={prompt}
                                         onChange={(e) => setPrompt(e.target.value)}
                                         className="min-h-[120px] bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-500 resize-none focus:border-indigo-500 focus:ring-indigo-500/20"
@@ -272,8 +272,8 @@ export default function HomeHeroGenerator({ onShowStaticContent, user }: HomeHer
                                     {/* 提示词长度建议 */}
                                     <p className="text-xs text-slate-500 mt-1.5">
                                         {locale === 'zh'
-                                            ? '💡 为保证文字生成效果，请控制提示词在 80 字内'
-                                            : '💡 For best text rendering, keep prompts under 80 characters'}
+                                            ? '💡 为了获得更好的 GPT Image 2 Generator 效果，请尽量写清主体、风格、光线和构图'
+                                            : '💡 For better GPT Image 2 Generator results, include subject, style, lighting, and composition details'}
                                     </p>
 
                                     {/* 灵感快捷按钮 */}
@@ -463,7 +463,7 @@ export default function HomeHeroGenerator({ onShowStaticContent, user }: HomeHer
 
                         {/* Bottom info */}
                         <p className="text-center text-slate-600 text-xs mt-6">
-                            Powered by CogView-4 • GLM-Image Generator
+                            GPT Image 2 Generator • Prompt to image in seconds
                         </p>
                     </div>
                 </div>

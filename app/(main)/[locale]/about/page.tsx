@@ -15,8 +15,8 @@ export async function generateMetadata(props: { params: Promise<{ locale: string
     const isZh = locale === 'zh';
     const title = isZh ? `关于我们 - ${siteConfig.name}` : `About Us - ${siteConfig.name}`;
     const description = isZh
-        ? 'GLM-Image 是基于智谱 CogView-4 的 AI 图像生成平台，提供高效、便捷的文生图服务。'
-        : 'GLM-Image is an AI image generation platform powered by Zhipu CogView-4, providing efficient text-to-image services.';
+        ? 'GPT Image 2 Generator 是一个面向创作者的 AI 图像生成平台，帮助用户通过提示词快速创建高质量视觉内容。'
+        : 'GPT Image 2 Generator is an AI image generation platform built for fast, high-quality prompt-to-image creation.';
 
     return {
         title,
@@ -72,12 +72,12 @@ export default async function AboutPage(props: { params: Promise<{ locale: strin
                             {isZh ? 'AI 图像生成' : 'AI Image Generation'}
                         </div>
                         <h1 className="text-4xl font-bold tracking-tight text-white sm:text-5xl">
-                            {isZh ? '关于 GLM-Image' : 'About GLM-Image'}
+                            {isZh ? '关于 GPT Image 2 Generator' : 'About GPT Image 2 Generator'}
                         </h1>
                         <p className="text-xl text-slate-400 max-w-3xl mx-auto">
                             {isZh
-                                ? '基于智谱 CogView-4 的新一代 AI 图像生成平台，让创意触手可及。'
-                                : 'Next-generation AI image generation platform powered by Zhipu CogView-4, making creativity accessible to everyone.'}
+                                ? '面向现代创作者的 GPT Image 2 Generator 在线图像生成平台，让灵感更快落地。'
+                                : 'A modern GPT Image 2 Generator experience for creators who want fast, detailed AI image generation.'}
                         </p>
                     </div>
 
@@ -89,13 +89,13 @@ export default async function AboutPage(props: { params: Promise<{ locale: strin
                         <div className="space-y-4 text-slate-400">
                             <p>
                                 {isZh
-                                    ? 'GLM-Image 致力于让每个人都能轻松创作高质量的 AI 图像。我们相信，强大的 AI 技术应该简单易用，让创意不再受技术门槛的限制。'
-                                    : 'GLM-Image is committed to making high-quality AI image creation accessible to everyone. We believe powerful AI technology should be simple to use, removing technical barriers from creative expression.'}
+                                    ? 'GPT Image 2 Generator 致力于让每个人都能更轻松地用提示词创作高质量 AI 图像。我们希望把复杂的模型体验，变成简单直接的网页工作流。'
+                                    : 'GPT Image 2 Generator is built to make high-quality AI image creation easier for everyone. We turn complex model workflows into a simple online prompt-to-image experience.'}
                             </p>
                             <p>
                                 {isZh
-                                    ? '我们采用智谱 AI 的 CogView-4 模型，这是目前最先进的中文文生图模型之一，支持中英双语输入，能够精准理解您的创意描述。'
-                                    : 'We leverage Zhipu AI\'s CogView-4 model, one of the most advanced text-to-image models with native Chinese understanding, supporting both Chinese and English inputs to accurately interpret your creative descriptions.'}
+                                    ? '我们围绕 GPT Image 2 Generator 关键词与现代提示词创作体验来设计产品，让用户可以更高效地完成图像生成、变体和风格探索。'
+                                    : 'The product experience is designed around GPT Image 2 Generator search intent, helping users explore image generation, variations, and style experiments from one interface.'}
                             </p>
                         </div>
                     </div>
@@ -107,12 +107,12 @@ export default async function AboutPage(props: { params: Promise<{ locale: strin
                                 <Sparkles className="h-6 w-6 text-indigo-400" />
                             </div>
                             <h3 className="text-lg font-bold text-white mb-2">
-                                {isZh ? 'CogView-4 驱动' : 'Powered by CogView-4'}
+                                {isZh ? 'GPT Image 2 Generator 工作流' : 'GPT Image 2 Generator Workflow'}
                             </h3>
                             <p className="text-slate-400 text-sm">
                                 {isZh
-                                    ? '采用智谱最新的图像生成模型，支持中英文输入，生成效果出色。'
-                                    : 'Using Zhipu\'s latest image generation model with excellent Chinese and English understanding.'}
+                                    ? '围绕 GPT Image 2 Generator 关键词场景设计，适合高细节图像创作与快速内容生产。'
+                                    : 'Built for the GPT Image 2 Generator workflow, with fast prompting and polished visual output.'}
                             </p>
                         </div>
 

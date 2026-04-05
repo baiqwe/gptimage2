@@ -80,7 +80,7 @@ export default function GLMImageGenerator({ user, locale = "en", t }: GLMImageGe
     useEffect(() => {
         const query = new URLSearchParams(window.location.search);
         if (query.get("checkout") === "success") {
-            const savedState = localStorage.getItem("pending_glm_generation");
+            const savedState = localStorage.getItem("pending_gpt_image_2_generation");
             if (savedState) {
                 try {
                     const parsed = JSON.parse(savedState);
@@ -88,7 +88,7 @@ export default function GLMImageGenerator({ user, locale = "en", t }: GLMImageGe
                     setSelectedStyle(parsed.selectedStyle || STYLES[0].id);
                     setSelectedRatio(parsed.selectedRatio || ASPECT_RATIOS[0].id);
 
-                    localStorage.removeItem("pending_glm_generation");
+                    localStorage.removeItem("pending_gpt_image_2_generation");
 
                     confetti({
                         particleCount: 150,
@@ -125,7 +125,7 @@ export default function GLMImageGenerator({ user, locale = "en", t }: GLMImageGe
         }
 
         // Check for pending generation after login
-        const pendingAfterLogin = localStorage.getItem("pending_glm_generation");
+        const pendingAfterLogin = localStorage.getItem("pending_gpt_image_2_generation");
         if (user && pendingAfterLogin) {
             try {
                 const parsed = JSON.parse(pendingAfterLogin);
@@ -134,7 +134,7 @@ export default function GLMImageGenerator({ user, locale = "en", t }: GLMImageGe
                     setPrompt(parsed.prompt || "");
                     setSelectedStyle(parsed.selectedStyle || STYLES[0].id);
                     setSelectedRatio(parsed.selectedRatio || ASPECT_RATIOS[0].id);
-                    localStorage.removeItem("pending_glm_generation");
+                    localStorage.removeItem("pending_gpt_image_2_generation");
 
                     toast({
                         title: locale === "zh" ? "欢迎！" : "Welcome!",
@@ -144,13 +144,13 @@ export default function GLMImageGenerator({ user, locale = "en", t }: GLMImageGe
                     });
                 }
             } catch (e) {
-                localStorage.removeItem("pending_glm_generation");
+                localStorage.removeItem("pending_gpt_image_2_generation");
             }
         }
     }, [user]);
 
     const saveStateForLater = () => {
-        localStorage.setItem("pending_glm_generation", JSON.stringify({
+        localStorage.setItem("pending_gpt_image_2_generation", JSON.stringify({
             prompt,
             selectedStyle,
             selectedRatio,
@@ -184,7 +184,7 @@ export default function GLMImageGenerator({ user, locale = "en", t }: GLMImageGe
         setShowLoginPrompt(false);
 
         try {
-            console.log("Calling GLM-Image API...");
+            console.log("Calling GPT Image 2 Generator API...");
 
             const response = await fetch("/api/ai/text-to-image", {
                 method: "POST",
@@ -257,7 +257,7 @@ export default function GLMImageGenerator({ user, locale = "en", t }: GLMImageGe
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `glm-image-${Date.now()}.webp`;
+            a.download = `gpt-image-2-generator-${Date.now()}.webp`;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
@@ -282,7 +282,7 @@ export default function GLMImageGenerator({ user, locale = "en", t }: GLMImageGe
                     {/* Header */}
                     <div className="space-y-2">
                         <h1 className="text-3xl font-bold tracking-tight">
-                            🚀 {locale === "zh" ? "GLM-4.5 图像生成器" : "GLM-4.5 Image Generator"}
+                            🚀 {locale === "zh" ? "GPT Image 2 Generator" : "GPT Image 2 Generator"}
                         </h1>
                         <p className="text-muted-foreground">
                             {locale === "zh"
@@ -295,19 +295,19 @@ export default function GLMImageGenerator({ user, locale = "en", t }: GLMImageGe
                     <Card className="p-6 space-y-4 border-2 border-primary/20">
                         <h3 className="font-semibold text-lg flex items-center gap-2">
                             <Sparkles className="w-5 h-5 text-primary" />
-                            {locale === "zh" ? "您的创意描述" : "Your Creative Prompt"}
+                            {locale === "zh" ? "GPT Image 2 Generator 提示词" : "GPT Image 2 Generator Prompt"}
                         </h3>
                         <Textarea
                             placeholder={locale === "zh"
-                                ? "一个宁静的日式花园，樱花盛开，锦鲤池塘，日落时分的传统拱桥..."
-                                : "A serene Japanese garden with cherry blossoms, koi pond, and traditional bridge at sunset..."}
+                                ? "一个未来感时尚肖像，霓虹雨夜街景，银色机能外套，电影级灯光，超高细节..."
+                                : "A cinematic fashion editorial portrait, rainy neon street, silver jacket, dramatic rim light, ultra detailed texture..."}
                             value={prompt}
                             onChange={(e) => setPrompt(e.target.value)}
                             className="min-h-[140px] text-base resize-none"
                             maxLength={2000}
                         />
                         <div className="flex justify-between text-xs text-muted-foreground">
-                            <span>{locale === "zh" ? "详细描述可获得更好的结果" : "Detailed descriptions get better results"}</span>
+                            <span>{locale === "zh" ? "详细描述可获得更好的结果" : "Detailed prompts work better in GPT Image 2 Generator"}</span>
                             <span>{prompt.length}/2000</span>
                         </div>
                     </Card>

@@ -132,7 +132,7 @@ export default async function PrivacyPage(props: { params: Promise<{ locale: str
                                         : 'When you use the AI generation feature:'}
                                 </p>
                                 <ul className="list-disc list-inside space-y-1">
-                                    <li>{isZh ? '您的文字提示词会发送至智谱 AI (CogView) API' : 'Your text prompts are sent to Zhipu AI (CogView) API'}</li>
+                                    <li>{isZh ? '您的文字提示词会发送至图像生成 API' : 'Your text prompts are sent to the image generation API'}</li>
                                     <li>{isZh ? '生成的图像会临时存储供下载' : 'Generated images are temporarily stored for download'}</li>
                                     <li>{isZh ? '我们不会永久保留您的生成内容' : 'We do not permanently retain your generations'}</li>
                                 </ul>

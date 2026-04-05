@@ -12,23 +12,23 @@ export interface BlogPost {
 
 export const blogPosts: BlogPost[] = [
   // ==========================================
-  // 0. CogView-4 中文评测 (核心SEO文章)
+  // 0. GPT Image 2 Generator 中文评测 (核心SEO文章)
   // ==========================================
   {
     slug: 'cogview-4-chinese-ai-image-generator-review',
-    title: 'CogView-4 Review: The Best AI for Chinese Text-to-Image Generation',
-    description: 'A comprehensive review of CogView-4 (GLM-Image). We test its Chinese prompt understanding, text rendering in images, and compare it to DALL-E 3 and Midjourney.',
+    title: 'GPT Image 2 Generator Review: The Best AI for Chinese Text-to-Image Generation',
+    description: 'A comprehensive review of GPT Image 2 Generator (GPT Image 2 Generator). We test its Chinese prompt understanding, text rendering in images, and compare it to DALL-E 3 and Midjourney.',
     keywords: ['cogview-4', 'cogview 4', 'glm-4 image', 'chinese ai image generator', 'ai绘画', '中文ai绘图', 'cogview vs midjourney', 'free dall-e alternative'],
     publishDate: '2026-01-17',
     heroImage: '/blog/cogview-4-hero.png',
     content: `
-<p><strong>CogView-4</strong> is the image generation model inside GLM-Image, made by Zhipu AI. It is the first large AI model that truly understands Chinese prompts and can render Chinese text inside images. This review covers everything you need to know.</p>
+<p><strong>GPT Image 2 Generator</strong> is the image generation model inside GPT Image 2 Generator, made by GPT Image 2 Generator. It is the first large AI model that truly understands Chinese prompts and can render Chinese text inside images. This review covers everything you need to know.</p>
 
-<h2>What Makes CogView-4 Different?</h2>
+<h2>What Makes GPT Image 2 Generator Different?</h2>
 
-<p>Most AI image generators struggle with Chinese. You type a prompt in Chinese, and the result looks wrong. CogView-4 solves this problem.</p>
+<p>Most AI image generators struggle with Chinese. You type a prompt in Chinese, and the result looks wrong. GPT Image 2 Generator solves this problem.</p>
 
-<p>Key advantages of CogView-4:</p>
+<p>Key advantages of GPT Image 2 Generator:</p>
 <ul>
   <li><strong>Native Chinese understanding</strong> — No translation needed. Chinese prompts work directly.</li>
   <li><strong>Chinese text rendering</strong> — It can write Chinese characters inside images correctly.</li>
@@ -38,7 +38,7 @@ export const blogPosts: BlogPost[] = [
 
 <h2>Chinese Prompt Test</h2>
 
-<p>We tested CogView-4 with this Chinese prompt:</p>
+<p>We tested GPT Image 2 Generator with this Chinese prompt:</p>
 
 <blockquote>一位穿着汉服的年轻女子站在樱花树下，手持纸伞，柔和的阳光透过花瓣洒落</blockquote>
 
@@ -46,13 +46,13 @@ export const blogPosts: BlogPost[] = [
 
 <h2>Chinese Text Rendering Test</h2>
 
-<p>This is where CogView-4 truly shines. We asked it to create a poster with this prompt:</p>
+<p>This is where GPT Image 2 Generator truly shines. We asked it to create a poster with this prompt:</p>
 
 <blockquote>电影海报，标题"永不言弃"，副标题"2026年度励志大片"，深蓝色背景，金色文字</blockquote>
 
 <p>The result displayed both the title "永不言弃" and subtitle correctly. The characters were sharp and readable. This is nearly impossible with Midjourney or DALL-E 3, which scramble non-Latin text.</p>
 
-<h2>CogView-4 vs DALL-E 3 vs Midjourney</h2>
+<h2>GPT Image 2 Generator vs DALL-E 3 vs Midjourney</h2>
 
 <p>Here is how the three models compare:</p>
 
@@ -60,7 +60,7 @@ export const blogPosts: BlogPost[] = [
   <thead>
     <tr>
       <th>Feature</th>
-      <th>CogView-4</th>
+      <th>GPT Image 2 Generator</th>
       <th>DALL-E 3</th>
       <th>Midjourney</th>
     </tr>
@@ -105,9 +105,9 @@ export const blogPosts: BlogPost[] = [
   </tbody>
 </table>
 
-<p><strong>Winner for Chinese users: CogView-4.</strong> If you create content in Chinese—posters, social media graphics, marketing materials—this is the only model that works reliably.</p>
+<p><strong>Winner for Chinese users: GPT Image 2 Generator.</strong> If you create content in Chinese—posters, social media graphics, marketing materials—this is the only model that works reliably.</p>
 
-<h2>Best Prompt Tips for CogView-4</h2>
+<h2>Best Prompt Tips for GPT Image 2 Generator</h2>
 
 <p>Based on our testing, here are tips to get the best results:</p>
 
@@ -131,9 +131,9 @@ export const blogPosts: BlogPost[] = [
 <p><strong>Traditional Art (Chinese):</strong></p>
 <blockquote>"水墨画风格，山水画，远山近水，一叶扁舟，老翁独钓，留白构图，传统国画意境"</blockquote>
 
-<h2>Who Should Use CogView-4?</h2>
+<h2>Who Should Use GPT Image 2 Generator?</h2>
 
-<p>CogView-4 is ideal for:</p>
+<p>GPT Image 2 Generator is ideal for:</p>
 <ul>
   <li><strong>Content creators</strong> — Making Chinese social media graphics and thumbnails</li>
   <li><strong>Marketers</strong> — Creating product images with Chinese text</li>
@@ -143,7 +143,7 @@ export const blogPosts: BlogPost[] = [
 
 <h2>Limitations</h2>
 
-<p>CogView-4 is excellent for Chinese, but not perfect:</p>
+<p>GPT Image 2 Generator is excellent for Chinese, but not perfect:</p>
 <ul>
   <li>Complex calligraphy may have minor stroke errors</li>
   <li>Very long text strings (10+ characters) may get truncated</li>
@@ -154,7 +154,7 @@ export const blogPosts: BlogPost[] = [
 
 <p>See the difference yourself. Go to our <a href="/create">free generator</a> and paste any Chinese prompt. You get 3 free images per day—no credit card required.</p>
 
-<p>CogView-4 is the breakthrough Chinese speakers have been waiting for. Finally, an AI that speaks your language.</p>
+<p>GPT Image 2 Generator is the breakthrough Chinese speakers have been waiting for. Finally, an AI that speaks your language.</p>
     `
   },
 
@@ -163,17 +163,17 @@ export const blogPosts: BlogPost[] = [
   // ==========================================
   {
     slug: 'z-image-vs-glm-4-comprehensive-review',
-    title: 'Z-Image vs GLM-4: Which AI Model Generates Better Details?',
-    description: 'A comprehensive comparison between Z-Image and GLM-4. We test both models on photorealism, text rendering, and speed to help you choose the best AI tool.',
+    title: 'Z-Image vs GPT Image 2: Which AI Model Generates Better Details?',
+    description: 'A comprehensive comparison between Z-Image and GPT Image 2. We test both models on photorealism, text rendering, and speed to help you choose the best AI tool.',
     keywords: ['z-image', 'z image ai', 'z-image model', 'z image alternative', 'glm vs z-image'],
     publishDate: '2026-01-16',
     heroImage: '/blog/z-image-comparison.png',
     content: `
-<p>Z-Image and GLM-4 are two popular AI image generators. Both can create pictures from text prompts. But they work differently and produce different results. This guide shows you which one works better for your needs.</p>
+<p>Z-Image and GPT Image 2 are two popular AI image generators. Both can create pictures from text prompts. But they work differently and produce different results. This guide shows you which one works better for your needs.</p>
 
 <figure class="my-8">
   <img src="/blog/z-image-comparison.png" alt="Comparison between stylized and photorealistic AI-generated cats" class="rounded-xl w-full" />
-  <figcaption class="text-center text-slate-500 text-sm mt-2">Left: Stylized art style. Right: Photorealistic output from GLM-4.</figcaption>
+  <figcaption class="text-center text-slate-500 text-sm mt-2">Left: Stylized art style. Right: Photorealistic output from GPT Image 2.</figcaption>
 </figure>
 
 <h2>What is Z-Image?</h2>
@@ -187,11 +187,11 @@ export const blogPosts: BlogPost[] = [
   <li>Abstract designs</li>
 </ul>
 
-<h2>What is GLM-4?</h2>
+<h2>What is GPT Image 2?</h2>
 
-<p><strong>GLM-4</strong> is a large AI model made by Zhipu AI. It creates realistic photos and handles complex prompts well. The model understands what you want, even with long descriptions.</p>
+<p><strong>GPT Image 2</strong> is a large AI model made by GPT Image 2 Generator. It creates realistic photos and handles complex prompts well. The model understands what you want, even with long descriptions.</p>
 
-<p>GLM-4 works best when you want:</p>
+<p>GPT Image 2 works best when you want:</p>
 <ul>
   <li>Realistic photos</li>
   <li>Text inside images that you can read</li>
@@ -207,7 +207,7 @@ export const blogPosts: BlogPost[] = [
     <tr>
       <th>Feature</th>
       <th>Z-Image</th>
-      <th>GLM-4</th>
+      <th>GPT Image 2</th>
     </tr>
   </thead>
   <tbody>
@@ -234,15 +234,15 @@ export const blogPosts: BlogPost[] = [
   </tbody>
 </table>
 
-<p><strong>GLM-4 wins</strong> on realism. When you ask for "a photo of a cat on a red chair," GLM-4 makes it look like a real photo. Z-Image makes it look more like a painting.</p>
+<p><strong>GPT Image 2 wins</strong> on realism. When you ask for "a photo of a cat on a red chair," GPT Image 2 makes it look like a real photo. Z-Image makes it look more like a painting.</p>
 
-<p><strong>GLM-4 wins</strong> on text rendering. If your prompt says "a sign that reads OPEN," GLM-4 spells it correctly. Z-Image often scrambles the letters.</p>
+<p><strong>GPT Image 2 wins</strong> on text rendering. If your prompt says "a sign that reads OPEN," GPT Image 2 spells it correctly. Z-Image often scrambles the letters.</p>
 
 <h2>Which One Should You Use?</h2>
 
-<p>Pick <strong>Z-Image</strong> if you want art-style images. Pick <strong>GLM-4</strong> if you need photos that look real.</p>
+<p>Pick <strong>Z-Image</strong> if you want art-style images. Pick <strong>GPT Image 2</strong> if you need photos that look real.</p>
 
-<p>You can try GLM-4 for free right now. Go to our <a href="/create">generator page</a> and type your prompt. No download needed.</p>
+<p>You can try GPT Image 2 for free right now. Go to our <a href="/create">generator page</a> and type your prompt. No download needed.</p>
     `
   },
 
@@ -251,13 +251,13 @@ export const blogPosts: BlogPost[] = [
   // ==========================================
   {
     slug: 'nano-banana-ai-vs-glm-image-review',
-    title: 'Nano Banana (Gemini) vs GLM-Image: The 2026 Showdown',
-    description: 'Is the Nano Banana model worth the hype? We compare Google\'s lightweight model against GLM-Image to see which one delivers better 3D consistency.',
+    title: 'Nano Banana (Gemini) vs GPT Image 2 Generator: The 2026 Showdown',
+    description: 'Is the Nano Banana model worth the hype? We compare Google\'s lightweight model against GPT Image 2 Generator to see which one delivers better 3D consistency.',
     keywords: ['nano banana', 'nano banana ai', 'gemini nano banana', 'nano banana 1'],
     publishDate: '2026-01-16',
     heroImage: '/blog/3d-shapes-demo.png',
     content: `
-<p><strong>Nano Banana</strong> is a small AI model designed for speed. Some people call it a "lite" version of bigger models. But small size means trade-offs. This article compares Nano Banana with GLM-Image to help you choose.</p>
+<p><strong>Nano Banana</strong> is a small AI model designed for speed. Some people call it a "lite" version of bigger models. But small size means trade-offs. This article compares Nano Banana with GPT Image 2 Generator to help you choose.</p>
 
 <h2>What is Nano Banana?</h2>
 
@@ -270,11 +270,11 @@ export const blogPosts: BlogPost[] = [
   <li>Uses less memory than big models</li>
 </ul>
 
-<h2>What is GLM-Image?</h2>
+<h2>What is GPT Image 2 Generator?</h2>
 
-<p><strong>GLM-Image</strong> uses the GLM model. It runs on powerful cloud servers. You use it through your browser—no install needed.</p>
+<p><strong>GPT Image 2 Generator</strong> uses the GLM model. It runs on powerful cloud servers. You use it through your browser—no install needed.</p>
 
-<p>Key facts about GLM-Image:</p>
+<p>Key facts about GPT Image 2 Generator:</p>
 <ul>
   <li>Runs on H100 GPU clusters</li>
   <li>Creates 1024x1024 images</li>
@@ -288,10 +288,10 @@ export const blogPosts: BlogPost[] = [
 <p>Here is what our tests showed:</p>
 <ul>
   <li><strong>Nano Banana</strong>: Fast but blurry. Details like hair and fabric look flat.</li>
-  <li><strong>GLM-Image</strong>: Takes 5-10 seconds but shows realistic textures.</li>
+  <li><strong>GPT Image 2 Generator</strong>: Takes 5-10 seconds but shows realistic textures.</li>
 </ul>
 
-<p>When you zoom in on a Nano Banana image, you see smudged edges. When you zoom in on a GLM-Image result, you see skin pores and fabric threads.</p>
+<p>When you zoom in on a Nano Banana image, you see smudged edges. When you zoom in on a GPT Image 2 Generator result, you see skin pores and fabric threads.</p>
 
 <h2>3D Consistency Test</h2>
 
@@ -299,12 +299,12 @@ export const blogPosts: BlogPost[] = [
 
 <figure class="my-8">
   <img src="/blog/3d-shapes-demo.png" alt="Red cube and blue sphere with proper 3D shadows" class="rounded-xl w-full max-w-md mx-auto" />
-  <figcaption class="text-center text-slate-500 text-sm mt-2">GLM-Image correctly renders 3D shapes with accurate shadows and reflections.</figcaption>
+  <figcaption class="text-center text-slate-500 text-sm mt-2">GPT Image 2 Generator correctly renders 3D shapes with accurate shadows and reflections.</figcaption>
 </figure>
 
-<p>Nano Banana made the shapes overlap weirdly. GLM-Image placed them correctly with proper shadows.</p>
+<p>Nano Banana made the shapes overlap weirdly. GPT Image 2 Generator placed them correctly with proper shadows.</p>
 
-<p>If you need objects in the right places, GLM-Image is the better choice.</p>
+<p>If you need objects in the right places, GPT Image 2 Generator is the better choice.</p>
 
 <h2>Try It Yourself</h2>
 
@@ -318,7 +318,7 @@ export const blogPosts: BlogPost[] = [
   {
     slug: 'qwen-image-edit-2511-free-online-alternative',
     title: 'Qwen Image Edit 2511: Free Online Alternative with Semantic Control',
-    description: 'Searching for Qwen Image Edit 2511? Discover how GLM-4 offers similar editing capabilities online without complex local installation.',
+    description: 'Searching for Qwen Image Edit 2511? Discover how GPT Image 2 offers similar editing capabilities online without complex local installation.',
     keywords: ['qwen image edit 2511', 'qwen image edit', 'qwen 2511 download', 'qwen image edit 2511 — 3d camera control'],
     publishDate: '2026-01-15',
     heroImage: '/blog/cloud-gpu-datacenter.png',
@@ -354,7 +354,7 @@ export const blogPosts: BlogPost[] = [
   <figcaption class="text-center text-slate-500 text-sm mt-2">Our cloud servers use H100 GPUs to run large AI models instantly.</figcaption>
 </figure>
 
-<p>You do not need to download anything. <strong>GLM-Image</strong> runs the same type of large AI models on cloud servers.</p>
+<p>You do not need to download anything. <strong>GPT Image 2 Generator</strong> runs the same type of large AI models on cloud servers.</p>
 
 <p>Here is how it works:</p>
 <ol>
@@ -372,7 +372,7 @@ export const blogPosts: BlogPost[] = [
     <tr>
       <th>Feature</th>
       <th>Qwen 2511 (Local)</th>
-      <th>GLM-Image (Cloud)</th>
+      <th>GPT Image 2 Generator (Cloud)</th>
     </tr>
   </thead>
   <tbody>
@@ -454,7 +454,7 @@ export const blogPosts: BlogPost[] = [
 
 <h2>The Natural Language Method (GLM Style)</h2>
 
-<p>GLM-4 understands camera terms from movies and photography. Instead of numbers, you write words like:</p>
+<p>GPT Image 2 understands camera terms from movies and photography. Instead of numbers, you write words like:</p>
 <ul>
   <li>"low angle shot looking up at the hero"</li>
   <li>"aerial view of the city at sunset"</li>
@@ -477,7 +477,7 @@ export const blogPosts: BlogPost[] = [
 
 <h2>Which Method is Easier?</h2>
 
-<p>For most people, natural language is easier. You describe what you see in your head. GLM-4 figures out the angles.</p>
+<p>For most people, natural language is easier. You describe what you see in your head. GPT Image 2 figures out the angles.</p>
 
 <p>Try it now. Go to our <a href="/create">generator</a> and add camera terms to your prompt.</p>
     `
@@ -489,12 +489,12 @@ export const blogPosts: BlogPost[] = [
   {
     slug: 'qwen-image-multiple-angles-3d-camera-tutorial',
     title: 'Generate Multiple Angles Like Qwen: A Guide to Character Consistency',
-    description: 'Want to generate "qwen image multiple angles"? Here is how to create consistent character sheets (front, side, back) using GLM-4.',
+    description: 'Want to generate "qwen image multiple angles"? Here is how to create consistent character sheets (front, side, back) using GPT Image 2.',
     keywords: ['qwen image multiple angles', 'qwen image multiple angles 3d cameraqwen', 'character sheet ai', 'ai view consistency'],
     publishDate: '2026-01-14',
     heroImage: '/blog/character-sheet.png',
     content: `
-<p>Creating the same character from <strong>multiple angles</strong> is hard for AI. The character often looks different in each image. This guide shows you how to make consistent character sheets using GLM-4.</p>
+<p>Creating the same character from <strong>multiple angles</strong> is hard for AI. The character often looks different in each image. This guide shows you how to make consistent character sheets using GPT Image 2.</p>
 
 <h2>What is a Character Sheet?</h2>
 
@@ -509,7 +509,7 @@ export const blogPosts: BlogPost[] = [
 
 <figure class="my-8">
   <img src="/blog/character-sheet.png" alt="Female warrior character sheet with front, side, and back views" class="rounded-xl w-full" />
-  <figcaption class="text-center text-slate-500 text-sm mt-2">A character sheet generated by GLM-4 showing front, side, and back views.</figcaption>
+  <figcaption class="text-center text-slate-500 text-sm mt-2">A character sheet generated by GPT Image 2 showing front, side, and back views.</figcaption>
 </figure>
 
 <h2>The Challenge with AI</h2>
@@ -520,7 +520,7 @@ export const blogPosts: BlogPost[] = [
 
 <h2>How to Get Consistent Results</h2>
 
-<p>GLM-4 learns from millions of 3D models. It understands how objects look from different angles. Here is how to use it:</p>
+<p>GPT Image 2 learns from millions of 3D models. It understands how objects look from different angles. Here is how to use it:</p>
 
 <p><strong>Step 1: Add style keywords</strong></p>
 
