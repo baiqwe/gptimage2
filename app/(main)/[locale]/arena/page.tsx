@@ -10,8 +10,8 @@ export async function generateMetadata(props: { params: Promise<{ locale: string
 
     const title = isZh ? 'GPT Image 2 Image Arena' : 'GPT Image 2 Image Arena';
     const description = isZh
-        ? '一个面向图像生成的轻量 Arena 页面，用统一 prompt 对比不同模型和工作流，承接 arena、llm arena、llmarena 等探索型搜索意图。'
-        : 'A lightweight image arena for comparing prompts, model behavior, and workflow output, designed for arena, llm arena, and llmarena search intent.';
+        ? '一个轻量的图像对比 Arena，用统一 prompt 比较不同模型和工作流在布局、文字可读性与完成度上的表现。'
+        : 'A lightweight image arena for comparing prompts, model behavior, and workflow output with the same prompt across multiple image tools.';
 
     return {
         title,

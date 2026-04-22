@@ -1,5 +1,6 @@
 import HomeClientWrapper from '@/components/home/HomeClientWrapper';
 import HomeStaticContent from '@/components/home/HomeStaticContent';
+import { SoftwareApplicationSchema } from '@/components/json-ld-schema';
 import { siteConfig } from '@/config/site';
 
 // ✅ This is now a Server Component (no 'use client')
@@ -57,6 +58,9 @@ export default async function HomePage(props: { params: Promise<{ locale: string
     const staticContent = await HomeStaticContent({ locale });
 
     return (
-        <HomeClientWrapper staticContent={staticContent} user={user} />
+        <>
+            <SoftwareApplicationSchema locale={locale} />
+            <HomeClientWrapper staticContent={staticContent} user={user} />
+        </>
     );
 }

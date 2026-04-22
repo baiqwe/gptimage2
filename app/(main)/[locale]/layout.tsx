@@ -7,7 +7,6 @@ import { Footer } from "@/components/footer";
 import { ThemeProvider } from "next-themes";
 import { Toaster } from "@/components/ui/toaster";
 import { Geist } from "next/font/google";
-import { SoftwareApplicationSchema } from "@/components/json-ld-schema";
 import { GoogleAnalytics } from "@/components/google-analytics";
 import { Clarity } from "@/components/clarity";
 import { PromotionBanner } from "@/components/feature/promotion-banner";
@@ -124,7 +123,6 @@ export default async function LocaleLayout(props: {
             <body className="bg-slate-950 text-slate-50 antialiased" suppressHydrationWarning>
                 <GoogleAnalytics />
                 <Clarity />
-                <SoftwareApplicationSchema locale={locale} />
                 <NextIntlClientProvider messages={messages} locale={locale}>
                     <ThemeProvider
                         attribute="class"

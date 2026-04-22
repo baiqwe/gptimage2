@@ -6,22 +6,22 @@ export default function CreateStaticContent({ locale }: { locale: string }) {
 
     const cards = [
         {
-            title: isZh ? '这是开始生成的主页面' : 'This is the main page for creating images',
+            title: isZh ? '这是 GPT Image 2 的主工作台' : 'This is the main GPT Image 2 workspace',
             description: isZh
-                ? '如果你想直接输入提示词并开始生成图片，这里就是最直接的入口。'
-                : 'If you want to type a prompt and start generating right away, this is the most direct place to do it.',
+                ? '如果你想直接输入提示词并开始生成图片，这里就是最直接的入口，适合海报、产品图、概念图和社媒视觉。'
+                : 'If you want to type a prompt and start generating right away, this is the fastest route for posters, product visuals, concept art, and social content.',
         },
         {
-            title: isZh ? '界面只保留真正有用的控制项' : 'Only the controls that matter are shown',
+            title: isZh ? '界面聚焦真正常用的控制项' : 'The interface keeps only the controls that matter',
             description: isZh
-                ? '生成器里展示的是用户可直接控制的尺寸、质量、格式和提示词输入，而不是无法验证的夸张承诺。'
-                : 'The generator focuses on prompt input plus concrete output controls such as size, quality, and format, rather than inflated claims.',
+                ? '你可以直接控制提示词、尺寸、质量和导出格式，更快完成测试、迭代和交付。'
+                : 'You can directly control the prompt, size, quality, and export format so it is easier to test, iterate, and deliver assets.',
         },
         {
-            title: isZh ? '如果你需要更多信息，也有对应入口' : 'There are dedicated pages for deeper needs',
+            title: isZh ? '需要更多资料时也有清晰入口' : 'There are clear paths when you need more context',
             description: isZh
-                ? '如果你要研究 API、做模型对比，或者继续看评测和教程，可以继续进入对应页面。'
-                : 'If you need API documentation, model comparisons, or longer reviews and tutorials, you can continue into those sections.',
+                ? '如果你还想看 API 指南、模型对比或完整评测，可以继续进入对应页面，不用离开当前工作流。'
+                : 'If you want API guidance, model comparisons, or deeper reviews, you can continue into those pages without losing the flow.',
         },
     ];
 
@@ -31,12 +31,12 @@ export default function CreateStaticContent({ locale }: { locale: string }) {
                 <div className="mx-auto max-w-5xl">
                     <div className="text-center">
                         <h2 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
-                            {isZh ? 'GPT Image 2 create 页面可以做什么？' : 'What can you do on the GPT Image 2 create page?'}
+                            {isZh ? '这个 GPT Image 2 AI 绘图工作台可以做什么？' : 'What can you do in this GPT Image 2 AI image workspace?'}
                         </h2>
                         <p className="mx-auto mt-4 max-w-3xl text-lg leading-8 text-slate-600">
                             {isZh
-                                ? '这是站内的核心生成页面，适合想立刻测试提示词、调整尺寸、选择导出格式并快速出图的人。'
-                                : 'This is the main workspace for people who want to test prompts, choose a size, set export options, and generate images quickly.'}
+                                ? '这是站内的核心生成页面，适合想立刻测试提示词、调整尺寸和质量、选择导出格式并快速出图的人。'
+                                : 'This is the main workspace for people who want to test prompts, choose size and quality settings, set export options, and generate images quickly.'}
                         </p>
                     </div>
 

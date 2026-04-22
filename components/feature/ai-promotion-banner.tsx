@@ -47,7 +47,7 @@ export function AiPromotionBanner({ className }: AiPromotionBannerProps) {
                 </p>
                 <div className="pt-2">
                     <Button asChild size="lg" className="bg-gradient-to-r from-blue-600 to-purple-600 hover:opacity-90 transition-opacity shadow-lg border-0">
-                        <Link href="/sign-up?next=/create">
+                        <Link href="/sign-up?next=/create" rel="nofollow">
                             <Sparkles className="w-4 h-4 mr-2" />
                             注册免费领 30 积分试用
                         </Link>

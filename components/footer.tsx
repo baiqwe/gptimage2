@@ -110,7 +110,7 @@ export function Footer() {
             <a
               href="https://findly.tools/gpt-image-2-generator?utm_source=gpt-image-2-generator"
               target="_blank"
-              rel="noopener noreferrer"
+              rel="noopener noreferrer nofollow"
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
@@ -124,7 +124,7 @@ export function Footer() {
             <a
               href="https://z-image.net/"
               target="_blank"
-              rel="noopener noreferrer"
+              rel="noopener noreferrer nofollow"
               className="text-sm font-medium text-slate-600 transition-colors hover:text-orange-600"
             >
               Z-Image
@@ -132,7 +132,7 @@ export function Footer() {
             <a
               href="https://goodaitools.com/ai/gpt-image-2-generator"
               target="_blank"
-              rel="noopener noreferrer"
+              rel="noopener noreferrer nofollow"
               className="text-sm text-slate-600 transition-colors hover:text-orange-600"
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -146,7 +146,7 @@ export function Footer() {
             <a
               href="https://apphublist.com"
               target="_blank"
-              rel="noopener noreferrer"
+              rel="noopener noreferrer nofollow"
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
@@ -159,7 +159,7 @@ export function Footer() {
             <a
               href="https://tooldynamo.com"
               target="_blank"
-              rel="noopener noreferrer"
+              rel="noopener noreferrer nofollow"
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
@@ -172,7 +172,7 @@ export function Footer() {
             <a
               href="https://aixcollection.com"
               target="_blank"
-              rel="noopener noreferrer"
+              rel="noopener noreferrer nofollow"
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
@@ -185,7 +185,7 @@ export function Footer() {
             <a
               href="https://weliketools.com"
               target="_blank"
-              rel="noopener noreferrer"
+              rel="noopener noreferrer nofollow"
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img

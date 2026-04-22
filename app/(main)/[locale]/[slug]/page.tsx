@@ -11,6 +11,16 @@ import { siteConfig } from '@/config/site';
 const supportedFormats = ['jpg', 'png', 'webp', 'heic'] as const;
 type SupportedFormat = typeof supportedFormats[number];
 
+export async function generateStaticParams() {
+    const locales = ['en', 'zh'];
+    return locales.flatMap((locale) =>
+        supportedFormats.map((format) => ({
+            locale,
+            slug: `${format}-to-black-and-white`,
+        }))
+    );
+}
+
 // 辅助函数：从 slug 解析 format
 function getFormatFromSlug(slug: string): SupportedFormat | null {
     const match = slug.match(/^([a-z0-9]+)-to-black-and-white$/);

@@ -12,15 +12,6 @@ function extractBlogSlugs() {
     }
 }
 
-function buildAlternateRefs(siteUrl, currentPath) {
-    const pathWithoutLocale = currentPath.replace(/^\/(en|zh)/, '') || '';
-    return [
-        { href: `${siteUrl}/en${pathWithoutLocale}`, hreflang: 'en' },
-        { href: `${siteUrl}/zh${pathWithoutLocale}`, hreflang: 'zh' },
-        { href: `${siteUrl}${pathWithoutLocale || '/'}`, hreflang: 'x-default' },
-    ];
-}
-
 /** @type {import('next-sitemap').IConfig} */
 module.exports = {
     siteUrl: process.env.NEXT_PUBLIC_SITE_URL || 'https://gptimage2.online',
@@ -100,7 +91,6 @@ module.exports = {
                     changefreq,
                     priority,
                     lastmod: new Date().toISOString(),
-                    alternateRefs: buildAlternateRefs(config.siteUrl, `/${locale}/${page}`),
                 });
             }
 
@@ -110,7 +100,6 @@ module.exports = {
                 changefreq: 'daily',
                 priority: 0.9,
                 lastmod: new Date().toISOString(),
-                alternateRefs: buildAlternateRefs(config.siteUrl, `/${locale}/blog`),
             });
 
             // Add individual blog posts
@@ -120,7 +109,6 @@ module.exports = {
                     changefreq: 'weekly',
                     priority: 0.85,
                     lastmod: new Date().toISOString(),
-                    alternateRefs: buildAlternateRefs(config.siteUrl, `/${locale}/blog/${slug}`),
                 });
             }
         }
@@ -152,7 +140,6 @@ module.exports = {
             changefreq,
             priority,
             lastmod: new Date().toISOString(),
-            alternateRefs: buildAlternateRefs(config.siteUrl, path),
         };
     },
 };

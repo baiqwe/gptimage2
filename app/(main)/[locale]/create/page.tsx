@@ -1,5 +1,6 @@
 import HomeClientWrapper from "@/components/home/HomeClientWrapper";
 import CreateStaticContent from "@/components/home/CreateStaticContent";
+import { SoftwareApplicationSchema } from "@/components/json-ld-schema";
 import { siteConfig } from "@/config/site";
 
 // ✅ 使用 ISR 模式，用户状态在客户端组件中获取
@@ -51,11 +52,14 @@ export default async function CreatePage(props: { params: Promise<{ locale: stri
     const user = null;
 
     return (
-        <div className="min-h-screen bg-[linear-gradient(180deg,#fffdf8_0%,#fff7ee_48%,#fff3e7_100%)]">
-            <HomeClientWrapper
-                user={user}
-                staticContent={<CreateStaticContent locale={locale} />}
-            />
-        </div>
+        <>
+            <SoftwareApplicationSchema locale={locale} pagePath="/create" />
+            <div className="min-h-screen bg-[linear-gradient(180deg,#fffdf8_0%,#fff7ee_48%,#fff3e7_100%)]">
+                <HomeClientWrapper
+                    user={user}
+                    staticContent={<CreateStaticContent locale={locale} />}
+                />
+            </div>
+        </>
     );
 }

@@ -86,7 +86,7 @@ export function MobileNav({ items, user, isDashboard, currentLocale = 'en' }: Mo
           {user ? (
             <div className="flex flex-col gap-2">
               <Button asChild variant="default" className="w-full">
-                <Link href={`${localePrefix}/dashboard`}>
+                <Link href={`${localePrefix}/dashboard`} rel="nofollow">
                   {currentLocale === 'zh' ? '控制台' : 'Dashboard'}
                 </Link>
               </Button>
@@ -99,12 +99,12 @@ export function MobileNav({ items, user, isDashboard, currentLocale = 'en' }: Mo
           ) : (
             <div className="flex flex-col gap-2">
               <Button asChild variant="outline" className="w-full">
-                <Link href={`${localePrefix}/sign-in`}>
+                <Link href={`${localePrefix}/sign-in`} rel="nofollow">
                   {currentLocale === 'zh' ? '登录' : 'Sign in'}
                 </Link>
               </Button>
               <Button asChild variant="default" className="w-full">
-                <Link href={`${localePrefix}/sign-up`}>
+                <Link href={`${localePrefix}/sign-up`} rel="nofollow">
                   {currentLocale === 'zh' ? '注册' : 'Sign up'}
                 </Link>
               </Button>

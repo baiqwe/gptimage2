@@ -88,7 +88,7 @@ export default function Header({ user: initialUser }: HeaderProps) {
           {user ? (
             <div className="hidden md:flex items-center gap-2">
               <Button asChild size="sm" variant="ghost" className="rounded-full text-slate-600 hover:bg-orange-50 hover:text-orange-700">
-                <Link href={`${localePrefix}/dashboard`}>
+                <Link href={`${localePrefix}/dashboard`} rel="nofollow">
                   {currentLocale === 'zh' ? '控制台' : 'Dashboard'}
                 </Link>
               </Button>
@@ -101,10 +101,10 @@ export default function Header({ user: initialUser }: HeaderProps) {
           ) : (
             <div className="hidden md:flex gap-2">
               <Button asChild size="sm" variant="ghost" className="rounded-full text-slate-600 hover:bg-orange-50 hover:text-orange-700">
-                <Link href={`${localePrefix}/sign-in`}>{t('sign_in')}</Link>
+                <Link href={`${localePrefix}/sign-in`} rel="nofollow">{t('sign_in')}</Link>
               </Button>
               <Button asChild size="sm" className="rounded-full border-0 bg-[#ff6b2c] text-white shadow-[0_14px_32px_rgba(255,107,44,0.22)] hover:bg-[#f86120]">
-                <Link href={`${localePrefix}/sign-up`} className="flex items-center gap-1.5">
+                <Link href={`${localePrefix}/sign-up`} rel="nofollow" className="flex items-center gap-1.5">
                   <Sparkles className="w-3.5 h-3.5" />
                   {t('sign_up')}
                 </Link>

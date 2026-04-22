@@ -5,35 +5,53 @@
  * Note: This is a server component to avoid hydration issues
  */
 import { getTranslations } from 'next-intl/server';
+import { ALL_PLANS } from '@/config/pricing';
 import { siteConfig } from '@/config/site';
 
-export async function SoftwareApplicationSchema({ locale }: { locale: string }) {
+export async function SoftwareApplicationSchema({ locale, pagePath = '' }: { locale: string; pagePath?: string }) {
     const t = await getTranslations({ locale, namespace: 'metadata' });
+    const isZh = locale === 'zh';
+    const prices = ALL_PLANS.map((plan) => plan.price);
+    const lowPrice = Math.min(...prices).toFixed(2);
+    const highPrice = Math.max(...prices).toFixed(2);
+    const currentUrl = `${siteConfig.url}/${locale}${pagePath}`;
 
     const schema = {
         "@context": "https://schema.org",
         "@type": "SoftwareApplication",
-        "name": `${siteConfig.name} - ${t('title')}`,
+        "name": isZh ? 'GPT Image 2 AI 绘图工作台' : 'GPT Image 2 AI Image Workspace',
+        "url": currentUrl,
         "description": t('description'),
         "applicationCategory": ["DesignApplication", "AITool"],
         "operatingSystem": "Web Browser",
-        "alternateName": ["GPT Image 2 Generator", "GPT Image 2", "Free GPT Image 2 Generator"],
+        "alternateName": ["GPT Image 2 Generator", "GPT Image 2", "AI Image Workspace"],
         "offers": {
-            "@type": "Offer",
-            "price": "0",
+            "@type": "AggregateOffer",
             "priceCurrency": "USD",
-            "description": "3 free generations for new users"
+            "lowPrice": lowPrice,
+            "highPrice": highPrice,
+            "offerCount": String(ALL_PLANS.length),
+            "offers": ALL_PLANS.map((plan) => ({
+                "@type": "Offer",
+                "name": isZh ? plan.nameZh : plan.name,
+                "price": plan.price.toFixed(2),
+                "priceCurrency": "USD",
+                "category": plan.type === 'subscription' ? 'Subscription' : 'One-time purchase',
+                "url": `${siteConfig.url}/${locale}/pricing`,
+                "availability": "https://schema.org/InStock",
+            })),
         },
         "featureList": [
-            "GPT Image 2 Generator text to image workflow",
-            "Multiple aspect ratios (1:1, 16:9, 9:16)",
-            "5 style presets (Photorealistic, Digital Art, Anime, Cinematic)",
-            "No queue, instant generation",
-            "Multi-language support (English, Chinese)",
-            "High resolution output",
-            "GPT Image 2 Generator online experience"
+            isZh ? "GPT Image 2 文生图工作流" : "GPT Image 2 prompt-to-image workflow",
+            isZh ? "方图、竖图与横图尺寸预设" : "Square, portrait, and landscape size presets",
+            isZh ? "快速、标准与精细质量选项" : "Fast, standard, and high quality options",
+            isZh ? "PNG、JPEG 与 WebP 导出格式" : "PNG, JPEG, and WebP export formats",
+            isZh ? "支持中英文提示词" : "Supports English and Chinese prompts",
+            isZh ? "适合海报、产品图与概念视觉" : "Useful for posters, product visuals, and concept art",
+            isZh ? "在线生成并即时下载" : "Generate online and download instantly"
         ],
-        "screenshot": `${siteConfig.url}/og-image.png`
+        "screenshot": `${siteConfig.url}/og-image.png`,
+        "isAccessibleForFree": true
         // Note: aggregateRating removed - only add when backed by real user review data
     };
 
@@ -44,4 +62,3 @@ export async function SoftwareApplicationSchema({ locale }: { locale: string }) 
         />
     );
 }
-

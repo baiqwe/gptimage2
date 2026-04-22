@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useTranslations } from 'next-intl';
 import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -109,9 +108,9 @@ interface HomeHeroGeneratorProps {
 }
 
 export default function HomeHeroGenerator({ onShowStaticContent, user }: HomeHeroGeneratorProps) {
-    const t = useTranslations('hero');
     const pathname = usePathname();
     const locale = pathname?.split('/')[1] === 'zh' ? 'zh' : 'en';
+    const isCreatePage = pathname?.endsWith('/create');
     const defaultPrompt = locale === 'zh' ? DEFAULT_PROMPTS.zh : DEFAULT_PROMPTS.en;
 
     const { credits, refetchCredits } = useCredits();
@@ -360,6 +359,23 @@ export default function HomeHeroGenerator({ onShowStaticContent, user }: HomeHer
 
     const activeResultImage = resultImages[activePreviewIndex] ?? resultImages[0];
     const activeSample = SAMPLE_PREVIEW_SLIDES[activeSampleIndex];
+    const heroBadge = locale === 'zh'
+        ? (isCreatePage ? 'GPT Image 2 AI 绘图工作台' : 'GPT Image 2 在线图像生成器')
+        : (isCreatePage ? 'GPT Image 2 AI Image Workspace' : 'GPT Image 2 Generator Online');
+    const heroTitle = locale === 'zh'
+        ? (isCreatePage
+            ? '立即使用 GPT Image 2 生成海报、产品图与概念视觉'
+            : '用 GPT Image 2 生成 AI 艺术图、产品视觉与设计概念')
+        : (isCreatePage
+            ? 'Generate AI Art, Product Visuals, and Concepts with GPT Image 2'
+            : 'Create AI Art, Product Visuals, and Design Concepts with GPT Image 2');
+    const heroSubtitle = locale === 'zh'
+        ? (isCreatePage
+            ? '在这个 AI 绘图工作台里输入提示词，选择尺寸、质量和导出格式，快速生成高清图像并立即下载。'
+            : '用 GPT Image 2 在线生成海报、产品图、界面概念图和风格化视觉，在一个清晰的提示词工作流里完成灵感到成品的转化。')
+        : (isCreatePage
+            ? 'Use this AI image workspace to write a prompt, choose size, quality, and export format, then generate high-quality visuals in seconds.'
+            : 'Create posters, product visuals, UI concepts, and styled artwork with GPT Image 2 in a clean prompt-to-image workflow built for fast iteration.');
 
     return (
         <>
@@ -372,13 +388,13 @@ export default function HomeHeroGenerator({ onShowStaticContent, user }: HomeHer
                         <div className="mb-10 text-center lg:mb-12">
                             <div className="inline-flex items-center gap-2 rounded-full border border-orange-200 bg-white/90 px-4 py-2 text-sm font-semibold text-orange-700 shadow-[0_10px_30px_rgba(255,138,61,0.08)]">
                                 <Sparkles className="h-4 w-4" />
-                                {t('badge')}
+                                {heroBadge}
                             </div>
                             <h1 className="mt-5 text-4xl font-semibold tracking-tight text-slate-900 sm:text-5xl lg:text-6xl">
-                                {locale === 'zh' ? '把你的想法直接排成成品级画面' : 'Turn your idea into a polished visual workspace'}
+                                {heroTitle}
                             </h1>
                             <p className="mx-auto mt-4 max-w-3xl text-base leading-7 text-slate-600 sm:text-lg">
-                                {t('subtitle')}
+                                {heroSubtitle}
                             </p>
                         </div>
 
