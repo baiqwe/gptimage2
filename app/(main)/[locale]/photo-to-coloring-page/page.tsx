@@ -43,7 +43,7 @@ export async function generateMetadata(props: { params: Promise<{ locale: string
             languages: {
                 'en': `${siteConfig.url}/en/photo-to-coloring-page`,
                 'zh': `${siteConfig.url}/zh/photo-to-coloring-page`,
-                'x-default': `${siteConfig.url}`,
+                'x-default': `${siteConfig.url}/en/photo-to-coloring-page`,
             },
         },
     };

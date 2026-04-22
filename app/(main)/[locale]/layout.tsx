@@ -63,15 +63,6 @@ export async function generateMetadata(props: { params: Promise<{ locale: string
             images: [`${siteConfig.url}/og-image.png`],
         },
 
-        alternates: {
-            canonical: `${siteConfig.url}/${locale}`,
-            languages: {
-                'en': `${siteConfig.url}/en`,
-                'zh': `${siteConfig.url}/zh`,
-                'x-default': `${siteConfig.url}`,
-            },
-        },
-
         robots: {
             index: true,
             follow: true,
