@@ -9,6 +9,11 @@ export function useUser() {
   const supabase = createClient();
 
   useEffect(() => {
+    if (!supabase) {
+      setLoading(false);
+      return;
+    }
+
     // Get user on mount
     getUser();
 
@@ -23,9 +28,15 @@ export function useUser() {
     return () => {
       subscription.unsubscribe();
     };
-  }, []);
+  }, [supabase]);
 
   async function getUser() {
+    if (!supabase) {
+      setUser(null);
+      setLoading(false);
+      return;
+    }
+
     try {
       const {
         data: { user },

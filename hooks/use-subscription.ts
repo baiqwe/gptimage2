@@ -57,10 +57,20 @@ export function useSubscription() {
   const supabase = createClient();
 
   useEffect(() => {
+    if (!supabase) {
+      setLoading(false);
+      return;
+    }
+
     checkSubscription();
-  }, []);
+  }, [supabase]);
 
   const checkSubscription = async () => {
+    if (!supabase) {
+      setLoading(false);
+      return;
+    }
+
     try {
       const {
         data: { user },

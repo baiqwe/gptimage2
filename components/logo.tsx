@@ -23,10 +23,10 @@ export function Logo() {
         className="w-10 h-10 rounded-xl shadow-lg shadow-orange-500/10"
       />
       <span className="flex flex-col leading-none">
-        <span className="font-bold text-base sm:text-lg bg-gradient-to-r from-amber-300 via-orange-400 to-rose-400 bg-clip-text text-transparent">
+        <span className="font-bold text-base sm:text-lg bg-gradient-to-r from-orange-500 via-amber-500 to-rose-500 bg-clip-text text-transparent">
           GPT Image 2
         </span>
-        <span className="text-[11px] sm:text-xs uppercase tracking-[0.28em] text-slate-400">
+        <span className="text-[11px] sm:text-xs uppercase tracking-[0.28em] text-slate-500">
           Generator
         </span>
       </span>

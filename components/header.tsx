@@ -8,6 +8,7 @@ import { usePathname } from "next/navigation";
 import { MobileNav } from "./mobile-nav";
 import { useTranslations } from "next-intl";
 import { Sparkles } from "lucide-react";
+import { useUser } from "@/hooks/use-user";
 
 interface HeaderProps {
   user: any;
@@ -18,14 +19,10 @@ interface NavItem {
   href: string;
 }
 
-import { useUser } from "@/hooks/use-user";
-
 export default function Header({ user: initialUser }: HeaderProps) {
   const pathname = usePathname();
   const t = useTranslations('nav');
   const { user: clientUser, loading } = useUser();
-
-  // Use server-side user initially (for hydration/SSR), then switch to client-side user
   const user = loading ? initialUser : clientUser;
 
   const pathParts = pathname?.split('/') || [];
@@ -48,19 +45,17 @@ export default function Header({ user: initialUser }: HeaderProps) {
   ];
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-slate-800 bg-slate-950/95 backdrop-blur-lg">
-      <div className="container flex h-16 items-center justify-between px-4">
-        {/* Logo */}
+    <header className="sticky top-0 z-50 w-full border-b border-orange-100/80 bg-white/80 backdrop-blur-xl">
+      <div className="container flex items-center justify-between px-4 py-4">
         <div className="flex items-center gap-8">
           <Logo />
 
-          {/* Desktop Nav */}
           <nav className="hidden md:flex items-center gap-6">
             {mainNavItems.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
-                className="text-sm font-medium text-slate-400 transition-colors hover:text-white"
+                className="text-sm font-semibold text-slate-500 transition-colors hover:text-orange-600"
               >
                 {item.label}
               </Link>
@@ -68,24 +63,22 @@ export default function Header({ user: initialUser }: HeaderProps) {
           </nav>
         </div>
 
-        {/* Right side */}
         <div className="flex items-center gap-3">
-          {/* Language Switcher */}
-          <div className="hidden md:flex items-center gap-1 bg-slate-800/50 rounded-lg p-1">
+          <div className="hidden md:flex items-center gap-1 rounded-full border border-orange-100 bg-[#fff8f1] p-1">
             <Link
               href={`/en${pathWithoutLocale}`}
-              className={`px-2.5 py-1 rounded text-xs font-medium transition-colors ${currentLocale === 'en'
-                ? 'bg-indigo-600 text-white'
-                : 'text-slate-400 hover:text-white'
+              className={`rounded-full px-3 py-1.5 text-xs font-semibold transition-colors ${currentLocale === 'en'
+                ? 'bg-[#ff6b2c] text-white'
+                : 'text-slate-500 hover:text-orange-700'
                 }`}
             >
               EN
             </Link>
             <Link
               href={`/zh${pathWithoutLocale}`}
-              className={`px-2.5 py-1 rounded text-xs font-medium transition-colors ${currentLocale === 'zh'
-                ? 'bg-indigo-600 text-white'
-                : 'text-slate-400 hover:text-white'
+              className={`rounded-full px-3 py-1.5 text-xs font-semibold transition-colors ${currentLocale === 'zh'
+                ? 'bg-[#ff6b2c] text-white'
+                : 'text-slate-500 hover:text-orange-700'
                 }`}
             >
               中文
@@ -94,23 +87,23 @@ export default function Header({ user: initialUser }: HeaderProps) {
 
           {user ? (
             <div className="hidden md:flex items-center gap-2">
-              <Button asChild size="sm" variant="ghost" className="text-slate-300 hover:text-white hover:bg-slate-800">
+              <Button asChild size="sm" variant="ghost" className="rounded-full text-slate-600 hover:bg-orange-50 hover:text-orange-700">
                 <Link href={`${localePrefix}/dashboard`}>
                   {currentLocale === 'zh' ? '控制台' : 'Dashboard'}
                 </Link>
               </Button>
               <form action={signOutAction}>
-                <Button type="submit" variant="outline" size="sm" className="border-slate-700 text-slate-300 hover:bg-slate-800 hover:text-white">
+                <Button type="submit" variant="outline" size="sm" className="rounded-full border-orange-200 bg-white text-slate-600 hover:bg-orange-50 hover:text-orange-700">
                   {t('sign_out')}
                 </Button>
               </form>
             </div>
           ) : (
             <div className="hidden md:flex gap-2">
-              <Button asChild size="sm" variant="ghost" className="text-slate-300 hover:text-white hover:bg-slate-800">
+              <Button asChild size="sm" variant="ghost" className="rounded-full text-slate-600 hover:bg-orange-50 hover:text-orange-700">
                 <Link href={`${localePrefix}/sign-in`}>{t('sign_in')}</Link>
               </Button>
-              <Button asChild size="sm" className="bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white border-0">
+              <Button asChild size="sm" className="rounded-full border-0 bg-[#ff6b2c] text-white shadow-[0_14px_32px_rgba(255,107,44,0.22)] hover:bg-[#f86120]">
                 <Link href={`${localePrefix}/sign-up`} className="flex items-center gap-1.5">
                   <Sparkles className="w-3.5 h-3.5" />
                   {t('sign_up')}

@@ -1,112 +1,231 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/utils/supabase/server";
 import { CREDITS_PER_GENERATION } from "@/config/pricing";
+import {
+    COUNT_OPTIONS,
+    GPT_IMAGE_MODEL,
+    resolveSizePreset,
+} from "@/config/gpt-image";
 
 // Use Node.js runtime for Vercel
 export const runtime = 'nodejs';
 export const maxDuration = 60; // 1 minute timeout
 
-// 智谱 AI API 端点
-const ZHIPU_API_URL = "https://open.bigmodel.cn/api/paas/v4/images/generations";
-const ZHIPU_CHAT_URL = "https://open.bigmodel.cn/api/paas/v4/chat/completions";
+const KIE_API_BASE_URL = process.env.KIE_API_BASE_URL || "https://api.kie.ai";
+const KIE_GPT_IMAGE_MODEL = "gpt-image-2-text-to-image";
+const KIE_POLL_INTERVAL_MS = 2500;
+const KIE_POLL_TIMEOUT_MS = 45000;
 
-// 支持的尺寸
-const SUPPORTED_SIZES: Record<string, string> = {
-    "1:1": "1024x1024",
-    "16:9": "1920x1080",
-    "9:16": "1080x1920",
-    "4:3": "1280x960",
-    "3:4": "960x1280",
-};
+type SupportedQuality = "auto" | "low" | "medium" | "high";
+type SupportedFormat = "png" | "jpeg" | "webp";
 
-// 模型选项
-const MODELS = {
-    "cogview-4": "cogview-4",           // 最新模型，支持汉字生成
-    "glm-image": "glm-image",           // GLM 图像模型
-    "cogview-3-flash": "cogview-3-flash" // 快速模型
-};
+interface KieCreateTaskResponse {
+    code: number;
+    msg: string;
+    data?: {
+        taskId?: string;
+    };
+}
 
-// 风格提示词映射
-const STYLE_HINTS: Record<string, string> = {
-    photo: "photorealistic photography, natural lighting, high resolution, sharp focus, professional camera",
-    art: "artistic masterpiece, painterly style, vibrant colors, expressive brushstrokes, gallery quality",
-    anime: "anime style, manga illustration, cel shading, vibrant colors, Japanese animation aesthetic",
-    cinematic: "cinematic film still, dramatic lighting, movie scene, epic composition, anamorphic lens",
-    default: "highly detailed, professional quality, stunning visual"
-};
+interface KieTaskRecordResponse {
+    code: number;
+    msg: string;
+    data?: {
+        taskId?: string;
+        model?: string;
+        state?: "waiting" | "queuing" | "generating" | "success" | "fail";
+        resultJson?: string;
+        failCode?: string;
+        failMsg?: string;
+    };
+}
 
-/**
- * 提示词隐形增强
- * 使用 GLM-4-Flash 将用户的简单提示词扩写成大师级提示词
- * 
- * 优化点：
- * 1. 保留用户原始语言（中文进中文出，英文进英文出）
- * 2. 保护引号内的文字不被翻译（用于文字渲染）
- * 3. 智谱 CogView 原生支持中文，中文提示词效果更好
- */
-async function enhancePrompt(
-    userPrompt: string,
-    style: string,
-    apiKey: string
-): Promise<{ enhanced: string; success: boolean }> {
+function optimizePrompt(prompt: string, locale: "zh" | "en") {
+    if (locale === "zh") {
+        return `${prompt.trim()}，主体清晰，构图完整，光线层次自然，材质细节丰富，画面干净，整体质感高级。`;
+    }
+
+    return `${prompt.trim()}, clear focal subject, cohesive composition, natural layered lighting, refined material detail, clean background separation, premium visual polish.`;
+}
+
+function sleep(ms: number) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function parseKieResultUrls(resultJson?: string | null): string[] {
+    if (!resultJson) return [];
+
     try {
-        const styleHint = STYLE_HINTS[style] || STYLE_HINTS.default;
+        const parsed = JSON.parse(resultJson);
+        if (Array.isArray(parsed?.resultUrls)) {
+            return parsed.resultUrls.filter(Boolean);
+        }
+        if (typeof parsed?.resultUrl === "string") {
+            return [parsed.resultUrl];
+        }
+        if (Array.isArray(parsed?.images)) {
+            return parsed.images.filter(Boolean);
+        }
+    } catch (error) {
+        console.error("Failed to parse Kie resultJson:", error);
+    }
 
-        const response = await fetch(ZHIPU_CHAT_URL, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${apiKey}`,
+    return [];
+}
+
+async function generateWithKie({
+    prompt,
+    sizePreset,
+    quality,
+    outputFormat,
+}: {
+    prompt: string;
+    sizePreset: string;
+    quality: SupportedQuality;
+    outputFormat: SupportedFormat;
+}) {
+    const createTaskUrl = `${KIE_API_BASE_URL}/api/v1/jobs/createTask`;
+    const recordInfoBaseUrl = `${KIE_API_BASE_URL}/api/v1/jobs/recordInfo`;
+
+    const createResponse = await fetch(createTaskUrl, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${process.env.KIE_API_KEY}`,
+        },
+        body: JSON.stringify({
+            model: KIE_GPT_IMAGE_MODEL,
+            input: {
+                prompt,
+                nsfw_checker: false,
             },
-            body: JSON.stringify({
-                model: "glm-4-flash",
-                messages: [{
-                    role: "system",
-                    content: `You are an expert AI art prompt engineer for image generation. Your job is to transform simple user prompts into detailed, vivid descriptions that will produce stunning images.
+        }),
+    });
 
-Rules:
-1. **Detect Language**: Check if the user's input is Chinese or English.
-2. **Language Consistency**: 
-   - If the user input is in **Chinese**, the output MUST be in **Chinese**.
-   - If the user input is in **English**, the output MUST be in **English**.
-   - **DO NOT TRANSLATE** the core meaning across languages.
-3. **Text Preservation**: If the user provides specific text to be displayed (usually in quotes like "文字内容" or specific names), YOU MUST KEEP IT EXACTLY AS IS. Do not alter or translate text content meant for rendering.
-4. Expand the prompt with artistic details: lighting, composition, atmosphere, textures, colors.
-5. Add quality boosters appropriate to the language:
-   - For Chinese: 高清, 精细, 大师级, 专业品质, 8K
-   - For English: 8K, highly detailed, masterpiece, professional
-6. Incorporate the style direction: "${styleHint}" (Translate this style concept into the target language naturally).
-7. Output ONLY the improved prompt, no explanations or quotes.
-8. Keep under 200 words.`
-                }, {
-                    role: "user",
-                    content: userPrompt
-                }],
-                temperature: 0.7,
-                max_tokens: 500  // 增加 token 限制，中文扩写需要更多空间
-            })
+    const createData = await createResponse.json() as KieCreateTaskResponse;
+    if (!createResponse.ok || createData.code !== 200 || !createData.data?.taskId) {
+        throw new Error(createData?.msg || `Kie task creation failed: ${createResponse.status}`);
+    }
+
+    const taskId = createData.data.taskId;
+    const startedAt = Date.now();
+
+    while (Date.now() - startedAt < KIE_POLL_TIMEOUT_MS) {
+        await sleep(KIE_POLL_INTERVAL_MS);
+
+        const recordInfoUrl = `${recordInfoBaseUrl}?taskId=${encodeURIComponent(taskId)}`;
+        const recordResponse = await fetch(recordInfoUrl, {
+            method: "GET",
+            headers: {
+                "Authorization": `Bearer ${process.env.KIE_API_KEY}`,
+            },
+            cache: "no-store",
         });
 
-        if (!response.ok) {
-            console.warn("Prompt enhancement failed, using original:", response.status);
-            return { enhanced: userPrompt, success: false };
+        const recordData = await recordResponse.json() as KieTaskRecordResponse;
+        if (!recordResponse.ok || recordData.code !== 200) {
+            throw new Error(recordData?.msg || `Kie task query failed: ${recordResponse.status}`);
         }
 
-        const data = await response.json();
-        const enhanced = data.choices?.[0]?.message?.content?.trim();
+        const state = recordData.data?.state;
+        if (state === "success") {
+            const images = parseKieResultUrls(recordData.data?.resultJson);
+            if (images.length === 0) {
+                throw new Error("Kie task succeeded but returned no images");
+            }
 
-        if (enhanced && enhanced.length > 5) {  // 降低阈值，中文提示词可能较短
-            console.log("=== Prompt Enhanced ===");
-            console.log("Original:", userPrompt);
-            console.log("Enhanced:", enhanced);
-            return { enhanced, success: true };
+            return {
+                provider: "kie" as const,
+                taskId,
+                model: KIE_GPT_IMAGE_MODEL,
+                images,
+                metadata: {
+                    provider: "kie",
+                    provider_model: KIE_GPT_IMAGE_MODEL,
+                    provider_task_id: taskId,
+                    size_preset: sizePreset,
+                    quality,
+                    output_format: outputFormat,
+                },
+            };
         }
 
-        return { enhanced: userPrompt, success: false };
-    } catch (error) {
-        console.warn("Prompt enhancement error:", error);
-        return { enhanced: userPrompt, success: false };
+        if (state === "fail") {
+            throw new Error(recordData.data?.failMsg || recordData.data?.failCode || "Kie generation failed");
+        }
     }
+
+    throw new Error("Kie generation timed out while waiting for task completion");
+}
+
+async function generateWithOpenAI({
+    prompt,
+    sizePreset,
+    quality,
+    outputFormat,
+    count,
+}: {
+    prompt: string;
+    sizePreset: string;
+    quality: SupportedQuality;
+    outputFormat: SupportedFormat;
+    count: number;
+}) {
+    const selectedSizePreset = resolveSizePreset(sizePreset);
+    const openaiApiUrl = `${process.env.OPENAI_BASE_URL || "https://api.openai.com/v1"}/images/generations`;
+    const outputCompression = outputFormat === "png" ? undefined : 90;
+
+    const response = await fetch(openaiApiUrl, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`,
+        },
+        body: JSON.stringify({
+            model: GPT_IMAGE_MODEL,
+            prompt,
+            size: selectedSizePreset.size,
+            quality,
+            output_format: outputFormat,
+            n: count,
+            background: "auto",
+            moderation: "auto",
+            ...(typeof outputCompression === "number"
+                ? { output_compression: outputCompression }
+                : {}),
+        }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+        console.error("OpenAI Images Error:", response.status, data);
+        throw new Error(data?.error?.message || `OpenAI API error: ${response.status}`);
+    }
+
+    const images = (data?.data || [])
+        .map((item: { b64_json?: string }) => item?.b64_json)
+        .filter(Boolean)
+        .map((b64: string) => `data:image/${outputFormat};base64,${b64}`);
+
+    if (images.length === 0) {
+        throw new Error("OpenAI did not return any images");
+    }
+
+    return {
+        provider: "openai" as const,
+        images,
+        model: GPT_IMAGE_MODEL,
+        metadata: {
+            provider: "openai",
+            provider_model: GPT_IMAGE_MODEL,
+            size_preset: sizePreset,
+            size: selectedSizePreset.size,
+            quality,
+            output_format: outputFormat,
+            count,
+        },
+    };
 }
 
 export async function POST(request: NextRequest) {
@@ -115,10 +234,11 @@ export async function POST(request: NextRequest) {
     try {
         const {
             prompt,
-            aspect_ratio = "1:1",
-            style = "default",
-            model = "cogview-4",
-            enhance = false  // 🔴 裸模型直出：默认关闭提示词增强
+            size_preset = "square",
+            quality = "auto",
+            output_format = "png",
+            count = 1,
+            prompt_optimization = false,
         } = await request.json();
 
         // 1. Authentication
@@ -138,27 +258,52 @@ export async function POST(request: NextRequest) {
             }, { status: 400 });
         }
 
-        if (prompt.length > 2000) {
+        if (prompt.length > 32000) {
             return NextResponse.json({
-                error: "Prompt too long (max 2000 characters)",
+                error: "Prompt too long (max 32000 characters)",
                 code: "PROMPT_TOO_LONG"
             }, { status: 400 });
         }
 
-        const zhipuApiKey = process.env.ZHIPU_API_KEY;
-        if (!zhipuApiKey) {
-            console.error("ZHIPU_API_KEY is not set");
+        if (!COUNT_OPTIONS.includes(count)) {
+            return NextResponse.json({
+                error: "Unsupported image count",
+                code: "INVALID_COUNT",
+            }, { status: 400 });
+        }
+
+        const allowedQualities = new Set(["auto", "low", "medium", "high"]);
+        if (!allowedQualities.has(quality)) {
+            return NextResponse.json({
+                error: "Unsupported quality option",
+                code: "INVALID_QUALITY",
+            }, { status: 400 });
+        }
+
+        const allowedFormats = new Set(["png", "jpeg", "webp"]);
+        if (!allowedFormats.has(output_format)) {
+            return NextResponse.json({
+                error: "Unsupported output format",
+                code: "INVALID_OUTPUT_FORMAT",
+            }, { status: 400 });
+        }
+
+        const provider = process.env.KIE_API_KEY ? "kie" : process.env.OPENAI_API_KEY ? "openai" : null;
+        if (!provider) {
+            console.error("No image provider is configured");
             return NextResponse.json({
                 error: "Service configuration error",
                 code: "CONFIG_ERROR"
             }, { status: 500 });
         }
 
+        const creditsRequired = CREDITS_PER_GENERATION * count;
+
         // 3. Deduct Credits
         const { data: deductSuccess, error: rpcError } = await supabase.rpc('decrease_credits', {
             p_user_id: user.id,
-            p_amount: CREDITS_PER_GENERATION,
-            p_description: `CogView Generation (${model})`
+            p_amount: creditsRequired,
+            p_description: `GPT Image 2 Generation (${count} image${count > 1 ? "s" : ""})`
         });
 
         if (rpcError) {
@@ -173,104 +318,75 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({
                 error: "Insufficient credits, please top up",
                 code: "INSUFFICIENT_CREDITS",
-                required: CREDITS_PER_GENERATION
+                required: creditsRequired
             }, { status: 402 });
         }
 
-        // 4. Prompt Processing - 裸模型直出方案
-        // 🔴 已禁用提示词增强：所想即所得，用户输入什么模型就画什么
-        let finalPrompt = prompt.trim();
-        const wasEnhanced = false;
+        const trimmedPrompt = prompt.trim();
+        const locale = /[\u4e00-\u9fff]/.test(trimmedPrompt) ? "zh" : "en";
+        const finalPrompt = prompt_optimization
+            ? optimizePrompt(trimmedPrompt, locale)
+            : trimmedPrompt;
 
-        // 注释掉提示词增强逻辑 - 保留代码便于将来恢复
-        // if (enhance) {
-        //     const { enhanced, success } = await enhancePrompt(finalPrompt, style, zhipuApiKey);
-        //     if (success) {
-        //         finalPrompt = enhanced;
-        //         wasEnhanced = true;
-        //     }
-        // }
-
-        // 5. Call Zhipu CogView API
         try {
-            // 获取尺寸
-            const size = SUPPORTED_SIZES[aspect_ratio] || "1024x1024";
-
-            // 获取模型
-            const selectedModel = MODELS[model as keyof typeof MODELS] || MODELS["cogview-4"];
-
-            console.log("=== CogView Generation ===");
+            console.log("=== GPT Image 2 Generation ===");
+            console.log("Provider:", provider);
             console.log("Original Prompt:", prompt);
             console.log("Final Prompt:", finalPrompt);
-            console.log("Enhanced:", wasEnhanced);
-            console.log("Size:", size);
-            console.log("Model:", selectedModel);
+            console.log("Prompt Optimization:", prompt_optimization);
+            console.log("Size Preset:", size_preset);
+            console.log("Quality:", quality);
+            console.log("Output Format:", output_format);
+            console.log("Count:", count);
 
-            const response = await fetch(ZHIPU_API_URL, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${zhipuApiKey}`,
-                },
-                body: JSON.stringify({
-                    model: selectedModel,
+            const generationResult = provider === "kie"
+                ? await generateWithKie({
                     prompt: finalPrompt,
-                    size: size,
-                    quality: "standard",
-                }),
-            });
-
-            if (!response.ok) {
-                const errorData = await response.json().catch(() => ({}));
-                console.error("Zhipu API Error:", response.status, errorData);
-                throw new Error(errorData.error?.message || `API Error: ${response.status}`);
-            }
-
-            const data = await response.json();
-            console.log("CogView Response:", JSON.stringify(data, null, 2));
-
-            // 智谱返回格式: { data: [{ url: "..." }] }
-            const resultUrl = data.data?.[0]?.url;
-
-            if (!resultUrl || !resultUrl.startsWith('http')) {
-                throw new Error("CogView returned invalid result");
-            }
+                    sizePreset: size_preset,
+                    quality,
+                    outputFormat: output_format,
+                })
+                : await generateWithOpenAI({
+                    prompt: finalPrompt,
+                    sizePreset: size_preset,
+                    quality,
+                    outputFormat: output_format,
+                    count,
+                });
 
             // 6. Log Generation
             await supabase.from("generations").insert({
                 user_id: user.id,
-                prompt: prompt.trim(),  // 保存原始提示词
-                model_id: selectedModel,
-                image_url: resultUrl,
+                prompt: trimmedPrompt,
+                model_id: generationResult.model,
+                image_url: generationResult.images[0],
                 input_image_url: null,
                 status: "succeeded",
-                credits_cost: CREDITS_PER_GENERATION,
+                credits_cost: creditsRequired,
                 metadata: {
-                    style,
-                    aspect_ratio,
-                    size,
-                    model: selectedModel,
-                    provider: "zhipu",
-                    enhanced_prompt: wasEnhanced ? finalPrompt : null,  // 保存增强后的提示词
-                    was_enhanced: wasEnhanced
+                    ...generationResult.metadata,
+                    prompt_optimization,
+                    optimized_prompt: prompt_optimization ? finalPrompt : null,
+                    image_count: generationResult.images.length,
                 }
             });
 
             return NextResponse.json({
-                url: resultUrl,
+                url: generationResult.images[0],
+                images: generationResult.images,
                 success: true,
-                enhancedPrompt: wasEnhanced ? finalPrompt : null,  // 返回给前端显示
-                wasEnhanced
+                provider,
+                revisedPrompt: prompt_optimization ? finalPrompt : null,
             });
 
         } catch (aiError: any) {
-            console.error("CogView Service Error:", aiError);
+            console.error("GPT Image 2 Service Error:", aiError);
 
             // Refund credits on failure
             await supabase.rpc('decrease_credits', {
                 p_user_id: user.id,
-                p_amount: -CREDITS_PER_GENERATION,
-                p_description: 'Refund: CogView Generation Failed'
+                p_amount: -creditsRequired,
+                p_description: 'Refund: GPT Image 2 Generation Failed'
             });
 
             return NextResponse.json({

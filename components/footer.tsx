@@ -28,13 +28,13 @@ export function Footer() {
   ];
 
   return (
-    <footer className="border-t border-slate-800 bg-slate-950">
+    <footer className="border-t border-orange-100 bg-white/70">
       <div className="container px-4 py-12 md:py-16">
         <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
           {/* Brand */}
           <div className="col-span-2">
             <Logo />
-            <p className="mt-4 text-sm text-slate-400 max-w-sm">
+            <p className="mt-4 text-sm text-slate-600 max-w-sm">
               {t('tagline')}
             </p>
             <p className="mt-3 text-xs text-slate-500">
@@ -44,7 +44,7 @@ export function Footer() {
 
           {/* Product */}
           <div className="flex flex-col gap-3">
-            <h3 className="text-sm font-semibold text-slate-200">
+            <h3 className="text-sm font-semibold text-slate-900">
               {currentLocale === 'zh' ? '产品' : 'Product'}
             </h3>
             <nav className="flex flex-col gap-2">
@@ -52,7 +52,7 @@ export function Footer() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="text-sm text-slate-400 transition-colors hover:text-indigo-400"
+                  className="text-sm text-slate-600 transition-colors hover:text-orange-600"
                 >
                   {currentLocale === 'zh' ? link.labelZh : link.label}
                 </Link>
@@ -62,13 +62,13 @@ export function Footer() {
 
           {/* Legal */}
           <div className="flex flex-col gap-3">
-            <h3 className="text-sm font-semibold text-slate-200">{t('legal')}</h3>
+            <h3 className="text-sm font-semibold text-slate-900">{t('legal')}</h3>
             <nav className="flex flex-col gap-2">
               {legalLinks.map((link) => (
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="text-sm text-slate-400 transition-colors hover:text-indigo-400"
+                  className="text-sm text-slate-600 transition-colors hover:text-orange-600"
                 >
                   {link.label}
                 </Link>
@@ -78,8 +78,8 @@ export function Footer() {
         </div>
 
         {/* Friends / 友链 */}
-        <div className="mt-8 pt-6 border-t border-slate-800">
-          <h3 className="text-sm font-semibold text-slate-200 mb-4">
+        <div className="mt-8 pt-6 border-t border-orange-100">
+          <h3 className="text-sm font-semibold text-slate-900 mb-4">
             {currentLocale === 'zh' ? '友情链接' : 'Friends'}
           </h3>
           <div className="flex flex-wrap items-center gap-6">
@@ -88,7 +88,7 @@ export function Footer() {
               target="_blank"
               rel="noopener noreferrer"
               title="AI Image Describer"
-              className="text-sm text-slate-400 transition-colors hover:text-indigo-400"
+              className="text-sm text-slate-600 transition-colors hover:text-orange-600"
             >
               AI Image Describer
             </a>
@@ -96,7 +96,7 @@ export function Footer() {
               href="https://fast-wan.com/"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-sm text-slate-400 transition-colors hover:text-indigo-400"
+              className="text-sm text-slate-600 transition-colors hover:text-orange-600"
             >
               Fast Wan
             </a>
@@ -130,12 +130,12 @@ export function Footer() {
         </div>
 
         {/* Bottom */}
-        <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-slate-800 pt-8 md:flex-row">
+        <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-orange-100 pt-8 md:flex-row">
           <p className="text-center text-sm text-slate-500 md:text-left">
             © {new Date().getFullYear()} {siteConfig.domain}. {t('rights')}
           </p>
           <p className="text-center text-sm text-slate-500 md:text-right">
-            Built by <span className="text-slate-400">{siteConfig.author}</span>
+            Built by <span className="text-slate-700">{siteConfig.author}</span>
           </p>
         </div>
       </div>

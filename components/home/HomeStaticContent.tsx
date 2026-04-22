@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { getTranslations } from 'next-intl/server';
-import { Sparkles, Lock, Zap, Palette, Smartphone, Printer, Users, GraduationCap, Camera, Heart, ArrowRight, Star } from 'lucide-react';
+import { Sparkles, Lock, Zap, Palette, Smartphone, Printer, Heart, ArrowRight, Star } from 'lucide-react';
 
 interface HomeStaticContentProps {
     locale: string;
@@ -11,78 +11,51 @@ export default async function HomeStaticContent({ locale }: HomeStaticContentPro
     const tFeatures = await getTranslations({ locale, namespace: 'features' });
 
     return (
-        <div className="bg-slate-950">
-            {/* What Section */}
+        <div className="bg-[linear-gradient(180deg,#fff9f2_0%,#fff6ed_48%,#fffdf9_100%)]">
             <WhatSection t={tHome} />
-
-            {/* How Section */}
             <HowSection t={tHome} />
-
-            {/* Features Section */}
             <FeaturesSection t={tFeatures} />
-
-            {/* SEO Content Section */}
             <SEOContentSection t={tHome} />
-
-            {/* FAQ Section */}
             <FAQSection t={tHome} />
-
-            {/* CTA Section */}
             <CTASection t={tHome} locale={locale} />
         </div>
     );
 }
 
-function WhatSection({ t }: { t: any }) {
+function SectionTitle({ title, subtitle }: { title: string; subtitle: string }) {
     return (
-        <section className="py-20 bg-slate-900/50">
+        <div className="mb-12 text-center">
+            <h2 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">{title}</h2>
+            <p className="mx-auto mt-4 max-w-3xl text-lg leading-8 text-slate-600">{subtitle}</p>
+        </div>
+    );
+}
+
+function WhatSection({ t }: { t: any }) {
+    const cards = [
+        { title: t('what.feature_1_title'), desc: t('what.feature_1_desc'), icon: Palette, tone: 'bg-orange-100 text-orange-500' },
+        { title: t('what.feature_2_title'), desc: t('what.feature_2_desc'), icon: Heart, tone: 'bg-amber-100 text-amber-500' },
+        { title: t('what.feature_3_title'), desc: t('what.feature_3_desc'), icon: Sparkles, tone: 'bg-rose-100 text-rose-500' },
+    ];
+
+    return (
+        <section className="py-20">
             <div className="container px-4 md:px-6">
-                <div className="max-w-4xl mx-auto">
-                    <div className="text-center space-y-4 mb-12">
-                        <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
-                            {t('what.title')}
-                        </h2>
-                        <p className="text-lg text-slate-400 max-w-3xl mx-auto leading-relaxed">
-                            {t('what.desc')}
-                        </p>
-                    </div>
-
-                    <div className="grid md:grid-cols-3 gap-6">
-                        <div className="bg-slate-800/50 rounded-xl p-6 border border-slate-700 hover:border-indigo-500/50 transition-colors">
-                            <div className="w-12 h-12 rounded-lg bg-indigo-500/20 flex items-center justify-center mb-4">
-                                <Palette className="w-6 h-6 text-indigo-400" />
-                            </div>
-                            <h3 className="text-xl font-bold mb-2 text-white">
-                                {t('what.feature_1_title')}
-                            </h3>
-                            <p className="text-slate-400">
-                                {t('what.feature_1_desc')}
-                            </p>
-                        </div>
-
-                        <div className="bg-slate-800/50 rounded-xl p-6 border border-slate-700 hover:border-indigo-500/50 transition-colors">
-                            <div className="w-12 h-12 rounded-lg bg-purple-500/20 flex items-center justify-center mb-4">
-                                <Heart className="w-6 h-6 text-purple-400" />
-                            </div>
-                            <h3 className="text-xl font-bold mb-2 text-white">
-                                {t('what.feature_2_title')}
-                            </h3>
-                            <p className="text-slate-400">
-                                {t('what.feature_2_desc')}
-                            </p>
-                        </div>
-
-                        <div className="bg-slate-800/50 rounded-xl p-6 border border-slate-700 hover:border-indigo-500/50 transition-colors">
-                            <div className="w-12 h-12 rounded-lg bg-pink-500/20 flex items-center justify-center mb-4">
-                                <Sparkles className="w-6 h-6 text-pink-400" />
-                            </div>
-                            <h3 className="text-xl font-bold mb-2 text-white">
-                                {t('what.feature_3_title')}
-                            </h3>
-                            <p className="text-slate-400">
-                                {t('what.feature_3_desc')}
-                            </p>
-                        </div>
+                <div className="mx-auto max-w-5xl">
+                    <SectionTitle title={t('what.title')} subtitle={t('what.desc')} />
+                    <div className="grid gap-6 md:grid-cols-3">
+                        {cards.map((card) => {
+                            const Icon = card.icon;
+                            return (
+                                <div key={card.title} className="rounded-[24px] border border-orange-100 bg-white p-6 shadow-[0_20px_50px_rgba(235,145,71,0.08)]">
+                                    <div className={`mb-4 inline-flex h-12 w-12 items-center justify-center rounded-2xl ${card.tone}`}>
+                                        <Icon className="h-6 w-6" />
+                                    </div>
+                                    <h3 className="text-xl font-bold text-slate-900">{card.title}</h3>
+                                    <p className="mt-3 leading-7 text-slate-600">{card.desc}</p>
+                                </div>
+                            );
+                        })}
                     </div>
                 </div>
             </div>
@@ -99,31 +72,21 @@ function HowSection({ t }: { t: any }) {
     ];
 
     return (
-        <section className="py-20 bg-slate-950">
+        <section className="py-20 bg-white/50">
             <div className="container px-4 md:px-6">
-                <div className="max-w-6xl mx-auto">
-                    <div className="text-center space-y-4 mb-12">
-                        <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
-                            {t('how.title')}
-                        </h2>
-                        <p className="text-lg text-slate-400 max-w-2xl mx-auto">
-                            {t('how.subtitle')}
-                        </p>
-                    </div>
-
-                    <div className="grid md:grid-cols-4 gap-8">
+                <div className="mx-auto max-w-6xl">
+                    <SectionTitle title={t('how.title')} subtitle={t('how.subtitle')} />
+                    <div className="grid gap-8 md:grid-cols-4">
                         {steps.map((step) => (
-                            <div key={step.number} className="relative">
-                                <div className="text-center space-y-4">
-                                    <div className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 text-white text-2xl font-bold shadow-lg shadow-indigo-500/25">
-                                        {step.number}
-                                    </div>
-                                    <h3 className="text-lg font-bold text-white">{step.title}</h3>
-                                    <p className="text-sm text-slate-400">{step.desc}</p>
+                            <div key={step.number} className="relative text-center">
+                                <div className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-orange-500 to-amber-500 text-2xl font-bold text-white shadow-[0_18px_36px_rgba(255,107,44,0.24)]">
+                                    {step.number}
                                 </div>
+                                <h3 className="mt-5 text-lg font-bold text-slate-900">{step.title}</h3>
+                                <p className="mt-3 text-sm leading-7 text-slate-600">{step.desc}</p>
                                 {step.number < steps.length && (
-                                    <div className="hidden md:flex absolute top-8 left-full w-8 -translate-y-1/2 items-center justify-center z-10">
-                                        <ArrowRight className="w-6 h-6 text-slate-600" />
+                                    <div className="absolute left-full top-8 hidden w-8 -translate-y-1/2 items-center justify-center md:flex">
+                                        <ArrowRight className="h-6 w-6 text-orange-300" />
                                     </div>
                                 )}
                             </div>
@@ -137,51 +100,29 @@ function HowSection({ t }: { t: any }) {
 
 function FeaturesSection({ t }: { t: any }) {
     const features = [
-        { icon: Lock, title: t('feature_1_title'), desc: t('feature_1_desc'), color: 'indigo' },
-        { icon: Zap, title: t('feature_2_title'), desc: t('feature_2_desc'), color: 'yellow' },
-        { icon: Palette, title: t('feature_3_title'), desc: t('feature_3_desc'), color: 'purple' },
-        { icon: Sparkles, title: t('feature_4_title'), desc: t('feature_4_desc'), color: 'pink' },
-        { icon: Smartphone, title: t('feature_5_title'), desc: t('feature_5_desc'), color: 'cyan' },
-        { icon: Printer, title: t('feature_6_title'), desc: t('feature_6_desc'), color: 'emerald' },
+        { icon: Lock, title: t('feature_1_title'), desc: t('feature_1_desc'), tone: 'bg-orange-100 text-orange-500' },
+        { icon: Zap, title: t('feature_2_title'), desc: t('feature_2_desc'), tone: 'bg-amber-100 text-amber-500' },
+        { icon: Palette, title: t('feature_3_title'), desc: t('feature_3_desc'), tone: 'bg-rose-100 text-rose-500' },
+        { icon: Sparkles, title: t('feature_4_title'), desc: t('feature_4_desc'), tone: 'bg-pink-100 text-pink-500' },
+        { icon: Smartphone, title: t('feature_5_title'), desc: t('feature_5_desc'), tone: 'bg-sky-100 text-sky-500' },
+        { icon: Printer, title: t('feature_6_title'), desc: t('feature_6_desc'), tone: 'bg-emerald-100 text-emerald-500' },
     ];
 
-    const colorMap: Record<string, string> = {
-        indigo: 'bg-indigo-500/20 text-indigo-400',
-        yellow: 'bg-yellow-500/20 text-yellow-400',
-        purple: 'bg-purple-500/20 text-purple-400',
-        pink: 'bg-pink-500/20 text-pink-400',
-        cyan: 'bg-cyan-500/20 text-cyan-400',
-        emerald: 'bg-emerald-500/20 text-emerald-400',
-    };
-
     return (
-        <section className="py-20 bg-slate-900/50">
+        <section className="py-20">
             <div className="container px-4 md:px-6">
-                <div className="mx-auto max-w-6xl space-y-12 text-center">
-                    <div className="space-y-4">
-                        <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
-                            {t('title')}
-                        </h2>
-                        <p className="mx-auto max-w-3xl text-slate-400 text-lg">
-                            {t('subtitle')}
-                        </p>
-                    </div>
-
+                <div className="mx-auto max-w-6xl">
+                    <SectionTitle title={t('title')} subtitle={t('subtitle')} />
                     <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                        {features.map((feature, idx) => {
+                        {features.map((feature) => {
                             const Icon = feature.icon;
                             return (
-                                <div
-                                    key={idx}
-                                    className="rounded-xl bg-slate-800/50 p-6 border border-slate-700 hover:border-indigo-500/50 transition-all hover:transform hover:-translate-y-1"
-                                >
-                                    <div className="space-y-4">
-                                        <div className={`inline-flex h-12 w-12 items-center justify-center rounded-lg ${colorMap[feature.color]}`}>
-                                            <Icon className="w-6 h-6" />
-                                        </div>
-                                        <h3 className="text-xl font-bold text-white">{feature.title}</h3>
-                                        <p className="text-slate-400">{feature.desc}</p>
+                                <div key={feature.title} className="rounded-[24px] border border-orange-100 bg-white p-6 shadow-[0_20px_50px_rgba(235,145,71,0.08)] transition-transform hover:-translate-y-1">
+                                    <div className={`inline-flex h-12 w-12 items-center justify-center rounded-2xl ${feature.tone}`}>
+                                        <Icon className="h-6 w-6" />
                                     </div>
+                                    <h3 className="mt-5 text-xl font-bold text-slate-900">{feature.title}</h3>
+                                    <p className="mt-3 leading-7 text-slate-600">{feature.desc}</p>
                                 </div>
                             );
                         })}
@@ -201,25 +142,15 @@ function FAQSection({ t }: { t: any }) {
     ];
 
     return (
-        <section className="py-20 bg-slate-950 border-t border-slate-800">
+        <section className="border-t border-orange-100 py-20">
             <div className="container px-4 md:px-6">
-                <div className="max-w-4xl mx-auto space-y-12">
-                    <div className="text-center space-y-4">
-                        <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
-                            {t('faq.title')}
-                        </h2>
-                        <p className="text-lg text-slate-400">
-                            {t('faq.subtitle')}
-                        </p>
-                    </div>
-
+                <div className="mx-auto max-w-4xl">
+                    <SectionTitle title={t('faq.title')} subtitle={t('faq.subtitle')} />
                     <div className="grid gap-6">
-                        {faqs.map((faq, idx) => (
-                            <div key={idx} className="bg-slate-800/50 rounded-xl p-6 border border-slate-700">
-                                <h3 className="text-xl font-bold text-white mb-3">{faq.q}</h3>
-                                <div className="text-slate-400 whitespace-pre-line leading-relaxed">
-                                    {faq.a}
-                                </div>
+                        {faqs.map((faq) => (
+                            <div key={faq.q} className="rounded-[24px] border border-orange-100 bg-white p-6 shadow-[0_20px_50px_rgba(235,145,71,0.08)]">
+                                <h3 className="text-xl font-bold text-slate-900">{faq.q}</h3>
+                                <p className="mt-3 whitespace-pre-line leading-7 text-slate-600">{faq.a}</p>
                             </div>
                         ))}
                     </div>
@@ -233,34 +164,32 @@ function CTASection({ t, locale }: { t: any; locale: string }) {
     const localePrefix = `/${locale}`;
 
     return (
-        <section className="py-24 bg-gradient-to-b from-slate-900 to-slate-950">
+        <section className="py-24">
             <div className="container px-4 md:px-6">
-                <div className="mx-auto max-w-4xl text-center space-y-8">
-                    <div className="space-y-6">
-                        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-indigo-500/20 text-indigo-300 text-sm">
-                            <Star className="w-4 h-4" />
-                            {locale === 'zh' ? '免费试用' : 'Free to Try'}
-                        </div>
-                        <h2 className="text-4xl font-bold tracking-tight text-white sm:text-5xl">
-                            {t('cta.title')}
-                        </h2>
-                        <p className="mx-auto max-w-2xl text-slate-400 text-lg">
-                            {t('cta.subtitle')}
-                        </p>
-                        <div className="flex flex-wrap justify-center gap-4 pt-4">
-                            <Link
-                                href={localePrefix}
-                                className="px-8 py-4 rounded-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white hover:from-indigo-600 hover:to-purple-700 transition-all font-medium text-lg shadow-lg shadow-indigo-500/25"
-                            >
-                                {t('cta.button_start')}
-                            </Link>
-                            <Link
-                                href={`${localePrefix}/pricing`}
-                                className="px-8 py-4 rounded-full bg-slate-800 text-slate-200 hover:bg-slate-700 transition-colors font-medium text-lg border border-slate-700"
-                            >
-                                {t('cta.button_coloring')}
-                            </Link>
-                        </div>
+                <div className="mx-auto max-w-4xl rounded-[32px] border border-orange-100 bg-white px-6 py-12 text-center shadow-[0_28px_80px_rgba(235,145,71,0.12)] sm:px-12">
+                    <div className="inline-flex items-center gap-2 rounded-full border border-orange-100 bg-[#fff6ef] px-4 py-2 text-sm font-semibold text-orange-700">
+                        <Star className="h-4 w-4" />
+                        {locale === 'zh' ? '免费试用' : 'Free to Try'}
+                    </div>
+                    <h2 className="mt-6 text-4xl font-bold tracking-tight text-slate-900 sm:text-5xl">
+                        {t('cta.title')}
+                    </h2>
+                    <p className="mx-auto mt-4 max-w-2xl text-lg leading-8 text-slate-600">
+                        {t('cta.subtitle')}
+                    </p>
+                    <div className="mt-8 flex flex-wrap justify-center gap-4">
+                        <Link
+                            href={localePrefix}
+                            className="rounded-full bg-[#ff6b2c] px-8 py-4 text-lg font-semibold text-white shadow-[0_18px_36px_rgba(255,107,44,0.24)] transition-colors hover:bg-[#f86120]"
+                        >
+                            {t('cta.button_start')}
+                        </Link>
+                        <Link
+                            href={`${localePrefix}/pricing`}
+                            className="rounded-full border border-orange-100 bg-[#fffaf4] px-8 py-4 text-lg font-semibold text-slate-700 transition-colors hover:bg-orange-50"
+                        >
+                            {t('cta.button_coloring')}
+                        </Link>
                     </div>
                 </div>
             </div>
@@ -270,93 +199,74 @@ function CTASection({ t, locale }: { t: any; locale: string }) {
 
 function SEOContentSection({ t }: { t: any }) {
     return (
-        <section className="py-20 bg-slate-900 border-t border-slate-800">
-            <div className="container px-4 md:px-6 max-w-4xl mx-auto prose prose-invert prose-lg">
-                {/* Comparison Table */}
-                <h2 className="text-3xl font-bold text-white mb-8">{t('seo.comparison_title')}</h2>
-                <p className="text-slate-400 mb-8">{t('seo.comparison_intro')}</p>
+        <section className="border-t border-orange-100 bg-white/50 py-20">
+            <div className="container max-w-5xl px-4 md:px-6">
+                <SectionTitle title={t('seo.comparison_title')} subtitle={t('seo.comparison_intro')} />
 
-                <div className="not-prose grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
-                    <div className="bg-slate-800/50 p-6 rounded-xl border border-slate-700">
-                        <div className="text-2xl mb-2">🇨🇳</div>
-                        <h3 className="font-bold text-white mb-2">{t('seo.compare_chinese')}</h3>
-                        <p className="text-sm text-slate-400">{t('seo.compare_chinese_desc')}</p>
-                    </div>
-                    <div className="bg-slate-800/50 p-6 rounded-xl border border-slate-700">
-                        <div className="text-2xl mb-2">⚡️</div>
-                        <h3 className="font-bold text-white mb-2">{t('seo.compare_speed')}</h3>
-                        <p className="text-sm text-slate-400">{t('seo.compare_speed_desc')}</p>
-                    </div>
-                    <div className="bg-slate-800/50 p-6 rounded-xl border border-slate-700">
-                        <div className="text-2xl mb-2">💰</div>
-                        <h3 className="font-bold text-white mb-2">{t('seo.compare_price')}</h3>
-                        <p className="text-sm text-slate-400">{t('seo.compare_price_desc')}</p>
-                    </div>
-                    <div className="bg-slate-800/50 p-6 rounded-xl border border-slate-700">
-                        <div className="text-2xl mb-2">🚀</div>
-                        <h3 className="font-bold text-white mb-2">{t('seo.compare_queue')}</h3>
-                        <p className="text-sm text-slate-400">{t('seo.compare_queue_desc')}</p>
+                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+                    <InfoCard emoji="🇨🇳" title={t('seo.compare_chinese')} desc={t('seo.compare_chinese_desc')} />
+                    <InfoCard emoji="⚡️" title={t('seo.compare_speed')} desc={t('seo.compare_speed_desc')} />
+                    <InfoCard emoji="💰" title={t('seo.compare_price')} desc={t('seo.compare_price_desc')} />
+                    <InfoCard emoji="🚀" title={t('seo.compare_queue')} desc={t('seo.compare_queue_desc')} />
+                </div>
+
+                <div className="mt-16 rounded-[28px] border border-orange-100 bg-white p-8 shadow-[0_20px_50px_rgba(235,145,71,0.08)]">
+                    <h3 className="text-2xl font-bold text-slate-900">{t('seo.video_title')}</h3>
+                    <p className="mt-3 leading-7 text-slate-600">{t('seo.video_intro')}</p>
+                    <div className="mt-8 space-y-6">
+                        <StepItem number={1} title={t('seo.video_step_1')} desc={t('seo.video_step_1_desc')} />
+                        <StepItem number={2} title={t('seo.video_step_2')} desc={t('seo.video_step_2_desc')} />
+                        <StepItem number={3} title={t('seo.video_step_3')} desc={t('seo.video_step_3_desc')} />
+                        <StepItem number={4} title={t('seo.video_step_4')} desc={t('seo.video_step_4_desc')} />
                     </div>
                 </div>
 
-                {/* Video Tutorial (Schema-ready) */}
-                <h2 className="text-3xl font-bold text-white mt-16 mb-6">{t('seo.video_title')}</h2>
-                <p className="text-slate-400 mb-8">{t('seo.video_intro')}</p>
-                <div className="space-y-6 mb-16">
-                    <div className="flex gap-4">
-                        <div className="flex-none w-8 h-8 rounded-full bg-indigo-500/20 text-indigo-400 flex items-center justify-center font-bold">1</div>
-                        <div>
-                            <h3 className="text-xl font-semibold text-white mb-1">{t('seo.video_step_1')}</h3>
-                            <p className="text-slate-400">{t('seo.video_step_1_desc')}</p>
-                        </div>
-                    </div>
-                    <div className="flex gap-4">
-                        <div className="flex-none w-8 h-8 rounded-full bg-indigo-500/20 text-indigo-400 flex items-center justify-center font-bold">2</div>
-                        <div>
-                            <h3 className="text-xl font-semibold text-white mb-1">{t('seo.video_step_2')}</h3>
-                            <p className="text-slate-400">{t('seo.video_step_2_desc')}</p>
-                        </div>
-                    </div>
-                    <div className="flex gap-4">
-                        <div className="flex-none w-8 h-8 rounded-full bg-indigo-500/20 text-indigo-400 flex items-center justify-center font-bold">3</div>
-                        <div>
-                            <h3 className="text-xl font-semibold text-white mb-1">{t('seo.video_step_3')}</h3>
-                            <p className="text-slate-400">{t('seo.video_step_3_desc')}</p>
-                        </div>
-                    </div>
-                    <div className="flex gap-4">
-                        <div className="flex-none w-8 h-8 rounded-full bg-indigo-500/20 text-indigo-400 flex items-center justify-center font-bold">4</div>
-                        <div>
-                            <h3 className="text-xl font-semibold text-white mb-1">{t('seo.video_step_4')}</h3>
-                            <p className="text-slate-400">{t('seo.video_step_4_desc')}</p>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Tech Specs */}
-                <div className="bg-slate-800/30 p-8 rounded-2xl">
-                    <h2 className="text-2xl font-bold text-white mb-6">{t('seo.tech_title')}</h2>
-                    <p className="text-slate-300 mb-6">{t('seo.tech_intro')}</p>
-                    <ul className="space-y-4 list-none pl-0">
-                        <li className="flex gap-3">
-                            <span className="text-indigo-400">❖</span>
-                            <span><strong className="text-white">{t('seo.tech_feature_1')}:</strong> {t('seo.tech_feature_1_desc')}</span>
-                        </li>
-                        <li className="flex gap-3">
-                            <span className="text-indigo-400">❖</span>
-                            <span><strong className="text-white">{t('seo.tech_feature_2')}:</strong> {t('seo.tech_feature_2_desc')}</span>
-                        </li>
-                        <li className="flex gap-3">
-                            <span className="text-indigo-400">❖</span>
-                            <span><strong className="text-white">{t('seo.tech_feature_3')}:</strong> {t('seo.tech_feature_3_desc')}</span>
-                        </li>
-                        <li className="flex gap-3">
-                            <span className="text-indigo-400">❖</span>
-                            <span><strong className="text-white">{t('seo.tech_feature_4')}:</strong> {t('seo.tech_feature_4_desc')}</span>
-                        </li>
+                <div className="mt-10 rounded-[28px] border border-orange-100 bg-[#fffaf4] p-8 shadow-[0_20px_50px_rgba(235,145,71,0.08)]">
+                    <h3 className="text-2xl font-bold text-slate-900">{t('seo.tech_title')}</h3>
+                    <p className="mt-3 leading-7 text-slate-600">{t('seo.tech_intro')}</p>
+                    <ul className="mt-6 space-y-4">
+                        <TechItem title={t('seo.tech_feature_1')} desc={t('seo.tech_feature_1_desc')} />
+                        <TechItem title={t('seo.tech_feature_2')} desc={t('seo.tech_feature_2_desc')} />
+                        <TechItem title={t('seo.tech_feature_3')} desc={t('seo.tech_feature_3_desc')} />
+                        <TechItem title={t('seo.tech_feature_4')} desc={t('seo.tech_feature_4_desc')} />
                     </ul>
                 </div>
             </div>
         </section>
+    );
+}
+
+function InfoCard({ emoji, title, desc }: { emoji: string; title: string; desc: string }) {
+    return (
+        <div className="rounded-[24px] border border-orange-100 bg-white p-6 shadow-[0_20px_50px_rgba(235,145,71,0.08)]">
+            <div className="text-2xl">{emoji}</div>
+            <h3 className="mt-4 text-lg font-bold text-slate-900">{title}</h3>
+            <p className="mt-2 text-sm leading-6 text-slate-600">{desc}</p>
+        </div>
+    );
+}
+
+function StepItem({ number, title, desc }: { number: number; title: string; desc: string }) {
+    return (
+        <div className="flex gap-4">
+            <div className="flex h-9 w-9 flex-none items-center justify-center rounded-full bg-orange-100 font-semibold text-orange-600">
+                {number}
+            </div>
+            <div>
+                <h4 className="text-lg font-semibold text-slate-900">{title}</h4>
+                <p className="mt-1 leading-7 text-slate-600">{desc}</p>
+            </div>
+        </div>
+    );
+}
+
+function TechItem({ title, desc }: { title: string; desc: string }) {
+    return (
+        <li className="flex gap-3 text-slate-700">
+            <span className="text-orange-500">❖</span>
+            <span>
+                <strong className="text-slate-900">{title}:</strong> {desc}
+            </span>
+        </li>
     );
 }
