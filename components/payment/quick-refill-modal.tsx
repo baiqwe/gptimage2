@@ -108,7 +108,7 @@ export function QuickRefillModal({ isOpen, onClose, currentPath }: QuickRefillMo
                                         {t('refill_upgrade')}
                                     </span>
                                     <span className="text-primary-foreground/80 text-sm font-normal">
-                                        $9.90 / mo • 1000 Credits
+                                        $19.99 / mo • 1,000 Credits
                                     </span>
                                 </>
                             )}
@@ -134,7 +134,7 @@ export function QuickRefillModal({ isOpen, onClose, currentPath }: QuickRefillMo
                         {loadingPlanId === PLAN_MINI.id ? (
                             <Loader2 className="h-4 w-4 animate-spin" />
                         ) : (
-                            <span>{t('refill_mini')} (500 pts)</span>
+                            <span>{t('refill_mini')} (400 credits)</span>
                         )}
                     </Button>
                 </div>

@@ -36,7 +36,7 @@ export default async function PricingPage({ params }: Props) {
     setRequestLocale(locale);
 
     return (
-        <div className="bg-slate-950 min-h-screen">
+        <div className="min-h-screen bg-[linear-gradient(180deg,#fff9f2_0%,#fff6ed_48%,#fffdf9_100%)]">
             <PricingSection locale={locale} />
         </div>
     );

@@ -125,7 +125,7 @@
         "refill_title": "积分不足？😱",
         "refill_subtitle": "别让创作灵感溜走！立即充值继续创作。",
         "refill_upgrade": "升级专业版（推荐）",
-        "refill_mini": "或仅充值 $4.99 救急",
+        "refill_mini": "或花 $9.99 解锁 40 张图",
         "restore_purchase": "恢复购买",
         "manage_subscription": "管理订阅",
         "error": "错误"
@@ -169,7 +169,7 @@
             "reason_2_title": "免费试用",
             "reason_2_desc": "新用户可先免费试用 GPT Image 2 Generator，再按需升级。",
             "reason_3_title": "实惠的价格",
-            "reason_3_desc": "以极低的成本获得专业级 AI 图像生成。$4.99 起可生成 50 张图像。",
+            "reason_3_desc": "以更健康的利润结构提供专业级 AI 图像生成。$9.99 起可生成 40 张图像。",
             "reason_4_title": "多语言支持",
             "reason_4_desc": "支持中英文提示词输入，降低创作门槛。"
         },

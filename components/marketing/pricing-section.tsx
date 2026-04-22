@@ -45,10 +45,10 @@ function DiscountTimer({ locale }: { locale: string }) {
     const pad = (n: number) => n.toString().padStart(2, '0');
 
     return (
-        <div className="flex items-center justify-center gap-2 text-xs font-medium text-amber-300 bg-amber-500/20 px-3 py-1.5 rounded-full mb-3">
+        <div className="mb-3 inline-flex items-center justify-center gap-2 rounded-full border border-orange-200 bg-[#fff3e7] px-3 py-1.5 text-xs font-medium text-orange-700">
             <Clock className="w-3.5 h-3.5" />
             <span>{locale === 'zh' ? '限时优惠' : 'Offer ends in'}</span>
-            <span className="font-mono font-bold text-amber-200">
+            <span className="font-mono font-bold text-orange-600">
                 {pad(time.hours)}:{pad(time.minutes)}:{pad(time.seconds)}
             </span>
         </div>
@@ -128,12 +128,12 @@ export function PricingSection({ locale }: PricingSectionProps) {
             <Crown key="crown" className="w-8 h-8 text-amber-400" />
         ];
 
-        let cardClass = "bg-slate-800/50 border-slate-700 hover:border-slate-600";
-        let buttonClass = "bg-slate-700 hover:bg-slate-600 text-white";
+        let cardClass = "bg-white border-orange-100 hover:border-orange-200 shadow-[0_20px_50px_rgba(235,145,71,0.08)]";
+        let buttonClass = "border border-orange-100 bg-[#fff7ef] text-slate-800 hover:bg-orange-50";
 
         if (plan.isPopular) {
-            cardClass = "bg-gradient-to-b from-indigo-900/60 to-slate-800/60 border-indigo-500 shadow-2xl shadow-indigo-500/30 scale-105";
-            buttonClass = "bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white shadow-lg";
+            cardClass = "bg-[linear-gradient(180deg,#fffaf4_0%,#ffffff_100%)] border-orange-300 shadow-[0_28px_80px_rgba(255,107,44,0.16)] scale-105";
+            buttonClass = "bg-[#ff6b2c] text-white shadow-[0_18px_36px_rgba(255,107,44,0.24)] hover:bg-[#f86120]";
         }
 
         return (
@@ -145,17 +145,17 @@ export function PricingSection({ locale }: PricingSectionProps) {
                     plan.isPopular && "z-10"
                 )}
             >
-                {/* Discount Badge */}
-                {discount > 0 && (
-                    <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1.5 rounded-full text-sm font-bold shadow-lg bg-gradient-to-r from-red-500 to-orange-500 text-white whitespace-nowrap">
-                        SAVE {discount}% TODAY
-                    </div>
-                )}
-
-                {/* Plan Label */}
-                {localizedPlan.displayLabel && !discount && (
-                    <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1.5 rounded-full text-sm font-bold shadow-lg bg-slate-700 text-white whitespace-nowrap">
-                        {localizedPlan.displayLabel}
+                {/* Badge */}
+                {localizedPlan.displayLabel && (
+                    <div className={cn(
+                        "absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1.5 rounded-full text-sm font-bold shadow-lg whitespace-nowrap",
+                        discount > 0
+                            ? "bg-gradient-to-r from-red-500 to-orange-500 text-white"
+                            : "border border-orange-200 bg-[#fff3e7] text-orange-700"
+                    )}>
+                        {plan.isPopular && discount > 0
+                            ? `${localizedPlan.displayLabel} · SAVE ${discount}%`
+                            : localizedPlan.displayLabel}
                     </div>
                 )}
 
@@ -164,33 +164,39 @@ export function PricingSection({ locale }: PricingSectionProps) {
                     {plan.type === 'subscription' && <DiscountTimer locale={locale} />}
 
                     {/* Icon */}
-                    <div className="w-16 h-16 rounded-xl bg-slate-700/50 flex items-center justify-center mx-auto mb-4">
+                    <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-[#fff3e7]">
                         {icons[index]}
                     </div>
 
-                    <h3 className="text-xl font-bold text-white">{localizedPlan.displayName}</h3>
-                    <p className="text-sm text-slate-400 mt-1">{localizedPlan.displayDescription}</p>
+                    <h3 className="text-xl font-bold text-slate-900">{localizedPlan.displayName}</h3>
+                    <p className="mt-1 text-sm text-slate-500">{localizedPlan.displayDescription}</p>
                 </div>
 
                 {/* Price */}
                 <div className="flex items-baseline justify-center gap-2 my-6">
                     {discount > 0 && (
-                        <span className="text-lg text-slate-500 line-through decoration-red-500/70 decoration-2">
+                        <span className="text-lg text-slate-400 line-through decoration-red-500/70 decoration-2">
                             {formatPrice(plan.originalPrice)}
                         </span>
                     )}
-                    <span className="text-4xl font-extrabold text-white">{formatPrice(plan.price)}</span>
+                    <span className="text-4xl font-extrabold text-slate-900">{formatPrice(plan.price)}</span>
                     {plan.interval && (
-                        <span className="text-slate-400 text-sm">
+                        <span className="text-sm text-slate-500">
                             /{plan.interval === 'month' ? (locale === 'zh' ? '月' : 'mo') : (locale === 'zh' ? '年' : 'yr')}
                         </span>
                     )}
                 </div>
 
+                {localizedPlan.displayPriceNote && (
+                    <p className="mb-5 text-center text-xs text-slate-500">
+                        {localizedPlan.displayPriceNote}
+                    </p>
+                )}
+
                 {/* Credits Highlight */}
-                <div className="bg-gradient-to-r from-indigo-500/20 to-purple-500/20 p-4 rounded-xl text-center mb-6 border border-indigo-500/30">
-                    <span className="block text-3xl font-bold text-white">{plan.credits.toLocaleString()}</span>
-                    <span className="text-sm text-slate-400">
+                <div className="mb-6 rounded-2xl border border-orange-100 bg-[#fff7ef] p-4 text-center">
+                    <span className="block text-3xl font-bold text-slate-900">{plan.credits.toLocaleString()}</span>
+                    <span className="text-sm text-slate-500">
                         {locale === 'zh' ? '积分' : 'Credits'} ({generations} {locale === 'zh' ? '张图' : 'Images'})
                     </span>
                 </div>
@@ -199,20 +205,20 @@ export function PricingSection({ locale }: PricingSectionProps) {
                 <ul className="space-y-3 mb-6 flex-1">
                     {localizedPlan.displayFeatures.map((feature: string) => (
                         <li key={feature} className="flex items-start gap-2">
-                            <Check className="h-4 w-4 text-emerald-400 shrink-0 mt-0.5" />
-                            <span className="text-sm text-slate-300">{feature}</span>
+                            <Check className="mt-0.5 h-4 w-4 shrink-0 text-emerald-500" />
+                            <span className="text-sm text-slate-600">{feature}</span>
                         </li>
                     ))}
                 </ul>
 
                 {/* Cost per image */}
-                <div className="text-center mb-4 py-2 bg-slate-700/30 rounded-lg">
-                    <span className="text-xs text-slate-400">
+                <div className="mb-4 rounded-lg bg-[#fffaf4] py-2 text-center">
+                    <span className="text-xs text-slate-500">
                         {locale === 'zh' ? '单张成本：' : 'Per image: '}
                     </span>
                     <span className={cn(
                         "font-bold text-sm",
-                        plan.isPopular ? "text-emerald-400" : "text-slate-300"
+                        plan.isPopular ? "text-orange-600" : "text-slate-700"
                     )}>
                         ${costPerGen.toFixed(3)}
                     </span>
@@ -230,13 +236,15 @@ export function PricingSection({ locale }: PricingSectionProps) {
                     {loadingPlanId === plan.id ? (
                         <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                     ) : plan.type === 'subscription' ? (
-                        locale === 'zh' ? '立即订阅' : 'Subscribe Now'
+                        plan.interval === 'year'
+                            ? (locale === 'zh' ? '锁定年付优惠' : 'Lock Annual Savings')
+                            : (locale === 'zh' ? '立即订阅' : 'Subscribe Now')
                     ) : (
-                        locale === 'zh' ? '立即购买' : 'Buy Credits'
+                        locale === 'zh' ? '立即买断' : 'Buy Once'
                     )}
                 </Button>
 
-                <div className="mt-3 flex items-center justify-center gap-1.5 text-[10px] text-slate-500">
+                <div className="mt-3 flex items-center justify-center gap-1.5 text-[10px] text-slate-400">
                     <Check className="w-3 h-3" />
                     <span>Secure Payment via Creem</span>
                 </div>
@@ -248,14 +256,14 @@ export function PricingSection({ locale }: PricingSectionProps) {
         <div className="w-full max-w-6xl mx-auto px-4 py-16">
             {/* Header */}
             <div className="text-center mb-16 space-y-4">
-                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-red-500/20 to-orange-500/20 text-orange-300 text-sm border border-orange-500/30">
+                <div className="inline-flex items-center gap-2 rounded-full border border-orange-200 bg-[#fff3e7] px-4 py-2 text-sm text-orange-700">
                     <Sparkles className="w-4 h-4" />
                     {locale === 'zh' ? '🎉 首发特惠' : '🎉 Launch Special'}
                 </div>
-                <h2 className="text-4xl font-extrabold tracking-tight text-white sm:text-5xl">
+                <h2 className="text-4xl font-extrabold tracking-tight text-slate-900 sm:text-5xl">
                     {locale === 'zh' ? '简单透明的定价' : 'Simple, Transparent Pricing'}
                 </h2>
-                <p className="text-xl text-slate-400 max-w-2xl mx-auto">
+                <p className="mx-auto max-w-2xl text-xl text-slate-600">
                     {locale === 'zh'
                         ? '选择适合你的套餐，立即开始 AI 图像创作'
                         : 'Choose the plan that fits your needs. No hidden fees.'}
@@ -268,11 +276,11 @@ export function PricingSection({ locale }: PricingSectionProps) {
             </div>
 
             {/* Bottom note */}
-            <div className="text-center mt-12 space-y-2">
-                <p className="text-slate-400 text-sm">
+            <div className="mt-12 space-y-2 text-center">
+                <p className="text-sm text-slate-600">
                     {locale === 'zh' ? '💰 所有套餐积分永久有效，无过期限制' : '💰 All credits never expire'}
                 </p>
-                <p className="text-slate-500 text-xs">
+                <p className="text-xs text-slate-400">
                     {locale === 'zh' ? '支持 Visa、Mastercard、PayPal' : 'Visa, Mastercard, PayPal accepted'}
                 </p>
             </div>

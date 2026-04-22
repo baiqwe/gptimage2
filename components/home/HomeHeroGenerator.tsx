@@ -13,6 +13,9 @@ import {
     ImagePlus,
     Dices,
     CheckCircle2,
+    ChevronLeft,
+    ChevronRight,
+    GalleryHorizontal,
 } from 'lucide-react';
 import Image from 'next/image';
 import { QuickRefillModal } from '@/components/payment/quick-refill-modal';
@@ -61,6 +64,36 @@ const INSPIRATION_PROMPTS = [
     }
 ];
 
+const SAMPLE_PREVIEW_SLIDES = [
+    {
+        src: "/examples/tiktok-live-stream.png",
+        title: "TikTok Live Stream",
+        titleZh: "TikTok 直播截图",
+        subtitle: "A preset social-content example with mobile livestream framing and creator-first composition.",
+        subtitleZh: "一个偏社媒内容方向的系统示例，强调手机直播构图和主播主体表现。",
+        prompt: "Generate a screenshot of a TikTok live stream featuring a beautiful woman streaming.",
+        promptZh: "生成一张 TikTok 直播截图，画面是一位漂亮女生正在直播。",
+    },
+    {
+        src: "/examples/design-system-board.png",
+        title: "XX Design System",
+        titleZh: "XX 设计系统",
+        subtitle: "A clean system board covering web, mobile, controls, cards, and reusable interface patterns.",
+        subtitleZh: "一个完整展示 Web、移动端、控件、卡片与复用组件的系统化设计板。",
+        prompt: "Generate a UI design system for me in xx style, including web pages, mobile, cards, controls, buttons, and others.",
+        promptZh: "请用 xx 风格为我生成一套 UI design system，包括 Web 页面、移动端、卡片、控件、按钮等。",
+    },
+    {
+        src: "/examples/t800-taobao-detail.png",
+        title: "Taobao Detail Page",
+        titleZh: "淘宝详情页",
+        subtitle: "A commerce-style product detail example combining technical views, pricing, features, and scenarios.",
+        subtitleZh: "一个电商详情页示例，把三视图、价格、卖点和使用场景整合在同一版面里。",
+        prompt: "Generate image: Taobao product detail page of a T-800 robot, showing: front, side, and back three-view drawings of the robot, product price, product details, functions and usage scenarios.",
+        promptZh: "生成图片：一个 T-800 机器人的淘宝商品详情页，展示机器人正面、侧面、背面三视图、商品价格、商品详情、功能与使用场景。",
+    },
+] as const;
+
 interface HomeHeroGeneratorProps {
     onShowStaticContent: (show: boolean) => void;
     user?: any;
@@ -85,6 +118,8 @@ export default function HomeHeroGenerator({ onShowStaticContent, user }: HomeHer
     const [isRefillModalOpen, setIsRefillModalOpen] = useState(false);
     const [showLoginPrompt, setShowLoginPrompt] = useState(false);
     const [currentUser, setCurrentUser] = useState<any>(user);
+    const [activePreviewIndex, setActivePreviewIndex] = useState(0);
+    const [activeSampleIndex, setActiveSampleIndex] = useState(0);
 
     useEffect(() => {
         const checkUser = async () => {
@@ -121,6 +156,32 @@ export default function HomeHeroGenerator({ onShowStaticContent, user }: HomeHer
     useEffect(() => {
         onShowStaticContent(resultImages.length === 0);
     }, [resultImages, onShowStaticContent]);
+
+    useEffect(() => {
+        if (resultImages.length <= 1) return;
+
+        const timer = window.setInterval(() => {
+            setActivePreviewIndex((index) => (index + 1) % resultImages.length);
+        }, 3500);
+
+        return () => window.clearInterval(timer);
+    }, [resultImages]);
+
+    useEffect(() => {
+        if (resultImages.length > 0) return;
+
+        const timer = window.setInterval(() => {
+            setActiveSampleIndex((index) => (index + 1) % SAMPLE_PREVIEW_SLIDES.length);
+        }, 3200);
+
+        return () => window.clearInterval(timer);
+    }, [resultImages.length]);
+
+    useEffect(() => {
+        if (resultImages.length > 0) {
+            setActivePreviewIndex(0);
+        }
+    }, [resultImages]);
 
     useEffect(() => {
         setPrompt((currentPrompt) => {
@@ -287,6 +348,9 @@ export default function HomeHeroGenerator({ onShowStaticContent, user }: HomeHer
             window.open(imageSrc, '_blank');
         }
     };
+
+    const activeResultImage = resultImages[activePreviewIndex] ?? resultImages[0];
+    const activeSample = SAMPLE_PREVIEW_SLIDES[activeSampleIndex];
 
     return (
         <>
@@ -518,30 +582,98 @@ export default function HomeHeroGenerator({ onShowStaticContent, user }: HomeHer
                                     </div>
 
                                     {resultImages.length > 0 ? (
-                                        <div className="space-y-4">
-                                            <div className={`grid gap-4 ${resultImages.length > 1 ? 'sm:grid-cols-2' : 'grid-cols-1'}`}>
-                                                {resultImages.map((imageSrc, index) => (
-                                                    <div key={`${imageSrc.slice(0, 24)}-${index}`} className="space-y-3">
-                                                        <div className="relative aspect-[4/3] overflow-hidden rounded-[24px] border border-[#ead8c7] bg-[#f7efe6]">
+                                        <div className="space-y-5">
+                                            <div className="rounded-[28px] border border-orange-100 bg-[linear-gradient(180deg,#fff7ef_0%,#fffefb_100%)] p-4 shadow-[0_18px_40px_rgba(235,145,71,0.12)]">
+                                                <div className="relative aspect-[4/3] overflow-hidden rounded-[24px] border border-[#ead8c7] bg-[#f7efe6]">
+                                                    {activeResultImage && (
+                                                        <Image
+                                                            src={activeResultImage}
+                                                            alt={`Generated image ${activePreviewIndex + 1}`}
+                                                            fill
+                                                            className="object-contain"
+                                                            unoptimized
+                                                        />
+                                                    )}
+                                                    {resultImages.length > 1 && (
+                                                        <>
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => setActivePreviewIndex((current) => (current - 1 + resultImages.length) % resultImages.length)}
+                                                                className="absolute left-4 top-1/2 inline-flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-slate-700 shadow-lg transition hover:bg-white"
+                                                            >
+                                                                <ChevronLeft className="h-5 w-5" />
+                                                            </button>
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => setActivePreviewIndex((current) => (current + 1) % resultImages.length)}
+                                                                className="absolute right-4 top-1/2 inline-flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-slate-700 shadow-lg transition hover:bg-white"
+                                                            >
+                                                                <ChevronRight className="h-5 w-5" />
+                                                            </button>
+                                                        </>
+                                                    )}
+                                                </div>
+                                            </div>
+
+                                            <div className="flex items-center justify-between rounded-[22px] border border-orange-100 bg-[#fffaf4] px-4 py-3">
+                                                <div>
+                                                    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
+                                                        {locale === 'zh' ? '当前画面' : 'Current frame'}
+                                                    </p>
+                                                    <p className="mt-1 text-sm text-slate-600">
+                                                        {locale === 'zh'
+                                                            ? `第 ${activePreviewIndex + 1} 张，共 ${resultImages.length} 张`
+                                                            : `Image ${activePreviewIndex + 1} of ${resultImages.length}`}
+                                                    </p>
+                                                </div>
+                                                <Button
+                                                    onClick={() => activeResultImage && handleDownload(activeResultImage, activePreviewIndex)}
+                                                    variant="outline"
+                                                    className="h-11 rounded-2xl border-orange-200 bg-white text-orange-700 hover:bg-orange-50"
+                                                >
+                                                    <Download className="mr-2 h-4 w-4" />
+                                                    {locale === 'zh' ? '下载当前图片' : 'Download current image'}
+                                                </Button>
+                                            </div>
+
+                                            {resultImages.length > 1 && (
+                                                <div className="grid grid-cols-3 gap-3">
+                                                    {resultImages.map((imageSrc, index) => (
+                                                        <button
+                                                            key={`${imageSrc.slice(0, 24)}-${index}`}
+                                                            type="button"
+                                                            onClick={() => setActivePreviewIndex(index)}
+                                                            className={`relative aspect-[4/3] overflow-hidden rounded-[18px] border transition-all ${activePreviewIndex === index
+                                                                ? 'border-orange-300 shadow-[0_12px_30px_rgba(255,107,44,0.18)]'
+                                                                : 'border-orange-100 opacity-75 hover:opacity-100'
+                                                                }`}
+                                                        >
                                                             <Image
                                                                 src={imageSrc}
-                                                                alt={`Generated image ${index + 1}`}
+                                                                alt={`Generated thumbnail ${index + 1}`}
                                                                 fill
-                                                                className="object-contain"
+                                                                className="object-cover"
                                                                 unoptimized
                                                             />
-                                                        </div>
-                                                        <Button
-                                                            onClick={() => handleDownload(imageSrc, index)}
-                                                            variant="outline"
-                                                            className="h-11 w-full rounded-2xl border-orange-200 bg-white text-orange-700 hover:bg-orange-50"
-                                                        >
-                                                            <Download className="mr-2 h-4 w-4" />
-                                                            {locale === 'zh' ? `下载图片 ${index + 1}` : `Download image ${index + 1}`}
-                                                        </Button>
-                                                    </div>
-                                                ))}
-                                            </div>
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            )}
+
+                                            {resultImages.length > 1 && (
+                                                <div className="flex items-center justify-center gap-2">
+                                                    {resultImages.map((_, index) => (
+                                                        <button
+                                                            key={`preview-dot-${index}`}
+                                                            type="button"
+                                                            onClick={() => setActivePreviewIndex(index)}
+                                                            className={`h-2.5 rounded-full transition-all ${activePreviewIndex === index ? 'w-8 bg-orange-500' : 'w-2.5 bg-orange-200 hover:bg-orange-300'}`}
+                                                            aria-label={`Preview image ${index + 1}`}
+                                                        />
+                                                    ))}
+                                                </div>
+                                            )}
+
                                             <Button
                                                 variant="outline"
                                                 className="h-11 rounded-2xl border-orange-200 bg-white text-slate-700 hover:bg-orange-50"
@@ -554,29 +686,131 @@ export default function HomeHeroGenerator({ onShowStaticContent, user }: HomeHer
                                             </Button>
                                         </div>
                                     ) : (
-                                        <div className="flex min-h-[520px] flex-col items-center justify-center rounded-[24px] border border-dashed border-orange-200 bg-[linear-gradient(180deg,#fff7ef_0%,#fffdfb_100%)] text-center">
-                                            <div className="relative mb-8 w-full max-w-[520px] px-8">
-                                                <div className="relative aspect-[4/3] overflow-hidden rounded-[24px] border border-orange-100 bg-white shadow-[0_20px_44px_rgba(235,145,71,0.14)]">
+                                        <div className="flex min-h-[520px] flex-col justify-between rounded-[24px] border border-dashed border-orange-200 bg-[linear-gradient(180deg,#fff7ef_0%,#fffdfb_100%)] p-5 text-center">
+                                            <div className="mb-5 flex items-center justify-between rounded-[20px] bg-white/80 px-4 py-3">
+                                                <div className="text-left">
+                                                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+                                                        {locale === 'zh' ? '系统示例轮播' : 'Preset carousel'}
+                                                    </p>
+                                                    <p className="mt-1 text-sm text-slate-600">
+                                                        {locale === 'zh' ? activeSample.titleZh : activeSample.title}
+                                                    </p>
+                                                </div>
+                                                <div className="flex items-center gap-2">
+                                                    {SAMPLE_PREVIEW_SLIDES.map((slide, index) => (
+                                                        <button
+                                                            key={slide.src}
+                                                            type="button"
+                                                            onClick={() => setActiveSampleIndex(index)}
+                                                            className={`h-2.5 rounded-full transition-all ${activeSampleIndex === index ? 'w-8 bg-orange-500' : 'w-2.5 bg-orange-200'}`}
+                                                            aria-label={`Sample slide ${index + 1}`}
+                                                        />
+                                                    ))}
+                                                </div>
+                                            </div>
+
+                                            <div className="relative mx-auto w-full max-w-[540px]">
+                                                <div className="relative aspect-[4/3] overflow-hidden rounded-[28px] border border-orange-100 bg-white shadow-[0_24px_54px_rgba(235,145,71,0.16)]">
                                                     <Image
-                                                        src="/blog/character-sheet.png"
-                                                        alt="Creative preview sample"
+                                                        src={activeSample.src}
+                                                        alt={locale === 'zh' ? activeSample.titleZh : activeSample.title}
                                                         fill
                                                         className="object-cover"
                                                     />
+                                                    <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/55 via-black/10 to-transparent p-5 text-left text-white">
+                                                        <p className="text-lg font-semibold">
+                                                            {locale === 'zh' ? activeSample.titleZh : activeSample.title}
+                                                        </p>
+                                                        <p className="mt-1 max-w-sm text-sm text-white/85">
+                                                            {locale === 'zh' ? activeSample.subtitleZh : activeSample.subtitle}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                <div className="mt-4 flex items-center justify-center gap-2">
+                                                    {SAMPLE_PREVIEW_SLIDES.map((slide, index) => (
+                                                        <button
+                                                            key={`sample-dot-bottom-${slide.src}`}
+                                                            type="button"
+                                                            onClick={() => setActiveSampleIndex(index)}
+                                                            className={`h-2.5 rounded-full transition-all ${activeSampleIndex === index ? 'w-8 bg-orange-500' : 'w-2.5 bg-orange-200 hover:bg-orange-300'}`}
+                                                            aria-label={`Sample image ${index + 1}`}
+                                                        />
+                                                    ))}
                                                 </div>
                                             </div>
                                             <h4 className="text-2xl font-semibold text-slate-900">
-                                                {locale === 'zh' ? '右侧实时展示出图结果' : 'See your output on the right'}
+                                                {locale === 'zh' ? '先看看示例效果，再开始生成你的画面' : 'Browse a few example outputs before creating your own'}
                                             </h4>
-                                            <p className="mt-3 max-w-md text-sm leading-6 text-slate-500">
+                                            <p className="mx-auto mt-3 max-w-md text-sm leading-6 text-slate-500">
                                                 {locale === 'zh'
-                                                    ? '整体布局参考了更适合商业展示的海报式工作台。现在先保留最实用的三个控制项：尺寸、质量和格式。'
-                                                    : 'The layout now feels closer to a polished poster-style workspace. For now, the generator keeps only the practical controls: size, quality, and format.'}
+                                                    ? '你生成成功后，这里会自动切换成你的结果轮播，方便连续预览和下载。'
+                                                    : 'Once your images are ready, this preview area automatically switches to your own result carousel.'}
                                             </p>
                                         </div>
                                     )}
                                 </div>
                             </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section className="bg-[linear-gradient(180deg,#fff8f0_0%,#fffdf9_100%)] py-20">
+                <div className="container px-4 md:px-6">
+                    <div className="mx-auto max-w-6xl">
+                        <div className="mb-12 text-center">
+                            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-slate-500">
+                                {locale === 'zh' ? '系统示例' : 'Preset examples'}
+                            </p>
+                            <h2 className="mt-3 flex items-center justify-center gap-2 text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
+                                <GalleryHorizontal className="h-6 w-6 text-orange-500" />
+                                {locale === 'zh' ? '看看 GPT Image 2 可以做出的不同成片方向' : 'Explore a few polished directions you can build with GPT Image 2'}
+                            </h2>
+                            <p className="mx-auto mt-4 max-w-3xl text-lg leading-8 text-slate-600">
+                                {locale === 'zh'
+                                    ? '下面这些是我们预置好的示例提示词和成品图，你可以用来理解风格、版式和画面完成度。'
+                                    : 'These curated examples show how different prompt styles can turn into polished, presentation-ready visuals.'}
+                            </p>
+                        </div>
+
+                        <div className="space-y-5">
+                            {SAMPLE_PREVIEW_SLIDES.map((item, index) => (
+                                <div
+                                    key={item.src}
+                                    className="grid gap-5 rounded-[28px] border border-orange-100 bg-[linear-gradient(180deg,#fffdf9_0%,#fff8f1_100%)] p-5 shadow-[0_20px_50px_rgba(235,145,71,0.08)] lg:grid-cols-[0.9fr_1.1fr]"
+                                >
+                                    <div className={`rounded-[24px] border border-orange-100 bg-white p-5 shadow-[0_12px_34px_rgba(235,145,71,0.08)] ${index === 1 ? 'lg:order-2' : ''}`}>
+                                        <div className="mb-4 flex flex-wrap items-center gap-2">
+                                            <span className="rounded-full bg-[#fff3ea] px-3 py-1 text-xs font-semibold text-orange-700">
+                                                GPT Image 2
+                                            </span>
+                                            <span className="rounded-full bg-[#f5f1ea] px-3 py-1 text-xs font-medium text-slate-600">
+                                                {locale === 'zh' ? item.titleZh : item.title}
+                                            </span>
+                                        </div>
+                                        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
+                                            Prompt
+                                        </p>
+                                        <p className="mt-3 text-base leading-8 text-slate-700">
+                                            {locale === 'zh' ? item.promptZh : item.prompt}
+                                        </p>
+                                    </div>
+
+                                    <div className={`space-y-3 ${index === 1 ? 'lg:order-1' : ''}`}>
+                                        <div className="relative aspect-[4/3] overflow-hidden rounded-[22px] border border-orange-100 bg-white shadow-[0_12px_30px_rgba(235,145,71,0.12)]">
+                                            <Image
+                                                src={item.src}
+                                                alt={locale === 'zh' ? item.titleZh : item.title}
+                                                fill
+                                                className="object-cover"
+                                            />
+                                        </div>
+                                        <div className="rounded-[18px] bg-white/80 px-4 py-3 text-sm text-slate-600">
+                                            {locale === 'zh' ? item.subtitleZh : item.subtitle}
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
                         </div>
                     </div>
                 </div>

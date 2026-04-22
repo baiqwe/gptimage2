@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { getTranslations } from 'next-intl/server';
 import { Sparkles, Lock, Zap, Palette, Smartphone, Printer, Heart, ArrowRight, Star } from 'lucide-react';
+import { PricingSection } from '@/components/marketing/pricing-section';
 
 interface HomeStaticContentProps {
     locale: string;
@@ -15,10 +16,21 @@ export default async function HomeStaticContent({ locale }: HomeStaticContentPro
             <WhatSection t={tHome} />
             <HowSection t={tHome} />
             <FeaturesSection t={tFeatures} />
+            <HomePricingSection locale={locale} />
             <SEOContentSection t={tHome} />
             <FAQSection t={tHome} />
             <CTASection t={tHome} locale={locale} />
         </div>
+    );
+}
+
+function HomePricingSection({ locale }: { locale: string }) {
+    return (
+        <section className="border-t border-orange-100 bg-[linear-gradient(180deg,#fff8f0_0%,#fffdf9_100%)] py-16">
+            <div className="container px-4 md:px-6">
+                <PricingSection locale={locale} />
+            </div>
+        </section>
     );
 }
 
