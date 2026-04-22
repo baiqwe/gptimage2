@@ -38,6 +38,9 @@ export async function POST(request: Request) {
             body: JSON.stringify({
                 product_id: priceId,
                 success_url: redirectUrl || `${process.env.NEXT_PUBLIC_SITE_URL}/dashboard?checkout=success`,
+                customer: {
+                    email: user.email,
+                },
                 // 🔥 关键：将 User ID 和产品类型传入 metadata，以便 Webhook 识别
                 metadata: {
                     user_id: user.id,
@@ -51,7 +54,15 @@ export async function POST(request: Request) {
         const data = await response.json();
 
         if (!response.ok) {
-            console.error("Creem API Error:", data);
+            console.error("Creem API Error:", {
+                status: response.status,
+                creemApiUrl: process.env.CREEM_API_URL,
+                priceId,
+                productType,
+                userId: user.id,
+                userEmail: user.email,
+                details: data,
+            });
             return NextResponse.json(
                 { error: "Failed to create checkout session", details: data },
                 { status: 500 }
