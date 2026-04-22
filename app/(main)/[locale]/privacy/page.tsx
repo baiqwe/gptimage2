@@ -14,7 +14,7 @@ export async function generateMetadata(props: { params: Promise<{ locale: string
     const params = await props.params;
     const { locale } = params;
     const isZh = locale === 'zh';
-    const title = isZh ? `隐私政策 - ${siteConfig.name}` : `Privacy Policy - ${siteConfig.name}`;
+    const title = isZh ? '隐私政策' : 'Privacy Policy';
     const description = isZh
         ? `${siteConfig.name} 的隐私政策。了解我们如何收集、使用和保护您的数据。`
         : `${siteConfig.name} Privacy Policy. Learn how we collect, use, and protect your data.`;
@@ -29,11 +29,11 @@ export async function generateMetadata(props: { params: Promise<{ locale: string
             url: `${siteConfig.url}/${locale}/privacy`,
         },
         alternates: {
-            canonical: `/${locale}/privacy`,
+            canonical: `${siteConfig.url}/${locale}/privacy`,
             languages: {
-                'en': '/en/privacy',
-                'zh': '/zh/privacy',
-                'x-default': '/en/privacy',
+                'en': `${siteConfig.url}/en/privacy`,
+                'zh': `${siteConfig.url}/zh/privacy`,
+                'x-default': `${siteConfig.url}/en/privacy`,
             },
         },
     };

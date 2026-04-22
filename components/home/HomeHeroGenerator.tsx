@@ -356,7 +356,7 @@ export default function HomeHeroGenerator({ onShowStaticContent, user }: HomeHer
         <>
             <QuickRefillModal isOpen={isRefillModalOpen} onClose={() => setIsRefillModalOpen(false)} />
 
-            <section className="relative overflow-hidden pb-16 pt-8 sm:pt-10 lg:pb-24">
+            <section id="generator-workspace" className="relative overflow-hidden pb-16 pt-8 sm:pt-10 lg:pb-24">
                 <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top_left,rgba(255,178,105,0.22),transparent_28%),radial-gradient(circle_at_top_right,rgba(255,112,52,0.12),transparent_20%),linear-gradient(180deg,#fffdf8_0%,#fff7ee_52%,#fff3e7_100%)]" />
                 <div className="container px-4">
                     <div className="mx-auto max-w-6xl">

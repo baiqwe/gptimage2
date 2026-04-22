@@ -119,6 +119,58 @@ export function Footer() {
                 className="h-[54px] w-auto opacity-90 transition-opacity hover:opacity-100"
               />
             </a>
+            <a
+              href="https://apphublist.com"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="https://apphublist.com/assets/images/badge.png"
+                alt="App Hub List"
+                height={54}
+                className="h-[54px] w-auto opacity-90 transition-opacity hover:opacity-100"
+              />
+            </a>
+            <a
+              href="https://tooldynamo.com"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="https://tooldynamo.com/assets/images/badge.png"
+                alt="Tool Dynamo"
+                height={54}
+                className="h-[54px] w-auto opacity-90 transition-opacity hover:opacity-100"
+              />
+            </a>
+            <a
+              href="https://aixcollection.com"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="https://aixcollection.com/assets/images/badge.png"
+                alt="AI X Collection"
+                height={54}
+                className="h-[54px] w-auto opacity-90 transition-opacity hover:opacity-100"
+              />
+            </a>
+            <a
+              href="https://weliketools.com"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="https://weliketools.com/assets/images/badge.png"
+                alt="We Like Tools"
+                height={54}
+                className="h-[54px] w-auto opacity-90 transition-opacity hover:opacity-100"
+              />
+            </a>
           </div>
         </div>
 

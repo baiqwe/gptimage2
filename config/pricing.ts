@@ -39,7 +39,7 @@ export const PLAN_STARTER: PricingPlan = {
     originalPrice: 19.99,
     credits: 400,            // 40张
     type: 'one_time',
-    productId: 'prod_5zsJuy4XoAHe7vdPJXWeWA',
+    productId: 'prod_7bP8ivuMhl76frU67YaQUQ',
     badge: 'Good for a quick project',
     badgeZh: '适合快速项目',
     features: [
@@ -68,7 +68,7 @@ export const PLAN_PRO_MONTHLY: PricingPlan = {
     credits: 1000,           // 100张
     type: 'subscription',
     interval: 'month',
-    productId: 'prod_5dlhcPKZ6PGN0BcjgDxymV',
+    productId: 'prod_XthXgy0iASIXG84KRQOBb',
     badge: 'Most Flexible',
     badgeZh: '灵活升级',
     features: [
@@ -97,7 +97,7 @@ export const PLAN_PRO_YEARLY: PricingPlan = {
     credits: 12000,          // 1200张/年
     type: 'subscription',
     interval: 'year',
-    productId: 'prod_4QnIT6F1UW5MRQJDlvvyx',
+    productId: 'prod_2o3W4tsUlKR6BbpNbGOp2g',
     badge: 'Best Value',
     badgeZh: '最佳选择',
     isPopular: true,

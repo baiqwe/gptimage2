@@ -10,12 +10,24 @@ export async function generateMetadata(props: { params: Promise<{ locale: string
     const params = await props.params;
     const { locale } = params;
     const isZh = locale === 'zh';
+    const title = isZh ? 'GPT Image 2 定价' : 'GPT Image 2 Pricing';
+    const description = isZh
+        ? "灵活的 GPT Image 2 定价方案，覆盖买断、月付与年付。适合从单次项目到长期创作工作流。"
+        : "Flexible GPT Image 2 pricing for one-time projects, monthly usage, and annual creative workflows.";
 
     return {
-        title: isZh ? `定价 - ${siteConfig.name}` : `Pricing - ${siteConfig.name}`,
-        description: isZh
-            ? "灵活的定价方案，适用于 GPT Image 2 Generator 图像生成。新用户可先免费试用。"
-            : "Flexible pricing plans for GPT Image 2 Generator. Get credits for fast, prompt-based AI image generation.",
+        title,
+        description,
+        openGraph: {
+            title,
+            description,
+            type: 'website',
+            url: `${siteConfig.url}/${locale}/pricing`,
+        },
+        twitter: {
+            title,
+            description,
+        },
         alternates: {
             canonical: `${siteConfig.url}/${locale}/pricing`,
             languages: {

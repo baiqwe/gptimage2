@@ -12,7 +12,7 @@ export async function generateMetadata(props: { params: Promise<{ locale: string
     const params = await props.params;
     const { locale } = params;
     const isZh = locale === 'zh';
-    const title = isZh ? `服务条款 - ${siteConfig.name}` : `Terms of Service - ${siteConfig.name}`;
+    const title = isZh ? '服务条款' : 'Terms of Service';
     const description = isZh
         ? `${siteConfig.name} 的服务条款。了解使用我们 AI 图像生成服务的条款和条件。`
         : `${siteConfig.name} Terms of Service. Learn about the terms and conditions for using our AI image generation service.`;
@@ -27,11 +27,11 @@ export async function generateMetadata(props: { params: Promise<{ locale: string
             url: `${siteConfig.url}/${locale}/terms`,
         },
         alternates: {
-            canonical: `/${locale}/terms`,
+            canonical: `${siteConfig.url}/${locale}/terms`,
             languages: {
-                'en': '/en/terms',
-                'zh': '/zh/terms',
-                'x-default': '/en/terms',
+                'en': `${siteConfig.url}/en/terms`,
+                'zh': `${siteConfig.url}/zh/terms`,
+                'x-default': `${siteConfig.url}/en/terms`,
             },
         },
     };
