@@ -2,6 +2,7 @@ import { getTranslations } from 'next-intl/server';
 import ImageEditor from '@/components/feature/image-editor';
 import { Palette, Users, GraduationCap, CheckCircle } from 'lucide-react';
 import { BreadcrumbSchema, FAQSchema, HowToSchema } from '@/components/breadcrumb-schema';
+import { siteConfig } from '@/config/site';
 
 // ✅ Cloudflare Edge Runtime
 
@@ -12,7 +13,7 @@ export async function generateMetadata(props: { params: Promise<{ locale: string
     const t = await getTranslations({ locale, namespace: 'pages' });
 
     const isZh = locale === 'zh';
-    const ogImage = 'https://makebw.com/web-app-manifest-512x512.png';
+    const ogImage = `${siteConfig.url}/web-app-manifest-512x512.png`;
 
     return {
         title: t('coloring_title'),
@@ -21,7 +22,7 @@ export async function generateMetadata(props: { params: Promise<{ locale: string
             title: t('coloring_title'),
             description: t('coloring_desc'),
             type: 'website',
-            url: `https://makebw.com/${locale}/photo-to-coloring-page`,
+            url: `${siteConfig.url}/${locale}/photo-to-coloring-page`,
             images: [
                 {
                     url: ogImage,
@@ -38,11 +39,11 @@ export async function generateMetadata(props: { params: Promise<{ locale: string
             images: [ogImage],
         },
         alternates: {
-            canonical: `/${locale}/photo-to-coloring-page`,
+            canonical: `${siteConfig.url}/${locale}/photo-to-coloring-page`,
             languages: {
-                'en': '/en/photo-to-coloring-page',
-                'zh': '/zh/photo-to-coloring-page',
-                'x-default': '/en/photo-to-coloring-page',
+                'en': `${siteConfig.url}/en/photo-to-coloring-page`,
+                'zh': `${siteConfig.url}/zh/photo-to-coloring-page`,
+                'x-default': `${siteConfig.url}`,
             },
         },
     };
@@ -57,8 +58,8 @@ export default async function ColoringPagePage(props: { params: Promise<{ locale
 
     // 面包屑数据
     const breadcrumbs = [
-        { name: isZh ? '首页' : 'Home', url: `https://makebw.com/${locale}` },
-        { name: isZh ? '填色画生成器' : 'Coloring Page Generator', url: `https://makebw.com/${locale}/photo-to-coloring-page` },
+        { name: isZh ? '首页' : 'Home', url: `${siteConfig.url}/${locale}` },
+        { name: isZh ? '填色画生成器' : 'Coloring Page Generator', url: `${siteConfig.url}/${locale}/photo-to-coloring-page` },
     ];
 
     // FAQ 数据

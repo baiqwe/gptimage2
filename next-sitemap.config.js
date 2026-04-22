@@ -1,3 +1,26 @@
+const fs = require('fs');
+const path = require('path');
+
+function extractBlogSlugs() {
+    try {
+        const source = fs.readFileSync(path.join(__dirname, 'config', 'blog-posts.ts'), 'utf8');
+        const matches = [...source.matchAll(/slug:\s*'([^']+)'/g)];
+        return matches.map((match) => match[1]);
+    } catch (error) {
+        console.warn('Failed to extract blog slugs for sitemap:', error);
+        return [];
+    }
+}
+
+function buildAlternateRefs(siteUrl, currentPath) {
+    const pathWithoutLocale = currentPath.replace(/^\/(en|zh)/, '') || '';
+    return [
+        { href: `${siteUrl}/en${pathWithoutLocale}`, hreflang: 'en' },
+        { href: `${siteUrl}/zh${pathWithoutLocale}`, hreflang: 'zh' },
+        { href: `${siteUrl}${pathWithoutLocale || '/'}`, hreflang: 'x-default' },
+    ];
+}
+
 /** @type {import('next-sitemap').IConfig} */
 module.exports = {
     siteUrl: process.env.NEXT_PUBLIC_SITE_URL || 'https://gptimage2.online',
@@ -16,18 +39,6 @@ module.exports = {
         '/*/sign-up',
         '/*/forgot-password',
         '/*/dashboard',     // User dashboard (private)
-    ],
-
-    // Generate alternate language links
-    alternateRefs: [
-        {
-            href: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://gptimage2.online'}/en`,
-            hreflang: 'en',
-        },
-        {
-            href: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://gptimage2.online'}/zh`,
-            hreflang: 'zh',
-        },
     ],
 
     robotsTxtOptions: {
@@ -55,18 +66,16 @@ module.exports = {
             'pricing',
             'privacy',
             'terms',
-            'about'
+            'about',
+            'gallery',
+            'developer-api',
+            'arena',
+            'color-to-black-and-white',
+            'invert-colors',
+            'photo-to-coloring-page'
         ];
 
-        // Blog posts slugs
-        const blogSlugs = [
-            'cogview-4-chinese-ai-image-generator-review',
-            'z-image-vs-glm-4-comprehensive-review',
-            'nano-banana-ai-vs-gpt-image-2-generator-review',
-            'qwen-image-edit-2511-free-online-alternative',
-            'qwen-image-edit-3d-camera-control-guide',
-            'qwen-image-multiple-angles-3d-camera-tutorial'
-        ];
+        const blogSlugs = extractBlogSlugs();
 
         const result = [];
 
@@ -91,6 +100,7 @@ module.exports = {
                     changefreq,
                     priority,
                     lastmod: new Date().toISOString(),
+                    alternateRefs: buildAlternateRefs(config.siteUrl, `/${locale}/${page}`),
                 });
             }
 
@@ -100,6 +110,7 @@ module.exports = {
                 changefreq: 'daily',
                 priority: 0.9,
                 lastmod: new Date().toISOString(),
+                alternateRefs: buildAlternateRefs(config.siteUrl, `/${locale}/blog`),
             });
 
             // Add individual blog posts
@@ -109,6 +120,7 @@ module.exports = {
                     changefreq: 'weekly',
                     priority: 0.85,
                     lastmod: new Date().toISOString(),
+                    alternateRefs: buildAlternateRefs(config.siteUrl, `/${locale}/blog/${slug}`),
                 });
             }
         }
@@ -140,6 +152,7 @@ module.exports = {
             changefreq,
             priority,
             lastmod: new Date().toISOString(),
+            alternateRefs: buildAlternateRefs(config.siteUrl, path),
         };
     },
 };

@@ -5,6 +5,13 @@ import { routing } from './i18n/routing'
 
 export async function middleware(request: NextRequest) {
   try {
+    if (request.nextUrl.pathname === '/') {
+      return NextResponse.redirect(
+        new URL(`/${routing.defaultLocale}`, request.url),
+        308
+      )
+    }
+
     // 1. 将 intl 中间件初始化移入函数内部，防止顶层初始化崩溃导致整个模块加载失败
     const intlMiddleware = createIntlMiddleware(routing)
     let response = intlMiddleware(request)

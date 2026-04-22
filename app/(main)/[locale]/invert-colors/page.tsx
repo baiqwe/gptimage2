@@ -2,6 +2,7 @@ import { getTranslations } from 'next-intl/server';
 import ImageEditor from '@/components/feature/image-editor';
 import { Sparkles, Eye, Palette, CheckCircle, Camera, Lightbulb } from 'lucide-react';
 import { BreadcrumbSchema, FAQSchema, HowToSchema } from '@/components/breadcrumb-schema';
+import { siteConfig } from '@/config/site';
 
 // ✅ Cloudflare Edge Runtime
 
@@ -12,7 +13,7 @@ export async function generateMetadata(props: { params: Promise<{ locale: string
     const t = await getTranslations({ locale, namespace: 'pages' });
 
     const isZh = locale === 'zh';
-    const ogImage = 'https://makebw.com/web-app-manifest-512x512.png';
+    const ogImage = `${siteConfig.url}/web-app-manifest-512x512.png`;
 
     return {
         title: t('invert_title'),
@@ -21,7 +22,7 @@ export async function generateMetadata(props: { params: Promise<{ locale: string
             title: t('invert_title'),
             description: t('invert_desc'),
             type: 'website',
-            url: `https://makebw.com/${locale}/invert-colors`,
+            url: `${siteConfig.url}/${locale}/invert-colors`,
             images: [
                 {
                     url: ogImage,
@@ -38,11 +39,11 @@ export async function generateMetadata(props: { params: Promise<{ locale: string
             images: [ogImage],
         },
         alternates: {
-            canonical: `/${locale}/invert-colors`,
+            canonical: `${siteConfig.url}/${locale}/invert-colors`,
             languages: {
-                'en': '/en/invert-colors',
-                'zh': '/zh/invert-colors',
-                'x-default': '/en/invert-colors',
+                'en': `${siteConfig.url}/en/invert-colors`,
+                'zh': `${siteConfig.url}/zh/invert-colors`,
+                'x-default': `${siteConfig.url}`,
             },
         },
     };
@@ -57,8 +58,8 @@ export default async function InvertColorsPage(props: { params: Promise<{ locale
 
     // 面包屑
     const breadcrumbs = [
-        { name: isZh ? '首页' : 'Home', url: `https://makebw.com/${locale}` },
-        { name: isZh ? '反色工具' : 'Invert Colors', url: `https://makebw.com/${locale}/invert-colors` },
+        { name: isZh ? '首页' : 'Home', url: `${siteConfig.url}/${locale}` },
+        { name: isZh ? '反色工具' : 'Invert Colors', url: `${siteConfig.url}/${locale}/invert-colors` },
     ];
 
     // FAQ

@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import ImageEditor from '@/components/feature/image-editor';
 import { CheckCircle, FileImage, Zap, Shield } from 'lucide-react';
 import { BreadcrumbSchema, FAQSchema, HowToSchema } from '@/components/breadcrumb-schema';
+import { siteConfig } from '@/config/site';
 
 // ✅ Cloudflare Edge Runtime
 
@@ -160,7 +161,7 @@ export async function generateMetadata(props: { params: Promise<{ locale: string
     const t = await getTranslations({ locale, namespace: 'metadata' });
     const formatUpper = format.toUpperCase();
     const isZh = locale === 'zh';
-    const ogImage = 'https://makebw.com/web-app-manifest-512x512.png';
+    const ogImage = `${siteConfig.url}/web-app-manifest-512x512.png`;
 
     return {
         title: t('format_title', { format: formatUpper }),
@@ -169,7 +170,7 @@ export async function generateMetadata(props: { params: Promise<{ locale: string
             title: t('format_title', { format: formatUpper }),
             description: t('format_desc', { format: formatUpper }),
             type: 'website',
-            url: `https://makebw.com/${locale}/${slug}`,
+            url: `${siteConfig.url}/${locale}/${slug}`,
             images: [
                 {
                     url: ogImage,
@@ -186,11 +187,11 @@ export async function generateMetadata(props: { params: Promise<{ locale: string
             images: [ogImage],
         },
         alternates: {
-            canonical: `/${locale}/${slug}`,
+            canonical: `${siteConfig.url}/${locale}/${slug}`,
             languages: {
-                'en': `/en/${slug}`,
-                'zh': `/zh/${slug}`,
-                'x-default': `/en/${slug}`,
+                'en': `${siteConfig.url}/en/${slug}`,
+                'zh': `${siteConfig.url}/zh/${slug}`,
+                'x-default': `${siteConfig.url}`,
             },
         },
     };
@@ -213,8 +214,8 @@ export default async function FormatToBWPage(props: { params: Promise<{ locale: 
 
     // 面包屑 - 使用 slug
     const breadcrumbs = [
-        { name: isZh ? '首页' : 'Home', url: `https://makebw.com/${locale}` },
-        { name: `${formatUpper} to B&W`, url: `https://makebw.com/${locale}/${slug}` },
+        { name: isZh ? '首页' : 'Home', url: `${siteConfig.url}/${locale}` },
+        { name: `${formatUpper} to B&W`, url: `${siteConfig.url}/${locale}/${slug}` },
     ];
 
     // FAQ

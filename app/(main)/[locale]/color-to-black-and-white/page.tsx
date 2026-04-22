@@ -3,6 +3,7 @@ import ImageEditor from '@/components/feature/image-editor';
 import { Printer, FileDown, DollarSign, CheckCircle, Camera, FileText } from 'lucide-react';
 import { BreadcrumbSchema, FAQSchema, HowToSchema } from '@/components/breadcrumb-schema';
 import { SoftwareApplicationSchema } from '@/components/json-ld-schema';
+import { siteConfig } from '@/config/site';
 
 // ✅ Cloudflare Edge Runtime
 
@@ -13,7 +14,7 @@ export async function generateMetadata(props: { params: Promise<{ locale: string
     const t = await getTranslations({ locale, namespace: 'pages' });
 
     const isZh = locale === 'zh';
-    const ogImage = 'https://makebw.com/web-app-manifest-512x512.png';
+    const ogImage = `${siteConfig.url}/web-app-manifest-512x512.png`;
 
     return {
         title: t('color_to_bw_title'),
@@ -22,7 +23,7 @@ export async function generateMetadata(props: { params: Promise<{ locale: string
             title: t('color_to_bw_title'),
             description: t('color_to_bw_desc'),
             type: 'website',
-            url: `https://makebw.com/${locale}/color-to-black-and-white`,
+            url: `${siteConfig.url}/${locale}/color-to-black-and-white`,
             images: [
                 {
                     url: ogImage,
@@ -39,11 +40,11 @@ export async function generateMetadata(props: { params: Promise<{ locale: string
             images: [ogImage],
         },
         alternates: {
-            canonical: `/${locale}/color-to-black-and-white`,
+            canonical: `${siteConfig.url}/${locale}/color-to-black-and-white`,
             languages: {
-                'en': '/en/color-to-black-and-white',
-                'zh': '/zh/color-to-black-and-white',
-                'x-default': '/en/color-to-black-and-white',
+                'en': `${siteConfig.url}/en/color-to-black-and-white`,
+                'zh': `${siteConfig.url}/zh/color-to-black-and-white`,
+                'x-default': `${siteConfig.url}`,
             },
         },
     };
@@ -58,8 +59,8 @@ export default async function ColorToBWPage(props: { params: Promise<{ locale: s
 
     // 面包屑
     const breadcrumbs = [
-        { name: isZh ? '首页' : 'Home', url: `https://makebw.com/${locale}` },
-        { name: isZh ? '彩色转黑白' : 'Color to Black & White', url: `https://makebw.com/${locale}/color-to-black-and-white` },
+        { name: isZh ? '首页' : 'Home', url: `${siteConfig.url}/${locale}` },
+        { name: isZh ? '彩色转黑白' : 'Color to Black & White', url: `${siteConfig.url}/${locale}/color-to-black-and-white` },
     ];
 
     // FAQ

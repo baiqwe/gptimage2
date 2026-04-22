@@ -12,11 +12,11 @@ export async function generateMetadata(props: { params: Promise<{ locale: string
     const isZh = locale === 'zh';
 
     const title = isZh
-        ? '用 GPT Image 2 创建图片'
-        : 'Create Images with GPT Image 2';
+        ? 'AI 绘图工作台 | 立即使用 GPT Image 2 生成图片'
+        : 'AI Image Workspace | Generate Art via GPT Image 2';
     const description = isZh
-        ? '在 GPT Image 2 生成器中直接输入提示词并输出图片。这里集中承接 gpt image 2、chatgpt image 2、gpt-image-2 等同义搜索意图，并提供尺寸、质量与格式说明。'
-        : 'Create images with GPT Image 2 from one prompt-driven workspace. This page targets GPT Image 2, ChatGPT Image 2, and GPT-Image-2 search intent with clear controls for size, quality, and format.';
+        ? '立即体验全新的 GPT Image 2 绘图引擎。输入提示词，极速生成高清海报、产品图与概念设计。免广告，支持多种尺寸与高质量导出，即刻开始创作！'
+        : 'Generate high-quality AI art, product visuals, and concepts instantly with the new GPT Image 2 engine. Fast, free-to-try, and no ads. Start creating now!';
 
     return {
         title,
@@ -26,7 +26,7 @@ export async function generateMetadata(props: { params: Promise<{ locale: string
             languages: {
                 en: `${siteConfig.url}/en/create`,
                 zh: `${siteConfig.url}/zh/create`,
-                'x-default': `${siteConfig.url}/en/create`,
+                'x-default': `${siteConfig.url}`,
             },
         },
         openGraph: {
