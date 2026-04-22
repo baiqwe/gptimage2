@@ -15,15 +15,15 @@ export const blogPosts: BlogPost[] = [
     description: 'A long-form guide to GPT Image 2 prompts for Chinese posters, product ads, Taobao-style layouts, and commercial detail pages, with prompt structure, examples, and workflow notes.',
     keywords: ['gpt image 2', 'chatgpt image 2', 'chinese ai image generator', 'ai绘画', '中文ai绘图', 'chat gpt image'],
     publishDate: '2026-04-22',
-    heroImage: '/blog/z-image-comparison.png',
+    heroImage: '/examples/t800-taobao-detail.png',
     content: `
 <p><strong>GPT Image 2</strong> becomes much more useful when you stop treating it like a generic “make me an image” tool and start treating it like a layout-aware creative workflow. That matters even more for Chinese-language posters, Taobao-style product cards, and branded detail pages where the prompt needs to describe not only the subject, but also the hierarchy of the page.</p>
 
 <p>This article focuses on one high-intent search use case: people who want <strong>GPT Image 2</strong> or <strong>ChatGPT Image 2</strong> to generate Chinese posters, product images, and commercial detail-page compositions. Instead of keyword stuffing, the goal is to document a repeatable prompt structure that real users can test.</p>
 
 <figure class="my-8">
-  <img src="/blog/z-image-comparison.png" alt="Poster-style and product-style visual layouts used as references for GPT Image 2 prompting" class="rounded-xl w-full" />
-  <figcaption class="text-center text-slate-500 text-sm mt-2">Commercial prompt quality depends on layout intent, not just on the object you describe.</figcaption>
+  <img src="/examples/t800-taobao-detail.png" alt="Taobao-style product detail layout generated as a reference for structured GPT Image 2 prompting" class="rounded-xl w-full" />
+  <figcaption class="text-center text-slate-500 text-sm mt-2">For commercial prompts, the layout request matters as much as the product itself.</figcaption>
 </figure>
 
 <h2>Why Chinese poster prompts are harder than single-subject prompts</h2>
@@ -149,13 +149,13 @@ export const blogPosts: BlogPost[] = [
     description: 'A naming guide for searches like openai image 2, openai gpt image 2, chatgpt image 2, chatgpt image 2.0, gpt-image-2, gptimage 2, gpti2, and image2 gpt.',
     keywords: ['openai image 2', 'openai gpt image 2', 'chatgpt image 2', 'chatgpt image 2.0', 'gpt-image-2', 'gptimage 2', 'gpt image2', 'gpti2', 'image2 gpt'],
     publishDate: '2026-04-22',
-    heroImage: '/blog/cloud-gpu-datacenter.png',
+    heroImage: '/blog/character-sheet.png',
     content: `
 <p>One of the biggest SEO traps in the GPT image space is treating every naming variant as if it deserves a separate landing page. Users search for <strong>OpenAI Image 2</strong>, <strong>OpenAI GPT Image 2</strong>, <strong>ChatGPT Image 2</strong>, <strong>ChatGPT Image 2.0</strong>, <strong>GPT-Image-2</strong>, <strong>GPTImage 2</strong>, <strong>GPTI2</strong>, and <strong>Image2 GPT</strong>. Those look like many keywords, but most of the time they point to the same underlying intent.</p>
 
 <figure class="my-8">
-  <img src="/blog/cloud-gpu-datacenter.png" alt="Illustration of hosted image workflow naming and infrastructure concepts" class="rounded-xl w-full" />
-  <figcaption class="text-center text-slate-500 text-sm mt-2">Naming changes often come from discovery context: ChatGPT, developer docs, social posts, or third-party tutorials.</figcaption>
+  <img src="/blog/character-sheet.png" alt="A structured reference board used to illustrate how people label the same image workflow in different contexts" class="rounded-xl w-full" />
+  <figcaption class="text-center text-slate-500 text-sm mt-2">The same workflow often gets different names depending on whether people discover it through tools, tutorials, or social posts.</figcaption>
 </figure>
 
 <h2>Why naming gets messy</h2>
@@ -245,7 +245,7 @@ export const blogPosts: BlogPost[] = [
     description: 'Tracking gpt image 2 release date, gpt image 1.5, gpt images 2, openai image, or chatgpt 5.5 rumors? This long-form explainer separates confirmed information from speculation.',
     keywords: ['gpt image 2 release date', 'gpt image 1.5', 'gpt images 2', 'openai image', 'chatgpt 5.5'],
     publishDate: '2026-04-22',
-    heroImage: '/blog/cloud-gpu-datacenter.png',
+    heroImage: '/examples/cyberpunk-silver-portrait.png',
     content: `
 <p>Searches like <strong>GPT Image 2 release date</strong> are rarely just about a date. They usually hide a second question: what is real, what is rumored, and what can users actually do today? That is why a useful release-date page needs to be more than a rumor roundup. It needs an editorial method.</p>
 
@@ -417,7 +417,7 @@ export const blogPosts: BlogPost[] = [
     description: 'A structured comparison for Pollo AI, Lovart, Kimi K2.6, and Claude, explaining where GPT Image 2 fits for poster design, UI concepts, long creative briefs, and prompt planning.',
     keywords: ['pollo ai', 'lovart', 'kimi k2.6', 'claude', 'gpt image 2', 'chatgpt image gen 2'],
     publishDate: '2026-04-22',
-    heroImage: '/blog/camera-angles.png',
+    heroImage: '/examples/design-system-board.png',
     content: `
 <p>Not every trending keyword deserves its own thin comparison page. Queries for <strong>Pollo AI</strong>, <strong>Lovart</strong>, <strong>Kimi K2.6</strong>, and <strong>Claude</strong> all touch the GPT image workflow in different ways, but the real question is not “which one wins?” The real question is <em>which part of the workflow are you trying to solve?</em></p>
 
@@ -500,7 +500,7 @@ export const blogPosts: BlogPost[] = [
     description: 'A practical guide for llm arena, llmarena, and arena-style comparisons in image generation, focused on prompts, judging criteria, and side-by-side evaluation.',
     keywords: ['llm arena', 'llmarena', 'arena', 'gpti2', 'image2'],
     publishDate: '2026-04-22',
-    heroImage: '/blog/3d-shapes-demo.png',
+    heroImage: '/blog/camera-angles.png',
     content: `
 <p><strong>LLM Arena</strong> comparisons are compelling because the format feels simple: same prompt, two outputs, pick a winner. But image generation is easy to judge badly. A fair arena test needs more than side-by-side screenshots and a quick emotional reaction.</p>
 
