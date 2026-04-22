@@ -60,10 +60,7 @@ module.exports = {
             'about',
             'gallery',
             'developer-api',
-            'arena',
-            'color-to-black-and-white',
-            'invert-colors',
-            'photo-to-coloring-page'
+            'arena'
         ];
 
         const blogSlugs = extractBlogSlugs();

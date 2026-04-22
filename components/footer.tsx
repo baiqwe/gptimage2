@@ -28,16 +28,10 @@ export function Footer() {
     { label: t('link_about'), href: `${localePrefix}/about` },
   ];
 
-  const toolLinks = [
-    { label: "Color to Black & White", labelZh: "彩色转黑白", href: `${localePrefix}/color-to-black-and-white` },
-    { label: "Invert Colors", labelZh: "反色工具", href: `${localePrefix}/invert-colors` },
-    { label: "Photo to Coloring Page", labelZh: "照片转填色画", href: `${localePrefix}/photo-to-coloring-page` },
-  ];
-
   return (
     <footer className="border-t border-orange-100 bg-white/70">
       <div className="container px-4 py-12 md:py-16">
-        <div className="grid grid-cols-2 gap-8 md:grid-cols-5">
+        <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
           {/* Brand */}
           <div className="col-span-2">
             <Logo />
@@ -78,23 +72,6 @@ export function Footer() {
                   className="text-sm text-slate-600 transition-colors hover:text-orange-600"
                 >
                   {link.label}
-                </Link>
-              ))}
-            </nav>
-          </div>
-
-          <div className="flex flex-col gap-3">
-            <h3 className="text-sm font-semibold text-slate-900">
-              {currentLocale === 'zh' ? '工具' : 'Tools'}
-            </h3>
-            <nav className="flex flex-col gap-2">
-              {toolLinks.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className="text-sm text-slate-600 transition-colors hover:text-orange-600"
-                >
-                  {currentLocale === 'zh' ? link.labelZh : link.label}
                 </Link>
               ))}
             </nav>
