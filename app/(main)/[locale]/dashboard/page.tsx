@@ -49,13 +49,13 @@ export default async function DashboardPage(props: { params: Promise<{ locale: s
     const userIdText = locale === 'zh' ? '用户 ID' : 'User ID';
 
     return (
-        <div className="flex-1 w-full flex flex-col gap-6 sm:gap-8 px-4 sm:px-8 container py-8">
+        <div className="container flex w-full flex-1 flex-col gap-6 px-4 py-8 sm:gap-8 sm:px-8">
             {/* Welcome Banner */}
-            <div className="bg-gradient-to-r from-primary/5 via-primary/10 to-primary/5 border rounded-lg p-6 sm:p-8">
-                <h1 className="text-2xl sm:text-3xl font-bold mb-2 break-words">
-                    {welcomeText}, <span className="text-primary">{user.email}</span>
+            <div className="rounded-[28px] border border-orange-100 bg-[linear-gradient(135deg,#fffaf4_0%,#fff3e6_100%)] p-6 shadow-[0_20px_60px_rgba(235,145,71,0.12)] sm:p-8">
+                <h1 className="mb-2 break-words text-2xl font-bold text-slate-900 sm:text-3xl">
+                    {welcomeText}, <span className="text-orange-600">{user.email}</span>
                 </h1>
-                <p className="text-muted-foreground">
+                <p className="text-base text-slate-600">
                     {manageText}
                 </p>
             </div>
@@ -67,16 +67,16 @@ export default async function DashboardPage(props: { params: Promise<{ locale: s
             </div>
 
             {/* Account Details */}
-            <div className="rounded-xl border bg-card p-6">
-                <h2 className="font-bold text-lg mb-4">{accountText}</h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+            <div className="rounded-[24px] border border-orange-100 bg-white p-6 shadow-[0_20px_50px_rgba(235,145,71,0.08)]">
+                <h2 className="mb-4 text-lg font-bold text-slate-900">{accountText}</h2>
+                <div className="grid grid-cols-1 gap-4 text-sm sm:grid-cols-2">
                     <div>
-                        <p className="text-muted-foreground">{emailText}</p>
-                        <p className="font-medium">{user.email}</p>
+                        <p className="text-slate-500">{emailText}</p>
+                        <p className="font-medium text-slate-900">{user.email}</p>
                     </div>
                     <div>
-                        <p className="text-muted-foreground">{userIdText}</p>
-                        <p className="font-medium text-xs font-mono bg-muted p-1 rounded inline-block">
+                        <p className="text-slate-500">{userIdText}</p>
+                        <p className="inline-block rounded bg-[#fff7ef] p-1 font-mono text-xs font-medium text-slate-700">
                             {user.id}
                         </p>
                     </div>

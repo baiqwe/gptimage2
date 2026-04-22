@@ -84,46 +84,39 @@ export function Footer() {
           </h3>
           <div className="flex flex-wrap items-center gap-6">
             <a
-              href="https://describepicture.cc/"
-              target="_blank"
-              rel="noopener noreferrer"
-              title="AI Image Describer"
-              className="text-sm text-slate-600 transition-colors hover:text-orange-600"
-            >
-              AI Image Describer
-            </a>
-            <a
-              href="https://fast-wan.com/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-sm text-slate-600 transition-colors hover:text-orange-600"
-            >
-              Fast Wan
-            </a>
-            <a
-              href="https://goodaitools.com"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src="https://goodaitools.com/assets/images/badge-dark.png"
-                alt="Good AI Tools"
-                height={54}
-                className="h-[54px] w-auto opacity-80 hover:opacity-100 transition-opacity"
-              />
-            </a>
-            <a
-              href="https://findly.tools/?utm_source=gpt-image-2-generator"
+              href="https://findly.tools/gpt-image-2-generator?utm_source=gpt-image-2-generator"
               target="_blank"
               rel="noopener noreferrer"
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src="https://findly.tools/badges/findly-tools-badge-light.svg"
-                alt="Featured on findly.tools"
-                width={150}
-                className="h-auto w-[150px] opacity-80 hover:opacity-100 transition-opacity"
+                alt="Featured on Findly.tools"
+                width={175}
+                height={55}
+                className="h-auto w-[175px] opacity-90 transition-opacity hover:opacity-100"
+              />
+            </a>
+            <a
+              href="https://z-image.net/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sm font-medium text-slate-600 transition-colors hover:text-orange-600"
+            >
+              Z-Image
+            </a>
+            <a
+              href="https://goodaitools.com/ai/gpt-image-2-generator"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sm text-slate-600 transition-colors hover:text-orange-600"
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="https://goodaitools.com/assets/images/badge.png"
+                alt="Badge"
+                height={54}
+                className="h-[54px] w-auto opacity-90 transition-opacity hover:opacity-100"
               />
             </a>
           </div>

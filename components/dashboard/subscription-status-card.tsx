@@ -89,13 +89,13 @@ export function SubscriptionStatusCard({
     subscription,
 }: SubscriptionStatusCardProps) {
     return (
-        <div className="rounded-xl border bg-card p-6">
+        <div className="rounded-[24px] border border-orange-100 bg-white p-6 shadow-[0_20px_50px_rgba(235,145,71,0.08)]">
             <div className="flex items-center gap-4">
-                <div className="p-2 bg-primary/10 rounded-lg">
-                    <CreditCard className="h-6 w-6 text-primary" />
+                <div className="rounded-2xl bg-[#fff3ea] p-3">
+                    <CreditCard className="h-6 w-6 text-orange-500" />
                 </div>
                 <div>
-                    <p className="text-sm text-muted-foreground">Subscription Status</p>
+                    <p className="text-sm font-medium text-slate-500">Subscription Status</p>
                     {subscription ? (
                         <h3
                             className={`text-2xl font-bold capitalize mt-1 ${getStatusConfig(
@@ -107,7 +107,7 @@ export function SubscriptionStatusCard({
                             {subscription.status}
                         </h3>
                     ) : (
-                        <h3 className="text-2xl font-bold mt-1 text-muted-foreground">
+                        <h3 className="mt-1 text-2xl font-bold text-slate-700">
                             Free Plan
                         </h3>
                     )}
@@ -115,7 +115,7 @@ export function SubscriptionStatusCard({
             </div>
             {subscription && (
                 <div className="mt-4 flex items-center text-sm gap-2">
-                    <span className="text-muted-foreground">
+                    <span className="text-slate-600">
                         {getStatusConfig(subscription.status, subscription.current_period_end).message}
                     </span>
                 </div>

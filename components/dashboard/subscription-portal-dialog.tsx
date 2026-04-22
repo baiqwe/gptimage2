@@ -34,7 +34,7 @@ export function SubscriptionPortalDialog() {
     return (
         <Button
             variant="outline"
-            className="w-full gap-2"
+            className="w-full gap-2 border-orange-200 bg-white text-orange-700 hover:bg-orange-50"
             onClick={handleManageSubscription}
             disabled={isLoading}
         >
