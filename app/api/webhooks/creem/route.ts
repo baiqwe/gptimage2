@@ -96,12 +96,27 @@ async function handleCheckoutCompleted(event: CreemWebhookEvent) {
         ? parseInt(checkout.metadata.credits)
         : checkout.metadata.credits;
 
-      await addCreditsToCustomer(
+      const actionKey = `checkout_completed:${checkout.order.id}`;
+      const creditGranted = await addCreditsToCustomer(
         customerId,
         credits,
         checkout.order.id,
-        `Purchased ${credits} credits (${checkout.metadata?.product_type || 'unknown'})`
+        `Purchased ${credits} credits (${checkout.metadata?.product_type || 'unknown'})`,
+        {
+          eventId: event.id,
+          eventType: event.eventType,
+          actionKey,
+          metadata: {
+            checkout_id: checkout.id,
+            order_id: checkout.order.id,
+            product_type: checkout.metadata?.product_type || 'unknown',
+          },
+        }
       );
+      if (!creditGranted) {
+        console.log(`Skipped duplicate checkout credit grant for action ${actionKey}`);
+        return;
+      }
       console.log(`Added ${credits} credits to customer ${customerId}`);
     }
   } catch (error) {
@@ -155,12 +170,28 @@ async function handleSubscriptionPaid(event: CreemWebhookEvent) {
         : subscription.metadata.credits;
 
       if (credits > 0) {
-        await addCreditsToCustomer(
+        const renewalMarker = subscription.current_period_end_date || subscription.updated_at || subscription.created_at;
+        const actionKey = `subscription_paid:${subscription.id}:${renewalMarker}`;
+        const creditGranted = await addCreditsToCustomer(
           customerId,
           credits,
           undefined, // We don't have order ID here directly usually, or it's in a different field
-          `Subscription renewal credits (${subscription.metadata.product_type || 'subscription'})`
+          `Subscription renewal credits (${subscription.metadata.product_type || 'subscription'})`,
+          {
+            eventId: event.id,
+            eventType: event.eventType,
+            actionKey,
+            metadata: {
+              subscription_id: subscription.id,
+              renewal_marker: renewalMarker,
+              product_type: subscription.metadata.product_type || 'subscription',
+            },
+          }
         );
+        if (!creditGranted) {
+          console.log(`Skipped duplicate subscription renewal credit grant for action ${actionKey}`);
+          return;
+        }
         console.log(`Added ${credits} renewal credits to customer ${customerId}`);
       }
     }

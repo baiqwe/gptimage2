@@ -52,11 +52,23 @@ export async function getUserCredits(userId: string) {
 
 export async function deductCredits(userId: string, amount: number, description: string) {
     const supabase = await createClient();
+    const { data: success, error: rpcError } = await supabase.rpc('decrease_credits', {
+        p_user_id: userId,
+        p_amount: amount,
+        p_description: description
+    });
 
-    // Get current balance
+    if (rpcError) {
+        throw new CreditError(rpcError.message);
+    }
+
+    if (!success) {
+        throw new CreditError('Insufficient credits', 'INSUFFICIENT_CREDITS');
+    }
+
     const { data: customer, error: fetchError } = await supabase
         .from('customers')
-        .select('id, credits')
+        .select('credits')
         .eq('user_id', userId)
         .single();
 
@@ -64,38 +76,7 @@ export async function deductCredits(userId: string, amount: number, description:
         throw new CreditError('User record not found', 'USER_NOT_FOUND');
     }
 
-    if (customer.credits < amount) {
-        throw new CreditError('Insufficient credits', 'INSUFFICIENT_CREDITS');
-    }
-
-    // Update balance
-    const newBalance = customer.credits - amount;
-    const { error: updateError } = await supabase
-        .from('customers')
-        .update({
-            credits: newBalance,
-            updated_at: new Date().toISOString()
-        })
-        .eq('id', customer.id);
-
-    if (updateError) {
-        throw new CreditError(updateError.message);
-    }
-
-    // Log history
-    await supabase.from('credits_history').insert({
-        customer_id: customer.id,
-        amount: amount,
-        type: 'subtract',
-        description: description,
-        metadata: {
-            operation: 'deduct',
-            credits_before: customer.credits,
-            credits_after: newBalance
-        }
-    });
-
-    return newBalance;
+    return customer.credits;
 }
 
 export async function addCredits(userId: string, amount: number, description: string) {
@@ -111,31 +92,17 @@ export async function addCredits(userId: string, amount: number, description: st
         throw new CreditError('User record not found', 'USER_NOT_FOUND');
     }
 
-    const newBalance = customer.credits + amount;
-
-    const { error: updateError } = await supabase
-        .from('customers')
-        .update({
-            credits: newBalance,
-            updated_at: new Date().toISOString()
-        })
-        .eq('id', customer.id);
-
-    if (updateError) {
-        throw new CreditError(updateError.message);
-    }
-
-    await supabase.from('credits_history').insert({
-        customer_id: customer.id,
-        amount: amount,
-        type: 'add',
-        description: description,
-        metadata: {
-            operation: 'add',
-            credits_before: customer.credits,
-            credits_after: newBalance
-        }
+    const { data: newBalance, error: rpcError } = await supabase.rpc('increase_credits', {
+        p_customer_id: customer.id,
+        p_amount: amount,
+        p_description: description,
+        p_creem_order_id: null,
+        p_metadata: { operation: 'add' }
     });
+
+    if (rpcError) {
+        throw new CreditError(rpcError.message);
+    }
 
     return newBalance;
 }

@@ -2,6 +2,8 @@
 import { useState, useEffect } from 'react';
 import { useUser } from './use-user';
 
+const CREDITS_UPDATED_EVENT = 'credits:updated';
+
 interface Credits {
   id: string;
   user_id: string;
@@ -17,6 +19,11 @@ interface UseCreditsResult {
   error: string | null;
   refetchCredits: () => Promise<void>;
   spendCredits: (amount: number, operation?: string) => Promise<boolean>;
+}
+
+function broadcastCreditsUpdate(credits: Credits | null) {
+  if (typeof window === 'undefined') return;
+  window.dispatchEvent(new CustomEvent(CREDITS_UPDATED_EVENT, { detail: credits }));
 }
 
 export function useCredits(): UseCreditsResult {
@@ -51,6 +58,7 @@ export function useCredits(): UseCreditsResult {
       }
 
       setCredits(data.credits);
+      broadcastCreditsUpdate(data.credits);
     } catch (err) {
       // Only log errors that aren't auth-related
       if (err instanceof Error && !err.message.includes('Unauthorized') && !err.message.includes('Failed to fetch')) {
@@ -93,6 +101,7 @@ export function useCredits(): UseCreditsResult {
       }
 
       setCredits(data.credits);
+      broadcastCreditsUpdate(data.credits);
       return true;
     } catch (err) {
       console.error('Error spending credits:', err);
@@ -108,6 +117,20 @@ export function useCredits(): UseCreditsResult {
   useEffect(() => {
     fetchCredits();
   }, [user]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const handleCreditsUpdate = (event: Event) => {
+      const customEvent = event as CustomEvent<Credits | null>;
+      setCredits(customEvent.detail ?? null);
+    };
+
+    window.addEventListener(CREDITS_UPDATED_EVENT, handleCreditsUpdate as EventListener);
+    return () => {
+      window.removeEventListener(CREDITS_UPDATED_EVENT, handleCreditsUpdate as EventListener);
+    };
+  }, []);
 
   return {
     credits,

@@ -169,42 +169,41 @@ export async function addCreditsToCustomer(
   customerId: string,
   credits: number,
   creemOrderId?: string,
-  description?: string
+  description?: string,
+  options?: {
+    eventId?: string;
+    eventType?: string;
+    actionKey?: string;
+    metadata?: Record<string, any>;
+  }
 ) {
   const supabase = createServiceRoleClient();
-  // Start a transaction
-  const { data: client } = await supabase
-    .from("customers")
-    .select("credits")
-    .eq("id", customerId)
-    .single();
-  if (!client) throw new Error("Customer not found");
-  console.log("🚀 ~ 1client:", client);
-  console.log("🚀 ~ 1credits:", credits);
-  const newCredits = (client.credits || 0) + credits;
-
-  // Update customer credits
-  const { error: updateError } = await supabase
-    .from("customers")
-    .update({ credits: newCredits, updated_at: new Date().toISOString() })
-    .eq("id", customerId);
-
-  if (updateError) throw updateError;
-
-  // Record the transaction in credits_history
-  const { error: historyError } = await supabase
-    .from("credits_history")
-    .insert({
-      customer_id: customerId,
-      amount: credits,
-      type: "add",
-      description: description || "Credits purchase",
-      creem_order_id: creemOrderId,
+  if (options?.eventId && options?.eventType && options?.actionKey) {
+    const { data, error } = await supabase.rpc("process_webhook_credit_grant", {
+      p_event_id: options.eventId,
+      p_event_type: options.eventType,
+      p_action_key: options.actionKey,
+      p_customer_id: customerId,
+      p_credits: credits,
+      p_description: description || "Credits purchase",
+      p_creem_order_id: creemOrderId ?? null,
+      p_metadata: options.metadata ?? {},
     });
 
-  if (historyError) throw historyError;
+    if (error) throw error;
+    return data;
+  }
 
-  return newCredits;
+  const { data, error } = await supabase.rpc("increase_credits", {
+    p_customer_id: customerId,
+    p_amount: credits,
+    p_description: description || "Credits purchase",
+    p_creem_order_id: creemOrderId ?? null,
+    p_metadata: options?.metadata ?? {},
+  });
+
+  if (error) throw error;
+  return data;
 }
 
 export async function useCredits(
