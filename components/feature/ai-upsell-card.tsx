@@ -5,8 +5,12 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Sparkles } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 
 export function AiUpsellCard({ className }: { className?: string }) {
+    const pathname = usePathname();
+    const currentLocale = pathname?.split('/')[1] === 'zh' ? 'zh' : 'en';
+
     return (
         <Card className={`w-full mx-auto border-2 border-primary/20 overflow-hidden bg-gradient-to-r from-primary/5 to-purple-500/5 ${className}`}>
             <CardContent className="p-3 md:p-4">
@@ -36,7 +40,7 @@ export function AiUpsellCard({ className }: { className?: string }) {
 
                         <div className="flex items-center gap-3 shrink-0">
                             <Button asChild size="sm" className="bg-gradient-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-600/90 border-0">
-                                <Link href="/create">
+                                <Link href={`/${currentLocale}/create`}>
                                     免费试用 AI
                                 </Link>
                             </Button>
@@ -50,4 +54,3 @@ export function AiUpsellCard({ className }: { className?: string }) {
         </Card>
     );
 }
-

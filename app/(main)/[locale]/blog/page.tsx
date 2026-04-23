@@ -14,7 +14,7 @@ export async function generateMetadata(props: { params: Promise<{ locale: string
     const params = await props.params;
     const { locale } = params;
     const isZh = locale === 'zh';
-    const title = isZh ? 'GPT Image 2 博客、评测与教程' : 'GPT Image 2 Blog, Reviews, and Tutorials';
+    const title = isZh ? 'GPT Image 2 指南与评测' : 'GPT Image 2 Guides and Reviews';
     const description = isZh
         ? `${siteConfig.name} 博客，包含 GPT Image 2 评测、竞品对比、提示词指南、发布时间解读与开发者资源。`
         : `${siteConfig.name} blog with GPT Image 2 reviews, comparisons, prompt guides, release-date explainers, and developer resources.`;
@@ -27,17 +27,19 @@ export async function generateMetadata(props: { params: Promise<{ locale: string
             description,
             type: 'website',
             url: `${siteConfig.url}/${locale}/blog`,
+            images: [{ url: siteConfig.socialImage, width: 512, height: 512, alt: siteConfig.name }],
         },
         twitter: {
+            card: 'summary_large_image',
             title,
             description,
+            images: [siteConfig.socialImage],
         },
         alternates: {
             canonical: `${siteConfig.url}/${locale}/blog`,
             languages: {
                 'en': `${siteConfig.url}/en/blog`,
                 'zh': `${siteConfig.url}/zh/blog`,
-                'x-default': `${siteConfig.url}/en/blog`,
             },
         },
     };

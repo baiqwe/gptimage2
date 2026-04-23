@@ -13,8 +13,11 @@ import { redirect } from "next/navigation";
 
 export default async function SignUp(props: {
   searchParams: Promise<Message>;
+  params: Promise<{ locale: string }>;
 }) {
   const searchParams = await props.searchParams;
+  const { locale } = await props.params;
+  const localePrefix = `/${locale}`;
 
   const signUpWithGoogle = async () => {
     "use server";
@@ -129,7 +132,7 @@ export default async function SignUp(props: {
         <div className="text-sm text-muted-foreground text-center">
           Already have an account?{" "}
           <Link
-            href="/sign-in"
+            href={`${localePrefix}/sign-in`}
             className="text-primary underline underline-offset-4 hover:text-primary/90"
           >
             Sign in

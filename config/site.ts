@@ -6,6 +6,7 @@ export const siteConfig = {
   name: "GPT Image 2 Generator",                        // 网站名称
   domain: "gptimage2.online",                  // 主域名
   url: "https://gptimage2.online",             // 完整 URL
+  socialImage: "https://gptimage2.online/web-app-manifest-512x512.png",
   author: "GPT Image 2 Generator Team",                 // 作者
   supportEmail: "support@gptimage2.online",    // 联系邮箱
 

@@ -9,8 +9,11 @@ import Link from "next/link";
 
 export default async function ForgotPassword(props: {
   searchParams: Promise<Message>;
+  params: Promise<{ locale: string }>;
 }) {
   const searchParams = await props.searchParams;
+  const { locale } = await props.params;
+  const localePrefix = `/${locale}`;
   return (
     <>
       <div className="flex flex-col space-y-2 text-center">
@@ -49,7 +52,7 @@ export default async function ForgotPassword(props: {
         <div className="text-sm text-muted-foreground text-center">
           Remember your password?{" "}
           <Link
-            href="/sign-in"
+            href={`${localePrefix}/sign-in`}
             className="text-primary underline underline-offset-4 hover:text-primary/90"
           >
             Sign in

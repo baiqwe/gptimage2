@@ -69,6 +69,13 @@ module.exports = {
 
         // Add static pages
         for (const locale of locales) {
+            result.push({
+                loc: `/${locale}`,
+                changefreq: 'daily',
+                priority: 1.0,
+                lastmod: new Date().toISOString(),
+            });
+
             for (const page of staticPages) {
                 let priority = 0.8;
                 let changefreq = 'weekly';

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -11,10 +11,10 @@ import {
     Download,
     ImagePlus,
     Dices,
-    CheckCircle2,
     ChevronLeft,
     ChevronRight,
     GalleryHorizontal,
+    X,
 } from 'lucide-react';
 import Image from 'next/image';
 import { QuickRefillModal } from '@/components/payment/quick-refill-modal';
@@ -22,15 +22,18 @@ import { useToast } from '@/hooks/use-toast';
 import { useCredits } from '@/hooks/use-credits';
 import { createClient } from '@/utils/supabase/client';
 import {
+    ASPECT_RATIO_OPTIONS,
     DEFAULT_PROMPTS,
-    OUTPUT_FORMAT_OPTIONS,
-    QUALITY_OPTIONS,
-    SIZE_PRESETS,
-    type OutputFormatOption,
-    type QualityOption,
-    type SizePresetId,
+    type AspectRatioOption,
 } from '@/config/gpt-image';
 import { CREDITS_PER_GENERATION } from '@/config/pricing';
+
+type GenerationMode = 'text-to-image' | 'image-to-image';
+
+interface ReferenceImage {
+    url: string;
+    name: string;
+}
 
 const INSPIRATION_PROMPTS = [
     {
@@ -62,6 +65,11 @@ const INSPIRATION_PROMPTS = [
         labelZh: "奇幻史诗"
     }
 ];
+
+const DEFAULT_EDIT_PROMPTS = {
+    en: "Change the background to a warm studio setting, keep the subject identity and composition, improve lighting and texture detail.",
+    zh: "将背景改成温暖的棚拍场景，保留主体身份与构图，增强光线层次和材质细节。",
+} as const;
 
 const SAMPLE_PREVIEW_SLIDES = [
     {
@@ -112,14 +120,15 @@ export default function HomeHeroGenerator({ onShowStaticContent, user }: HomeHer
     const locale = pathname?.split('/')[1] === 'zh' ? 'zh' : 'en';
     const isCreatePage = pathname?.endsWith('/create');
     const defaultPrompt = locale === 'zh' ? DEFAULT_PROMPTS.zh : DEFAULT_PROMPTS.en;
+    const defaultEditPrompt = locale === 'zh' ? DEFAULT_EDIT_PROMPTS.zh : DEFAULT_EDIT_PROMPTS.en;
 
     const { credits, refetchCredits } = useCredits();
     const { toast } = useToast();
+    const fileInputRef = useRef<HTMLInputElement | null>(null);
 
     const [prompt, setPrompt] = useState<string>(defaultPrompt);
-    const [sizePreset, setSizePreset] = useState<SizePresetId>("square");
-    const [quality, setQuality] = useState<QualityOption>("auto");
-    const [outputFormat, setOutputFormat] = useState<OutputFormatOption>("png");
+    const [generationMode, setGenerationMode] = useState<GenerationMode>("text-to-image");
+    const [aspectRatio, setAspectRatio] = useState<AspectRatioOption>("auto");
     const [resultImages, setResultImages] = useState<string[]>([]);
     const [isGenerating, setIsGenerating] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -128,6 +137,8 @@ export default function HomeHeroGenerator({ onShowStaticContent, user }: HomeHer
     const [currentUser, setCurrentUser] = useState<any>(user);
     const [activePreviewIndex, setActivePreviewIndex] = useState(0);
     const [activeSampleIndex, setActiveSampleIndex] = useState(0);
+    const [referenceImages, setReferenceImages] = useState<ReferenceImage[]>([]);
+    const [isUploadingReference, setIsUploadingReference] = useState(false);
 
     useEffect(() => {
         const checkUser = async () => {
@@ -196,16 +207,36 @@ export default function HomeHeroGenerator({ onShowStaticContent, user }: HomeHer
             if (currentPrompt === DEFAULT_PROMPTS.en || currentPrompt === DEFAULT_PROMPTS.zh) {
                 return defaultPrompt;
             }
+            if (currentPrompt === DEFAULT_EDIT_PROMPTS.en || currentPrompt === DEFAULT_EDIT_PROMPTS.zh) {
+                return defaultEditPrompt;
+            }
             return currentPrompt;
         });
-    }, [defaultPrompt]);
+    }, [defaultEditPrompt, defaultPrompt]);
+
+    useEffect(() => {
+        setPrompt((currentPrompt) => {
+            const isDefaultTextPrompt = currentPrompt === DEFAULT_PROMPTS.en || currentPrompt === DEFAULT_PROMPTS.zh;
+            const isDefaultEditPrompt = currentPrompt === DEFAULT_EDIT_PROMPTS.en || currentPrompt === DEFAULT_EDIT_PROMPTS.zh;
+
+            if (generationMode === "image-to-image" && isDefaultTextPrompt) {
+                return defaultEditPrompt;
+            }
+
+            if (generationMode === "text-to-image" && isDefaultEditPrompt) {
+                return defaultPrompt;
+            }
+
+            return currentPrompt;
+        });
+    }, [defaultEditPrompt, defaultPrompt, generationMode]);
 
     const saveStateForLater = () => {
         localStorage.setItem("pending_gpt_image_2_generation", JSON.stringify({
             prompt,
-            sizePreset,
-            quality,
-            outputFormat,
+            generationMode,
+            aspectRatio,
+            referenceImages,
             timestamp: Date.now()
         }));
     };
@@ -218,9 +249,9 @@ export default function HomeHeroGenerator({ onShowStaticContent, user }: HomeHer
                 try {
                     const parsed = JSON.parse(savedState);
                     setPrompt(parsed.prompt || defaultPrompt);
-                    setSizePreset(parsed.sizePreset || "square");
-                    setQuality(parsed.quality || "auto");
-                    setOutputFormat(parsed.outputFormat || "png");
+                    setGenerationMode(parsed.generationMode || "text-to-image");
+                    setAspectRatio(parsed.aspectRatio || "auto");
+                    setReferenceImages(Array.isArray(parsed.referenceImages) ? parsed.referenceImages : []);
                     localStorage.removeItem("pending_gpt_image_2_generation");
 
                     toast({
@@ -249,9 +280,9 @@ export default function HomeHeroGenerator({ onShowStaticContent, user }: HomeHer
                 const parsed = JSON.parse(pendingAfterLogin);
                 if (parsed.timestamp && Date.now() - parsed.timestamp < 30 * 60 * 1000) {
                     setPrompt(parsed.prompt || defaultPrompt);
-                    setSizePreset(parsed.sizePreset || "square");
-                    setQuality(parsed.quality || "auto");
-                    setOutputFormat(parsed.outputFormat || "png");
+                    setGenerationMode(parsed.generationMode || "text-to-image");
+                    setAspectRatio(parsed.aspectRatio || "auto");
+                    setReferenceImages(Array.isArray(parsed.referenceImages) ? parsed.referenceImages : []);
                     localStorage.removeItem("pending_gpt_image_2_generation");
 
                     toast({
@@ -270,6 +301,11 @@ export default function HomeHeroGenerator({ onShowStaticContent, user }: HomeHer
     const handleGenerate = async (force = false) => {
         if (!prompt.trim()) {
             setError(locale === "zh" ? "请输入描述" : "Please enter a prompt");
+            return;
+        }
+
+        if (generationMode === "image-to-image" && referenceImages.length === 0) {
+            setError(locale === "zh" ? "请先上传至少一张参考图" : "Please upload at least one reference image first");
             return;
         }
 
@@ -295,9 +331,10 @@ export default function HomeHeroGenerator({ onShowStaticContent, user }: HomeHer
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     prompt: prompt.trim(),
-                    size_preset: sizePreset,
-                    quality,
-                    output_format: outputFormat,
+                    aspect_ratio: aspectRatio,
+                    input_urls: generationMode === "image-to-image"
+                        ? referenceImages.map((image) => image.url)
+                        : [],
                 }),
             });
 
@@ -339,15 +376,76 @@ export default function HomeHeroGenerator({ onShowStaticContent, user }: HomeHer
         }
     };
 
+    const handleReferenceUpload = async (files?: FileList | File[]) => {
+        const selectedFiles = Array.from(files || []).slice(0, 10 - referenceImages.length);
+        if (selectedFiles.length === 0) return;
+
+        if (!currentUser) {
+            saveStateForLater();
+            setShowLoginPrompt(true);
+            return;
+        }
+
+        setIsUploadingReference(true);
+        setError(null);
+
+        try {
+            const uploadedImages: ReferenceImage[] = [];
+
+            for (const file of selectedFiles) {
+                const formData = new FormData();
+                formData.append("file", file);
+
+                const response = await fetch("/api/ai/upload-reference", {
+                    method: "POST",
+                    body: formData,
+                });
+
+                const data = await response.json();
+                if (!response.ok) {
+                    throw new Error(data?.error || "Upload failed");
+                }
+
+                uploadedImages.push({
+                    url: data.url,
+                    name: file.name,
+                });
+            }
+
+            setReferenceImages((current) => [...current, ...uploadedImages].slice(0, 10));
+            setGenerationMode("image-to-image");
+            toast({
+                title: locale === "zh" ? "参考图已上传" : "Reference images uploaded",
+                description: locale === "zh"
+                    ? "生成时会自动使用 GPT Image 2 图生图模式。"
+                    : "Generation will now use GPT Image 2 image-to-image mode.",
+            });
+        } catch (uploadError: any) {
+            setError(uploadError.message || "Upload failed");
+        } finally {
+            setIsUploadingReference(false);
+            if (fileInputRef.current) {
+                fileInputRef.current.value = "";
+            }
+        }
+    };
+
     const handleDownload = async (imageSrc: string, imageIndex = 0) => {
         if (!imageSrc) return;
         try {
             const response = await fetch(imageSrc);
             const blob = await response.blob();
+            const extension = blob.type.includes("jpeg")
+                ? "jpg"
+                : blob.type.includes("webp")
+                    ? "webp"
+                    : blob.type.includes("png")
+                        ? "png"
+                        : "png";
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `gpt-image-2-${Date.now()}-${imageIndex + 1}.${outputFormat}`;
+            a.download = `gpt-image-2-${Date.now()}-${imageIndex + 1}.${extension}`;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
@@ -389,52 +487,139 @@ export default function HomeHeroGenerator({ onShowStaticContent, user }: HomeHer
             : 'Create with GPT Image 2: A Free AI Art Generator for Product Visuals and Concepts');
     const heroSubtitle = locale === 'zh'
         ? (isCreatePage
-            ? '在这个 AI 绘图工作台里输入提示词，选择尺寸、质量和导出格式，快速生成高清图像并立即下载。'
+            ? '在这个 AI 绘图工作台里输入提示词，选择画面比例，快速生成高清图像；也可以上传参考图进行图生图编辑。'
             : '用 GPT Image 2 在线生成海报、产品图、界面概念图和风格化视觉，在一个清晰的提示词工作流里完成灵感到成品的转化。')
         : (isCreatePage
-            ? 'Use this AI image workspace to write a prompt, choose size, quality, and export format, then generate high-quality visuals in seconds.'
+            ? 'Use this AI image workspace to write a prompt, choose an aspect ratio, generate high-quality visuals, or upload references for image-to-image editing.'
             : 'Create posters, product visuals, UI concepts, and styled artwork with GPT Image 2 in a clean prompt-to-image workflow built for fast iteration.');
 
     return (
         <>
             <QuickRefillModal isOpen={isRefillModalOpen} onClose={() => setIsRefillModalOpen(false)} />
 
-            <section id="generator-workspace" className="relative overflow-hidden pb-16 pt-8 sm:pt-10 lg:pb-24">
+            <section id="generator-workspace" className="relative overflow-hidden pb-14 pt-6 sm:pt-8 lg:pb-20">
                 <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top_left,rgba(255,178,105,0.22),transparent_28%),radial-gradient(circle_at_top_right,rgba(255,112,52,0.12),transparent_20%),linear-gradient(180deg,#fffdf8_0%,#fff7ee_52%,#fff3e7_100%)]" />
                 <div className="container px-4">
-                    <div className="mx-auto max-w-6xl">
-                        <div className="mb-10 text-center lg:mb-12">
-                            <div className="inline-flex items-center gap-2 rounded-full border border-orange-200 bg-white/90 px-4 py-2 text-sm font-semibold text-orange-700 shadow-[0_10px_30px_rgba(255,138,61,0.08)]">
+                    <div className="mx-auto max-w-5xl">
+                        <div className="mb-8 text-center lg:mb-10">
+                            <div className="inline-flex items-center gap-2 rounded-full border border-orange-200 bg-white/90 px-4 py-1.5 text-[13px] font-semibold text-orange-700 shadow-[0_10px_26px_rgba(255,138,61,0.08)]">
                                 <Sparkles className="h-4 w-4" />
                                 {heroBadge}
                             </div>
-                            <h1 className="mt-5 text-4xl font-semibold tracking-tight text-slate-900 sm:text-5xl lg:text-6xl">
+                            <h1 className="mt-4 text-4xl font-semibold tracking-tight text-slate-900 sm:text-5xl lg:text-[3.75rem] lg:leading-[1.04]">
                                 {heroTitle}
                             </h1>
-                            <p className="mx-auto mt-4 max-w-3xl text-base leading-7 text-slate-600 sm:text-lg">
+                            <p className="mx-auto mt-3 max-w-3xl text-[15px] leading-7 text-slate-600 sm:text-base">
                                 {heroSubtitle}
                             </p>
                         </div>
 
                         <div className="rounded-[32px] border border-orange-100 bg-white/85 p-4 shadow-[0_30px_120px_rgba(234,120,45,0.14)] backdrop-blur sm:p-6 lg:p-8">
-                            <div className="grid gap-6 xl:grid-cols-[1.02fr_1fr]">
-                                <div className="space-y-5">
-                                    <div className="grid grid-cols-2 gap-3 rounded-[28px] border border-orange-100 bg-[#fffaf4] p-2">
+                            <div className="grid gap-5 xl:grid-cols-[1.02fr_1fr]">
+                                <div className="space-y-4">
+                                    <input
+                                        ref={fileInputRef}
+                                        type="file"
+                                        accept="image/png,image/jpeg,image/webp"
+                                        multiple
+                                        className="hidden"
+                                        onChange={(event) => handleReferenceUpload(event.target.files || undefined)}
+                                    />
+
+                                    <div className="grid grid-cols-2 gap-2.5 rounded-[26px] border border-orange-100 bg-[#fffaf4] p-1.5">
                                         <button
                                             type="button"
-                                            className="flex items-center justify-center gap-2 rounded-[20px] border border-orange-100 bg-white px-4 py-4 text-lg font-semibold text-slate-500 shadow-sm"
+                                            onClick={() => setGenerationMode("image-to-image")}
+                                            className={`flex items-center justify-center gap-2 rounded-[18px] px-4 py-3 text-base font-semibold transition ${generationMode === "image-to-image"
+                                                ? "bg-[#ff6b2c] text-white shadow-[0_14px_34px_rgba(255,107,44,0.28)]"
+                                                : "border border-orange-100 bg-white text-slate-500 shadow-sm hover:border-orange-200 hover:bg-orange-50"
+                                                }`}
                                         >
                                             <ImagePlus className="h-5 w-5" />
-                                            {locale === 'zh' ? '编辑图片' : 'Edit Image'}
+                                            {locale === 'zh' ? '图生图' : 'Edit Image'}
                                         </button>
                                         <button
                                             type="button"
-                                            className="flex items-center justify-center gap-2 rounded-[20px] bg-[#ff6b2c] px-4 py-4 text-lg font-semibold text-white shadow-[0_16px_40px_rgba(255,107,44,0.28)]"
+                                            onClick={() => setGenerationMode("text-to-image")}
+                                            className={`flex items-center justify-center gap-2 rounded-[18px] px-4 py-3 text-base font-semibold transition ${generationMode === "text-to-image"
+                                                ? "bg-[#ff6b2c] text-white shadow-[0_14px_34px_rgba(255,107,44,0.28)]"
+                                                : "border border-orange-100 bg-white text-slate-500 shadow-sm hover:border-orange-200 hover:bg-orange-50"
+                                                }`}
                                         >
                                             <Sparkles className="h-5 w-5" />
-                                            {locale === 'zh' ? '生成图片' : 'Create Image'}
+                                            {locale === 'zh' ? '文生图' : 'Create Image'}
                                         </button>
                                     </div>
+
+                                    {generationMode === "image-to-image" && (
+                                        <div className="rounded-[28px] border border-[#f1dcc7] bg-[#fffdfa] p-5 shadow-[0_20px_60px_rgba(235,145,71,0.08)] sm:p-6">
+                                            <div className="mb-3 flex items-center justify-between">
+                                                <div>
+                                                    <p className="flex items-center gap-2 text-lg font-semibold text-slate-900">
+                                                        <Sparkles className="h-5 w-5 text-orange-400" />
+                                                        {locale === 'zh' ? '上传参考图' : 'Upload Images'}
+                                                    </p>
+                                                    <p className="mt-1 text-sm text-slate-500">
+                                                        {locale === 'zh' ? '最多 10 张，支持 JPG、PNG、WebP。' : 'Up to 10 images. JPG, PNG, and WebP are supported.'}
+                                                    </p>
+                                                </div>
+                                                <span className="rounded-full bg-[#fff3ea] px-3 py-1 text-xs font-semibold text-orange-700">
+                                                    {referenceImages.length}/10
+                                                </span>
+                                            </div>
+
+                                            <div className="grid gap-3 sm:grid-cols-[150px_1fr]">
+                                                <button
+                                                    type="button"
+                                                    onClick={() => fileInputRef.current?.click()}
+                                                    disabled={isUploadingReference || referenceImages.length >= 10}
+                                                    className="flex min-h-[132px] flex-col items-center justify-center rounded-[22px] border border-dashed border-orange-200 bg-white text-slate-500 transition hover:border-orange-300 hover:bg-orange-50 disabled:cursor-not-allowed disabled:opacity-60"
+                                                >
+                                                    {isUploadingReference ? (
+                                                        <Loader2 className="mb-3 h-8 w-8 animate-spin text-orange-500" />
+                                                    ) : (
+                                                        <ImagePlus className="mb-3 h-8 w-8 text-orange-500" />
+                                                    )}
+                                                    <span className="text-sm font-semibold">
+                                                        {locale === 'zh' ? '添加图片' : 'Add Images'}
+                                                    </span>
+                                                </button>
+
+                                                {referenceImages.length > 0 ? (
+                                                    <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
+                                                        {referenceImages.map((image, index) => (
+                                                            <div
+                                                                key={`${image.url}-${index}`}
+                                                                className="group relative aspect-square overflow-hidden rounded-[18px] border border-orange-100 bg-white"
+                                                            >
+                                                                <Image
+                                                                    src={image.url}
+                                                                    alt={image.name || `Reference image ${index + 1}`}
+                                                                    fill
+                                                                    className="object-cover"
+                                                                    unoptimized
+                                                                />
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() => setReferenceImages((current) => current.filter((_, itemIndex) => itemIndex !== index))}
+                                                                    className="absolute right-1.5 top-1.5 inline-flex h-7 w-7 items-center justify-center rounded-full bg-white/90 text-slate-600 opacity-0 shadow transition hover:bg-white hover:text-orange-700 group-hover:opacity-100"
+                                                                    aria-label={locale === 'zh' ? '移除参考图' : 'Remove reference image'}
+                                                                >
+                                                                    <X className="h-4 w-4" />
+                                                                </button>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                ) : (
+                                                    <div className="flex min-h-[132px] items-center justify-center rounded-[22px] border border-orange-100 bg-[#fff8f1] px-5 text-center text-sm leading-6 text-slate-500">
+                                                        {locale === 'zh'
+                                                            ? '上传参考图后，GPT Image 2 会根据你的描述对图片进行编辑或重绘。'
+                                                            : 'After uploading references, GPT Image 2 will edit or redraw them based on your prompt.'}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    )}
 
                                     <div className="rounded-[28px] border border-[#f1dcc7] bg-[#fffdfa] p-5 shadow-[0_20px_60px_rgba(235,145,71,0.08)] sm:p-6">
                                         <div className="mb-3 flex items-center justify-between">
@@ -442,14 +627,14 @@ export default function HomeHeroGenerator({ onShowStaticContent, user }: HomeHer
                                                 <Sparkles className="h-5 w-5 text-orange-400" />
                                                 {locale === 'zh' ? '描述你的想法' : 'Describe your idea'}
                                             </label>
-                                            <span className="text-sm text-slate-400">{prompt.length}/32000</span>
+                                            <span className="text-sm text-slate-400">{prompt.length}/20000</span>
                                         </div>
 
                                         <Textarea
                                             value={prompt}
                                             onChange={(e) => setPrompt(e.target.value)}
                                             className="min-h-[170px] resize-none rounded-[22px] border-orange-200 bg-white text-lg text-slate-900 shadow-[inset_0_1px_6px_rgba(30,41,59,0.04)] placeholder:text-slate-400 focus:border-orange-300 focus:ring-orange-200"
-                                            maxLength={32000}
+                                            maxLength={20000}
                                         />
 
                                         <div className="mt-4 flex flex-wrap gap-2">
@@ -458,7 +643,7 @@ export default function HomeHeroGenerator({ onShowStaticContent, user }: HomeHer
                                                     key={item.id}
                                                     type="button"
                                                     onClick={() => setPrompt(locale === 'zh' ? item.promptZh : item.prompt)}
-                                                    className="rounded-full bg-[#f5f1ea] px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-[#ffe6d8] hover:text-orange-700"
+                                                    className="rounded-full bg-[#f5f1ea] px-3.5 py-1.5 text-[13px] font-medium text-slate-700 transition-colors hover:bg-[#ffe6d8] hover:text-orange-700"
                                                 >
                                                     {locale === 'zh' ? item.labelZh : item.label}
                                                 </button>
@@ -469,84 +654,40 @@ export default function HomeHeroGenerator({ onShowStaticContent, user }: HomeHer
                                                     const random = INSPIRATION_PROMPTS[Math.floor(Math.random() * INSPIRATION_PROMPTS.length)];
                                                     setPrompt(locale === 'zh' ? random.promptZh : random.prompt);
                                                 }}
-                                                className="inline-flex items-center gap-2 rounded-full bg-[#ffe7d9] px-4 py-2 text-sm font-medium text-orange-700 transition-colors hover:bg-[#ffd8c0]"
+                                                className="inline-flex items-center gap-2 rounded-full bg-[#ffe7d9] px-3.5 py-1.5 text-[13px] font-medium text-orange-700 transition-colors hover:bg-[#ffd8c0]"
                                             >
                                                 <Dices className="h-4 w-4" />
                                                 {locale === 'zh' ? '随机灵感' : 'Random'}
                                             </button>
                                         </div>
+
                                     </div>
 
-                                    <div className="grid gap-4 rounded-[28px] border border-orange-100 bg-[#fffaf4] p-5 sm:grid-cols-3 sm:p-6">
-                                        <div className="space-y-3">
+                                    <div className="rounded-[28px] border border-orange-100 bg-[#fffaf4] p-5 sm:p-6">
+                                        <div className="mb-3 flex items-center justify-between gap-3">
                                             <p className="text-sm font-semibold uppercase tracking-[0.18em] text-slate-500">
-                                                {locale === 'zh' ? '尺寸' : 'Size'}
+                                                {locale === 'zh' ? '画面比例' : 'Aspect Ratio'}
                                             </p>
-                                            <div className="space-y-2">
-                                                {SIZE_PRESETS.map((preset) => (
-                                                    <button
-                                                        key={preset.id}
-                                                        type="button"
-                                                        onClick={() => setSizePreset(preset.id)}
-                                                        className={`flex w-full items-center justify-center rounded-2xl border px-4 py-3 text-center transition-all ${sizePreset === preset.id
-                                                            ? 'border-orange-200 bg-[#ff6b2c] text-white shadow-[0_12px_28px_rgba(255,107,44,0.22)]'
-                                                            : 'border-[#ecd9c7] bg-white text-slate-700 hover:border-orange-200 hover:bg-orange-50'
-                                                            }`}
-                                                    >
-                                                        <span className="text-sm font-semibold tracking-[0.02em] sm:text-base">
-                                                            {preset.size}
-                                                        </span>
-                                                    </button>
-                                                ))}
-                                            </div>
                                         </div>
-
-                                        <div className="space-y-3">
-                                            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-slate-500">
-                                                {locale === 'zh' ? '质量' : 'Quality'}
-                                            </p>
-                                            <div className="grid grid-cols-2 gap-2">
-                                                {QUALITY_OPTIONS.map((option) => (
-                                                    <button
-                                                        key={option.id}
-                                                        type="button"
-                                                        onClick={() => setQuality(option.id)}
-                                                        className={`rounded-2xl border px-3 py-3 text-sm font-medium transition-all ${quality === option.id
-                                                            ? 'border-orange-200 bg-[#ff6b2c] text-white shadow-[0_12px_24px_rgba(255,107,44,0.2)]'
-                                                            : 'border-[#ecd9c7] bg-white text-slate-700 hover:border-orange-200 hover:bg-orange-50'
-                                                            }`}
-                                                    >
-                                                        {locale === 'zh' ? option.labelZh : option.label}
-                                                    </button>
-                                                ))}
-                                            </div>
-                                        </div>
-
-                                        <div className="space-y-3">
-                                            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-slate-500">
-                                                {locale === 'zh' ? '格式' : 'Format'}
-                                            </p>
-                                            <div className="space-y-2">
-                                                {OUTPUT_FORMAT_OPTIONS.map((option) => (
-                                                    <button
-                                                        key={option.id}
-                                                        type="button"
-                                                        onClick={() => setOutputFormat(option.id)}
-                                                        className={`flex w-full items-center justify-between rounded-2xl border px-4 py-3 text-left text-sm font-medium transition-all ${outputFormat === option.id
-                                                            ? 'border-orange-200 bg-[#ff6b2c] text-white shadow-[0_12px_24px_rgba(255,107,44,0.2)]'
-                                                            : 'border-[#ecd9c7] bg-white text-slate-700 hover:border-orange-200 hover:bg-orange-50'
-                                                            }`}
-                                                    >
-                                                        <span>{option.label}</span>
-                                                        {outputFormat === option.id && <CheckCircle2 className="h-4 w-4" />}
-                                                    </button>
-                                                ))}
-                                            </div>
+                                        <div className="grid grid-cols-3 gap-2 sm:grid-cols-6">
+                                            {ASPECT_RATIO_OPTIONS.map((option) => (
+                                                <button
+                                                    key={option.id}
+                                                    type="button"
+                                                    onClick={() => setAspectRatio(option.id)}
+                                                    className={`flex min-h-10 items-center justify-center rounded-2xl border px-2.5 py-2 text-[12px] font-semibold transition-all sm:text-[13px] ${aspectRatio === option.id
+                                                        ? 'border-orange-200 bg-[#ff6b2c] text-white shadow-[0_12px_28px_rgba(255,107,44,0.22)]'
+                                                        : 'border-[#ecd9c7] bg-white text-slate-700 hover:border-orange-200 hover:bg-orange-50'
+                                                        }`}
+                                                >
+                                                    {locale === 'zh' ? option.labelZh : option.label}
+                                                </button>
+                                            ))}
                                         </div>
                                     </div>
 
                                     {currentUser ? (
-                                        <div className="flex items-center justify-between rounded-[24px] border border-orange-100 bg-[#fffaf4] px-5 py-4">
+                                        <div className="flex items-center justify-between rounded-[22px] border border-orange-100 bg-[#fffaf4] px-4 py-3.5">
                                             <div>
                                                 <p className="text-sm font-medium text-slate-500">
                                                     {locale === 'zh' ? '剩余积分' : 'Credits remaining'}
@@ -561,7 +702,7 @@ export default function HomeHeroGenerator({ onShowStaticContent, user }: HomeHer
                                             </div>
                                         </div>
                                     ) : (
-                                        <div className="rounded-[24px] border border-orange-100 bg-[#fff6ef] px-5 py-4 text-sm text-slate-600">
+                                        <div className="rounded-[22px] border border-orange-100 bg-[#fff6ef] px-4 py-3.5 text-sm text-slate-600">
                                             <span className="font-semibold text-orange-700">{locale === 'zh' ? '免费试用：' : 'Free trial:'}</span>{' '}
                                             {locale === 'zh' ? '新用户可先体验 3 次生成。' : 'New users can try 3 generations first.'}
                                         </div>
@@ -570,7 +711,7 @@ export default function HomeHeroGenerator({ onShowStaticContent, user }: HomeHer
                                     <div className="space-y-3">
                                         <Button
                                             size="lg"
-                                            className="h-16 w-full rounded-[22px] bg-[#ff6b2c] text-lg font-semibold text-white shadow-[0_20px_44px_rgba(255,107,44,0.32)] transition-transform hover:translate-y-[-1px] hover:bg-[#f86120]"
+                                            className="h-14 w-full rounded-[20px] bg-[#ff6b2c] text-base font-semibold text-white shadow-[0_18px_38px_rgba(255,107,44,0.32)] transition-transform hover:translate-y-[-1px] hover:bg-[#f86120]"
                                             onClick={() => handleGenerate()}
                                             disabled={isGenerating}
                                         >
@@ -582,7 +723,9 @@ export default function HomeHeroGenerator({ onShowStaticContent, user }: HomeHer
                                             ) : (
                                                 <>
                                                     <Wand2 className="mr-2 h-5 w-5" />
-                                                    {locale === 'zh' ? '生成图片' : 'Generate Image'}
+                                                    {generationMode === "image-to-image"
+                                                        ? (locale === 'zh' ? '开始编辑' : 'Start Editing')
+                                                        : (locale === 'zh' ? '生成图片' : 'Generate Image')}
                                                 </>
                                             )}
                                         </Button>
@@ -609,17 +752,17 @@ export default function HomeHeroGenerator({ onShowStaticContent, user }: HomeHer
                                     </div>
                                 </div>
 
-                                <div className="rounded-[28px] border border-orange-100 bg-[#fffdf9] p-5 shadow-[0_20px_60px_rgba(235,145,71,0.08)] sm:p-6">
-                                    <div className="mb-5 flex items-center justify-between">
+                                <div className="rounded-[28px] border border-orange-100 bg-[#fffdf9] p-4 shadow-[0_20px_60px_rgba(235,145,71,0.08)] sm:p-5">
+                                    <div className="mb-4 flex items-center justify-between">
                                         <div>
                                             <p className="text-sm font-semibold uppercase tracking-[0.18em] text-slate-500">
                                                 {locale === 'zh' ? '预览' : 'Preview'}
                                             </p>
-                                            <h3 className="mt-1 text-2xl font-semibold text-slate-900">
+                                            <h3 className="mt-1 text-[1.55rem] font-semibold leading-tight text-slate-900">
                                                 {locale === 'zh' ? '生成结果会显示在这里' : 'Generated image will appear here'}
                                             </h3>
                                         </div>
-                                        <div className="rounded-full bg-[#fff3ea] px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-orange-600">
+                                        <div className="whitespace-nowrap rounded-full bg-[#fff3ea] px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.16em] text-orange-600 sm:px-3.5 sm:text-[11px]">
                                             GPT Image 2
                                         </div>
                                     </div>
@@ -726,36 +869,14 @@ export default function HomeHeroGenerator({ onShowStaticContent, user }: HomeHer
                                                 className="h-11 rounded-2xl border-orange-200 bg-white text-slate-700 hover:bg-orange-50"
                                                 onClick={() => {
                                                     setResultImages([]);
-                                                    setPrompt(defaultPrompt);
+                                                    setPrompt(generationMode === "image-to-image" ? defaultEditPrompt : defaultPrompt);
                                                 }}
                                             >
                                                 {locale === 'zh' ? '重新开始' : 'Start Over'}
                                             </Button>
                                         </div>
                                     ) : (
-                                        <div className="flex min-h-[520px] flex-col justify-between rounded-[24px] border border-dashed border-orange-200 bg-[linear-gradient(180deg,#fff7ef_0%,#fffdfb_100%)] p-5 text-center">
-                                            <div className="mb-5 flex items-center justify-between rounded-[20px] bg-white/80 px-4 py-3">
-                                                <div className="text-left">
-                                                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
-                                                        {locale === 'zh' ? '系统示例轮播' : 'Preset carousel'}
-                                                    </p>
-                                                    <p className="mt-1 text-sm text-slate-600">
-                                                        {locale === 'zh' ? activeSample.titleZh : activeSample.title}
-                                                    </p>
-                                                </div>
-                                                <div className="flex items-center gap-2">
-                                                    {SAMPLE_PREVIEW_SLIDES.map((slide, index) => (
-                                                        <button
-                                                            key={slide.src}
-                                                            type="button"
-                                                            onClick={() => setActiveSampleIndex(index)}
-                                                            className={`h-2.5 rounded-full transition-all ${activeSampleIndex === index ? 'w-8 bg-orange-500' : 'w-2.5 bg-orange-200'}`}
-                                                            aria-label={`Sample slide ${index + 1}`}
-                                                        />
-                                                    ))}
-                                                </div>
-                                            </div>
-
+                                        <div className="flex min-h-[500px] flex-col justify-center rounded-[24px] border border-dashed border-orange-200 bg-[linear-gradient(180deg,#fff7ef_0%,#fffdfb_100%)] p-4 text-center">
                                             <div className="relative mx-auto w-full max-w-[540px]">
                                                 <div className="relative aspect-[4/3] overflow-hidden rounded-[28px] border border-orange-100 bg-white shadow-[0_24px_54px_rgba(235,145,71,0.16)]">
                                                     <Image
@@ -765,16 +886,8 @@ export default function HomeHeroGenerator({ onShowStaticContent, user }: HomeHer
                                                         className="object-cover"
                                                         priority
                                                     />
-                                                    <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/55 via-black/10 to-transparent p-5 text-left text-white">
-                                                        <p className="text-lg font-semibold">
-                                                            {locale === 'zh' ? activeSample.titleZh : activeSample.title}
-                                                        </p>
-                                                        <p className="mt-1 max-w-sm text-sm text-white/85">
-                                                            {locale === 'zh' ? activeSample.subtitleZh : activeSample.subtitle}
-                                                        </p>
-                                                    </div>
                                                 </div>
-                                        <div className="mt-4 flex items-center justify-center gap-2">
+                                                <div className="mt-4 flex items-center justify-center gap-2">
                                                     {SAMPLE_PREVIEW_SLIDES.map((slide, index) => (
                                                         <button
                                                             key={`sample-dot-bottom-${slide.src}`}
@@ -786,23 +899,15 @@ export default function HomeHeroGenerator({ onShowStaticContent, user }: HomeHer
                                                     ))}
                                                 </div>
                                             </div>
-                                            <h4 className="text-2xl font-semibold text-slate-900">
-                                                {locale === 'zh' ? '先看看示例效果，再开始生成你的画面' : 'Browse a few example outputs before creating your own'}
-                                            </h4>
-                                            <p className="mx-auto mt-3 max-w-md text-sm leading-6 text-slate-500">
-                                                {locale === 'zh'
-                                                    ? '你生成成功后，这里会自动切换成你的结果轮播，方便连续预览和下载。'
-                                                    : 'Once your images are ready, this preview area automatically switches to your own result carousel.'}
-                                            </p>
-                                            <div className="mt-4 flex justify-center">
-                                                <Button
-                                                    variant="outline"
-                                                    className="h-11 rounded-2xl border-orange-200 bg-white text-orange-700 hover:bg-orange-50"
-                                                    onClick={() => handleUseSamplePrompt(locale === 'zh' ? activeSample.promptZh : activeSample.prompt)}
-                                                >
-                                                    <Sparkles className="mr-2 h-4 w-4" />
-                                                    {locale === 'zh' ? '复制并试玩这个提示词' : 'Copy & try this prompt'}
-                                                </Button>
+                                            <div className="mt-6">
+                                                <h4 className="text-[1.7rem] font-semibold leading-tight text-slate-900">
+                                                    {locale === 'zh' ? '先看看示例效果，再开始生成你的画面' : 'Browse a few example outputs before creating your own'}
+                                                </h4>
+                                                <p className="mx-auto mt-3 max-w-md text-[13px] leading-6 text-slate-500">
+                                                    {locale === 'zh'
+                                                        ? '你生成成功后，这里会自动切换成你的结果轮播，方便连续预览和下载。'
+                                                        : 'Once your images are ready, this preview area automatically switches to your own result carousel.'}
+                                                </p>
                                             </div>
                                         </div>
                                     )}

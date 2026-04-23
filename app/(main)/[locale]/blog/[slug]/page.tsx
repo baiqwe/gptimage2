@@ -101,17 +101,26 @@ export async function generateMetadata(props: { params: Promise<{ slug: string; 
             publishedTime: post.publishDate,
             authors: [post.author],
             url: `${siteConfig.url}/${params.locale}/blog/${params.slug}`,
+            images: [
+                {
+                    url: `${siteConfig.url}${post.heroImage}`,
+                    width: 1200,
+                    height: 675,
+                    alt: post.title,
+                },
+            ],
         },
         twitter: {
+            card: 'summary_large_image',
             title: post.title,
             description: post.description,
+            images: [`${siteConfig.url}${post.heroImage}`],
         },
         alternates: {
             canonical: `${siteConfig.url}/${params.locale}/blog/${params.slug}`,
             languages: {
                 'en': `${siteConfig.url}/en/blog/${params.slug}`,
                 'zh': `${siteConfig.url}/zh/blog/${params.slug}`,
-                'x-default': `${siteConfig.url}/en/blog/${params.slug}`,
             },
         },
     };

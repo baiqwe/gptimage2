@@ -5,54 +5,34 @@ export const DEFAULT_PROMPTS = {
   zh: "一位穿着时尚的人站在雨夜城市街头的电影感肖像，地面有柔和霓虹倒影，皮肤纹理真实，服装细节丰富，浅景深，高度写实",
 } as const;
 
-export const SIZE_PRESETS = [
-  {
-    id: "square",
-    label: "Square",
-    labelZh: "方形",
-    size: "1024x1024",
-    hint: "1024×1024",
-    icon: "□",
-  },
-  {
-    id: "portrait",
-    label: "Portrait",
-    labelZh: "竖版",
-    size: "1024x1536",
-    hint: "1024×1536",
-    icon: "▯",
-  },
-  {
-    id: "landscape",
-    label: "Landscape",
-    labelZh: "横版",
-    size: "1536x1024",
-    hint: "1536×1024",
-    icon: "▭",
-  },
-] as const;
-
-export const QUALITY_OPTIONS = [
+export const ASPECT_RATIO_OPTIONS = [
   { id: "auto", label: "Auto", labelZh: "自动" },
-  { id: "low", label: "Low", labelZh: "快速" },
-  { id: "medium", label: "Medium", labelZh: "标准" },
-  { id: "high", label: "High", labelZh: "精细" },
-] as const;
-
-export const OUTPUT_FORMAT_OPTIONS = [
-  { id: "png", label: "PNG" },
-  { id: "jpeg", label: "JPEG" },
-  { id: "webp", label: "WebP" },
+  { id: "1:1", label: "1:1", labelZh: "1:1" },
+  { id: "9:16", label: "9:16", labelZh: "9:16" },
+  { id: "16:9", label: "16:9", labelZh: "16:9" },
+  { id: "4:3", label: "4:3", labelZh: "4:3" },
+  { id: "3:4", label: "3:4", labelZh: "3:4" },
 ] as const;
 
 export const COUNT_OPTIONS = [1, 2, 4] as const;
 
-export type SizePresetId = (typeof SIZE_PRESETS)[number]["id"];
-export type QualityOption = (typeof QUALITY_OPTIONS)[number]["id"];
-export type OutputFormatOption = (typeof OUTPUT_FORMAT_OPTIONS)[number]["id"];
+export type AspectRatioOption = (typeof ASPECT_RATIO_OPTIONS)[number]["id"];
 export type CountOption = (typeof COUNT_OPTIONS)[number];
 
-export function resolveSizePreset(sizePreset: string) {
-  return SIZE_PRESETS.find((preset) => preset.id === sizePreset) ?? SIZE_PRESETS[0];
+export function resolveAspectRatio(aspectRatio: string): AspectRatioOption {
+  return ASPECT_RATIO_OPTIONS.find((option) => option.id === aspectRatio)?.id ?? "auto";
 }
 
+export function resolveOpenAISize(aspectRatio: string) {
+  const resolved = resolveAspectRatio(aspectRatio);
+
+  if (resolved === "9:16" || resolved === "3:4") {
+    return "1024x1536";
+  }
+
+  if (resolved === "16:9" || resolved === "4:3") {
+    return "1536x1024";
+  }
+
+  return "1024x1024";
+}

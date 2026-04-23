@@ -10,13 +10,13 @@ const config = {
   ],
   prefix: "",
   theme: {
-    container: {
-      center: true,
-      padding: "1.5rem",
-      screens: {
-        "2xl": "1320px",
+      container: {
+        center: true,
+        padding: "2rem",
+        screens: {
+          "2xl": "1280px",
+        },
       },
-    },
     extend: {
       colors: {
         border: "hsl(var(--border))",

@@ -3,12 +3,16 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Sparkles } from "lucide-react";
+import { usePathname } from "next/navigation";
 
 interface AiPromotionBannerProps {
     className?: string;
 }
 
 export function AiPromotionBanner({ className }: AiPromotionBannerProps) {
+    const pathname = usePathname();
+    const currentLocale = pathname?.split('/')[1] === 'zh' ? 'zh' : 'en';
+
     return (
         <div className={`mt-8 rounded-[28px] border border-orange-100 bg-[linear-gradient(135deg,#fffaf3_0%,#fff4e8_52%,#fff0e3_100%)] p-6 shadow-[0_20px_60px_rgba(255,107,44,0.08)] flex flex-col md:flex-row items-center gap-6 ${className}`}>
             {/* 1. 左侧：静态对比图 */}
@@ -47,7 +51,7 @@ export function AiPromotionBanner({ className }: AiPromotionBannerProps) {
                 </p>
                 <div className="pt-2">
                     <Button asChild size="lg" className="border-0 bg-gradient-to-r from-orange-500 to-amber-500 shadow-lg transition-opacity hover:opacity-90">
-                        <Link href="/sign-up?next=/create" rel="nofollow">
+                        <Link href={`/${currentLocale}/sign-up?next=/${currentLocale}/create`} rel="nofollow">
                             <Sparkles className="w-4 h-4 mr-2" />
                             注册免费领 30 积分试用
                         </Link>

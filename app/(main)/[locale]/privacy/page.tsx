@@ -27,13 +27,19 @@ export async function generateMetadata(props: { params: Promise<{ locale: string
             description,
             type: 'website',
             url: `${siteConfig.url}/${locale}/privacy`,
+            images: [{ url: siteConfig.socialImage, width: 512, height: 512, alt: siteConfig.name }],
+        },
+        twitter: {
+            card: 'summary_large_image',
+            title,
+            description,
+            images: [siteConfig.socialImage],
         },
         alternates: {
             canonical: `${siteConfig.url}/${locale}/privacy`,
             languages: {
                 'en': `${siteConfig.url}/en/privacy`,
                 'zh': `${siteConfig.url}/zh/privacy`,
-                'x-default': `${siteConfig.url}/en/privacy`,
             },
         },
     };

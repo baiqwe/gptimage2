@@ -32,7 +32,6 @@ export async function generateMetadata(props: { params: Promise<{ locale: string
             languages: {
                 en: `${siteConfig.url}/en`,
                 zh: `${siteConfig.url}/zh`,
-                'x-default': `${siteConfig.url}`,
             },
         },
         openGraph: {
@@ -40,10 +39,20 @@ export async function generateMetadata(props: { params: Promise<{ locale: string
             description,
             type: 'website',
             url: `${siteConfig.url}/${locale}`,
+            images: [
+                {
+                    url: siteConfig.socialImage,
+                    width: 512,
+                    height: 512,
+                    alt: siteConfig.name,
+                },
+            ],
         },
         twitter: {
+            card: 'summary_large_image',
             title,
             description,
+            images: [siteConfig.socialImage],
         },
     };
 }
@@ -72,6 +81,11 @@ export default async function HomePage(props: { params: Promise<{ locale: string
             <WebsiteEntitySchema />
             <SoftwareApplicationSchema locale={locale} />
             <FAQSchema items={faqItems} />
+            <h1 className="sr-only">
+                {locale === 'zh'
+                    ? 'GPT Image 2 官网，免费 AI 绘画与图像生成器'
+                    : 'GPT Image 2 Generator, a free AI art and image creation workspace'}
+            </h1>
             <HomeClientWrapper staticContent={staticContent} user={user} />
         </>
     );

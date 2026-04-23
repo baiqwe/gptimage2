@@ -21,7 +21,6 @@ export async function generateMetadata(props: { params: Promise<{ locale: string
             languages: {
                 en: `${siteConfig.url}/en/arena`,
                 zh: `${siteConfig.url}/zh/arena`,
-                'x-default': `${siteConfig.url}/en/arena`,
             },
         },
         openGraph: {
@@ -29,10 +28,13 @@ export async function generateMetadata(props: { params: Promise<{ locale: string
             description,
             type: 'website',
             url: `${siteConfig.url}/${locale}/arena`,
+            images: [{ url: siteConfig.socialImage, width: 512, height: 512, alt: siteConfig.name }],
         },
         twitter: {
+            card: 'summary_large_image',
             title,
             description,
+            images: [siteConfig.socialImage],
         },
     };
 }

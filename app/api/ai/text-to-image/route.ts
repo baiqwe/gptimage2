@@ -4,7 +4,8 @@ import { CREDITS_PER_GENERATION } from "@/config/pricing";
 import {
     COUNT_OPTIONS,
     GPT_IMAGE_MODEL,
-    resolveSizePreset,
+    resolveAspectRatio,
+    resolveOpenAISize,
 } from "@/config/gpt-image";
 
 // Use Node.js runtime for Vercel
@@ -12,12 +13,10 @@ export const runtime = 'nodejs';
 export const maxDuration = 60; // 1 minute timeout
 
 const KIE_API_BASE_URL = process.env.KIE_API_BASE_URL || "https://api.kie.ai";
-const KIE_GPT_IMAGE_MODEL = "gpt-image-2-text-to-image";
+const KIE_TEXT_TO_IMAGE_MODEL = "gpt-image-2-text-to-image";
+const KIE_IMAGE_TO_IMAGE_MODEL = "gpt-image-2-image-to-image";
 const KIE_POLL_INTERVAL_MS = 2500;
 const KIE_POLL_TIMEOUT_MS = 45000;
-
-type SupportedQuality = "auto" | "low" | "medium" | "high";
-type SupportedFormat = "png" | "jpeg" | "webp";
 
 interface KieCreateTaskResponse {
     code: number;
@@ -75,17 +74,26 @@ function parseKieResultUrls(resultJson?: string | null): string[] {
 
 async function generateWithKie({
     prompt,
-    sizePreset,
-    quality,
-    outputFormat,
+    aspectRatio,
+    inputUrls,
 }: {
     prompt: string;
-    sizePreset: string;
-    quality: SupportedQuality;
-    outputFormat: SupportedFormat;
+    aspectRatio: string;
+    inputUrls?: string[];
 }) {
     const createTaskUrl = `${KIE_API_BASE_URL}/api/v1/jobs/createTask`;
     const recordInfoBaseUrl = `${KIE_API_BASE_URL}/api/v1/jobs/recordInfo`;
+    const hasInputImage = Array.isArray(inputUrls) && inputUrls.length > 0;
+    const model = hasInputImage ? KIE_IMAGE_TO_IMAGE_MODEL : KIE_TEXT_TO_IMAGE_MODEL;
+    const input: Record<string, unknown> = {
+        prompt,
+        aspect_ratio: resolveAspectRatio(aspectRatio),
+        nsfw_checker: false,
+    };
+
+    if (hasInputImage) {
+        input.input_urls = inputUrls;
+    }
 
     const createResponse = await fetch(createTaskUrl, {
         method: "POST",
@@ -94,11 +102,8 @@ async function generateWithKie({
             "Authorization": `Bearer ${process.env.KIE_API_KEY}`,
         },
         body: JSON.stringify({
-            model: KIE_GPT_IMAGE_MODEL,
-            input: {
-                prompt,
-                nsfw_checker: false,
-            },
+            model,
+            input,
         }),
     });
 
@@ -137,15 +142,16 @@ async function generateWithKie({
             return {
                 provider: "kie" as const,
                 taskId,
-                model: KIE_GPT_IMAGE_MODEL,
+                model,
                 images,
                 metadata: {
                     provider: "kie",
-                    provider_model: KIE_GPT_IMAGE_MODEL,
+                    provider_model: model,
                     provider_task_id: taskId,
-                    size_preset: sizePreset,
-                    quality,
-                    output_format: outputFormat,
+                    mode: hasInputImage ? "image-to-image" : "text-to-image",
+                    aspect_ratio: input.aspect_ratio,
+                    input_urls: hasInputImage ? inputUrls : null,
+                    nsfw_checker: false,
                 },
             };
         }
@@ -160,20 +166,15 @@ async function generateWithKie({
 
 async function generateWithOpenAI({
     prompt,
-    sizePreset,
-    quality,
-    outputFormat,
+    aspectRatio,
     count,
 }: {
     prompt: string;
-    sizePreset: string;
-    quality: SupportedQuality;
-    outputFormat: SupportedFormat;
+    aspectRatio: string;
     count: number;
 }) {
-    const selectedSizePreset = resolveSizePreset(sizePreset);
+    const selectedSize = resolveOpenAISize(aspectRatio);
     const openaiApiUrl = `${process.env.OPENAI_BASE_URL || "https://api.openai.com/v1"}/images/generations`;
-    const outputCompression = outputFormat === "png" ? undefined : 90;
 
     const response = await fetch(openaiApiUrl, {
         method: "POST",
@@ -184,15 +185,12 @@ async function generateWithOpenAI({
         body: JSON.stringify({
             model: GPT_IMAGE_MODEL,
             prompt,
-            size: selectedSizePreset.size,
-            quality,
-            output_format: outputFormat,
+            size: selectedSize,
+            quality: "auto",
+            output_format: "png",
             n: count,
             background: "auto",
             moderation: "auto",
-            ...(typeof outputCompression === "number"
-                ? { output_compression: outputCompression }
-                : {}),
         }),
     });
 
@@ -206,7 +204,7 @@ async function generateWithOpenAI({
     const images = (data?.data || [])
         .map((item: { b64_json?: string }) => item?.b64_json)
         .filter(Boolean)
-        .map((b64: string) => `data:image/${outputFormat};base64,${b64}`);
+        .map((b64: string) => `data:image/png;base64,${b64}`);
 
     if (images.length === 0) {
         throw new Error("OpenAI did not return any images");
@@ -219,10 +217,9 @@ async function generateWithOpenAI({
         metadata: {
             provider: "openai",
             provider_model: GPT_IMAGE_MODEL,
-            size_preset: sizePreset,
-            size: selectedSizePreset.size,
-            quality,
-            output_format: outputFormat,
+            aspect_ratio: resolveAspectRatio(aspectRatio),
+            size: selectedSize,
+            output_format: "png",
             count,
         },
     };
@@ -234,12 +231,13 @@ export async function POST(request: NextRequest) {
     try {
         const {
             prompt,
-            size_preset = "square",
-            quality = "auto",
-            output_format = "png",
+            aspect_ratio,
+            size_preset,
             count = 1,
             prompt_optimization = false,
+            input_urls = [],
         } = await request.json();
+        const requestedAspectRatio = resolveAspectRatio(aspect_ratio ?? size_preset ?? "auto");
 
         // 1. Authentication
         const { data: { user }, error: authError } = await supabase.auth.getUser();
@@ -258,9 +256,9 @@ export async function POST(request: NextRequest) {
             }, { status: 400 });
         }
 
-        if (prompt.length > 32000) {
+        if (prompt.length > 20000) {
             return NextResponse.json({
-                error: "Prompt too long (max 32000 characters)",
+                error: "Prompt too long (max 20000 characters)",
                 code: "PROMPT_TOO_LONG"
             }, { status: 400 });
         }
@@ -272,21 +270,9 @@ export async function POST(request: NextRequest) {
             }, { status: 400 });
         }
 
-        const allowedQualities = new Set(["auto", "low", "medium", "high"]);
-        if (!allowedQualities.has(quality)) {
-            return NextResponse.json({
-                error: "Unsupported quality option",
-                code: "INVALID_QUALITY",
-            }, { status: 400 });
-        }
-
-        const allowedFormats = new Set(["png", "jpeg", "webp"]);
-        if (!allowedFormats.has(output_format)) {
-            return NextResponse.json({
-                error: "Unsupported output format",
-                code: "INVALID_OUTPUT_FORMAT",
-            }, { status: 400 });
-        }
+        const validatedInputUrls = Array.isArray(input_urls)
+            ? input_urls.filter((url) => typeof url === "string" && /^https?:\/\//.test(url)).slice(0, 10)
+            : [];
 
         const provider = process.env.KIE_API_KEY ? "kie" : process.env.OPENAI_API_KEY ? "openai" : null;
         if (!provider) {
@@ -295,6 +281,13 @@ export async function POST(request: NextRequest) {
                 error: "Service configuration error",
                 code: "CONFIG_ERROR"
             }, { status: 500 });
+        }
+
+        if (provider !== "kie" && validatedInputUrls.length > 0) {
+            return NextResponse.json({
+                error: "Image-to-image generation requires Kie.ai configuration",
+                code: "IMAGE_TO_IMAGE_PROVIDER_UNAVAILABLE",
+            }, { status: 400 });
         }
 
         const creditsRequired = CREDITS_PER_GENERATION * count;
@@ -334,23 +327,19 @@ export async function POST(request: NextRequest) {
             console.log("Original Prompt:", prompt);
             console.log("Final Prompt:", finalPrompt);
             console.log("Prompt Optimization:", prompt_optimization);
-            console.log("Size Preset:", size_preset);
-            console.log("Quality:", quality);
-            console.log("Output Format:", output_format);
+            console.log("Aspect Ratio:", requestedAspectRatio);
+            console.log("Input URLs:", validatedInputUrls.length);
             console.log("Count:", count);
 
             const generationResult = provider === "kie"
                 ? await generateWithKie({
                     prompt: finalPrompt,
-                    sizePreset: size_preset,
-                    quality,
-                    outputFormat: output_format,
+                    aspectRatio: requestedAspectRatio,
+                    inputUrls: validatedInputUrls,
                 })
                 : await generateWithOpenAI({
                     prompt: finalPrompt,
-                    sizePreset: size_preset,
-                    quality,
-                    outputFormat: output_format,
+                    aspectRatio: requestedAspectRatio,
                     count,
                 });
 
@@ -360,7 +349,7 @@ export async function POST(request: NextRequest) {
                 prompt: trimmedPrompt,
                 model_id: generationResult.model,
                 image_url: generationResult.images[0],
-                input_image_url: null,
+                input_image_url: validatedInputUrls[0] || null,
                 status: "succeeded",
                 credits_cost: creditsRequired,
                 metadata: {

@@ -27,7 +27,6 @@ export async function generateMetadata(props: { params: Promise<{ locale: string
             languages: {
                 en: `${siteConfig.url}/en/create`,
                 zh: `${siteConfig.url}/zh/create`,
-                'x-default': `${siteConfig.url}/en/create`,
             },
         },
         openGraph: {
@@ -35,10 +34,20 @@ export async function generateMetadata(props: { params: Promise<{ locale: string
             description,
             type: 'website',
             url: `${siteConfig.url}/${locale}/create`,
+            images: [
+                {
+                    url: siteConfig.socialImage,
+                    width: 512,
+                    height: 512,
+                    alt: siteConfig.name,
+                },
+            ],
         },
         twitter: {
+            card: 'summary_large_image',
             title,
             description,
+            images: [siteConfig.socialImage],
         },
     };
 }
@@ -55,6 +64,11 @@ export default async function CreatePage(props: { params: Promise<{ locale: stri
         <>
             <SoftwareApplicationSchema locale={locale} pagePath="/create" />
             <div className="min-h-screen bg-[linear-gradient(180deg,#fffdf8_0%,#fff7ee_48%,#fff3e7_100%)]">
+                <h1 className="sr-only">
+                    {locale === 'zh'
+                        ? 'AI 绘图工作台，立即使用 GPT Image 2 生成图片'
+                        : 'AI Image Workspace for generating art with GPT Image 2'}
+                </h1>
                 <HomeClientWrapper
                     user={user}
                     staticContent={<CreateStaticContent locale={locale} />}

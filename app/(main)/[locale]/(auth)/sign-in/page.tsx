@@ -11,8 +11,10 @@ import { redirect } from "next/navigation";
 
 
 
-export default async function Login(props: { searchParams: Promise<Message> }) {
+export default async function Login(props: { searchParams: Promise<Message>; params: Promise<{ locale: string }> }) {
   const searchParams = await props.searchParams;
+  const { locale } = await props.params;
+  const localePrefix = `/${locale}`;
 
   const signInWithGoogle = async () => {
     "use server";
@@ -71,7 +73,7 @@ export default async function Login(props: { searchParams: Promise<Message> }) {
             <div className="flex items-center justify-between">
               <Label htmlFor="password">Password</Label>
               <Link
-                href="/forgot-password"
+                href={`${localePrefix}/forgot-password`}
                 className="text-sm font-medium text-primary hover:underline"
               >
                 Forgot password?
@@ -135,7 +137,7 @@ export default async function Login(props: { searchParams: Promise<Message> }) {
         <div className="text-sm text-muted-foreground text-center">
           Don't have an account?{" "}
           <Link
-            href="/sign-up"
+            href={`${localePrefix}/sign-up`}
             className="text-primary underline underline-offset-4 hover:text-primary/90"
           >
             Sign up
