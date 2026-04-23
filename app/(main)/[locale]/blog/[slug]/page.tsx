@@ -13,6 +13,20 @@ import { routing } from '@/i18n/routing';
 // 静态页面 - 使用 generateStaticParams 预生成所有博客文章
 export const dynamic = 'force-static';
 
+function slugifyHeading(title: string, used = new Map<string, number>()) {
+    const base = title
+        .toLowerCase()
+        .replace(/\s+/g, '-')
+        .replace(/[^\u4e00-\u9fff\u3040-\u30ff\u3400-\u4dbf\uf900-\ufaff\uac00-\ud7a3a-z0-9\-_]/g, '')
+        .replace(/-+/g, '-')
+        .replace(/(^-|-$)/g, '') || 'section';
+
+    const existingCount = used.get(base) ?? 0;
+    used.set(base, existingCount + 1);
+
+    return existingCount === 0 ? base : `${base}-${existingCount + 1}`;
+}
+
 // 从配置获取博客文章
 function getPost(slug: string, locale: string): (BlogPost & {
     author: string;
@@ -32,10 +46,11 @@ function getPost(slug: string, locale: string): (BlogPost & {
     // 从内容中提取 h2 标题作为目录
     const h2Regex = /<h2[^>]*>(.*?)<\/h2>/gi;
     const toc: { id: string; title: string }[] = [];
+    const usedHeadingIds = new Map<string, number>();
     let match;
     while ((match = h2Regex.exec(post.content)) !== null) {
         const title = match[1].replace(/<[^>]*>/g, '').trim();
-        const id = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+        const id = slugifyHeading(title, usedHeadingIds);
         toc.push({ id, title });
     }
 
@@ -104,9 +119,11 @@ export async function generateMetadata(props: { params: Promise<{ slug: string; 
 
 // 处理内容：添加 id 到 h2 标签
 function processContent(content: string): string {
+    const usedHeadingIds = new Map<string, number>();
+
     const contentWithHeadingIds = content.replace(/<h2([^>]*)>(.*?)<\/h2>/gi, (match, attrs, title) => {
         const cleanTitle = title.replace(/<[^>]*>/g, '').trim();
-        const id = cleanTitle.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+        const id = slugifyHeading(cleanTitle, usedHeadingIds);
         return `<h2 id="${id}"${attrs}>${title}</h2>`;
     });
 

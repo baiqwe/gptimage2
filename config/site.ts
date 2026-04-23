@@ -21,7 +21,7 @@ export const siteConfig = {
 
   // === PWA 主题 ===
   themeColor: "#f97316",                    // Orange 主题色（匹配新 logo）
-  backgroundColor: "#0f172a",               // 深色背景
+  backgroundColor: "#fffaf4",               // 浅色背景
 };
 
 // 类型导出

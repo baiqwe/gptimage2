@@ -34,9 +34,11 @@ export async function SoftwareApplicationSchema({ locale, pagePath = '' }: { loc
             "offers": ALL_PLANS.map((plan) => ({
                 "@type": "Offer",
                 "name": isZh ? plan.nameZh : plan.name,
+                "description": plan.type === 'subscription'
+                    ? (isZh ? '订阅方案' : 'Subscription plan')
+                    : (isZh ? '一次性购买' : 'One-time pass'),
                 "price": plan.price.toFixed(2),
                 "priceCurrency": "USD",
-                "category": plan.type === 'subscription' ? 'Subscription' : 'One-time purchase',
                 "url": `${siteConfig.url}/${locale}/pricing`,
                 "availability": "https://schema.org/InStock",
             })),
@@ -50,7 +52,7 @@ export async function SoftwareApplicationSchema({ locale, pagePath = '' }: { loc
             isZh ? "适合海报、产品图与概念视觉" : "Useful for posters, product visuals, and concept art",
             isZh ? "在线生成并即时下载" : "Generate online and download instantly"
         ],
-        "screenshot": `${siteConfig.url}/og-image.png`,
+        "screenshot": `${siteConfig.url}/web-app-manifest-512x512.png`,
         "isAccessibleForFree": true
         // Note: aggregateRating removed - only add when backed by real user review data
     };
@@ -84,7 +86,7 @@ export function WebsiteEntitySchema() {
                 "url": `${siteConfig.url}/`,
                 "logo": {
                     "@type": "ImageObject",
-                    "url": `${siteConfig.url}/og-image.png`
+                    "url": `${siteConfig.url}/web-app-manifest-512x512.png`
                 }
             }
         ]

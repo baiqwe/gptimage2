@@ -52,10 +52,10 @@ export async function generateMetadata(props: { params: Promise<{ locale: string
             siteName: siteConfig.name,
             images: [
                 {
-                    url: `${siteConfig.url}/og-image.png`,
-                    width: 1200,
-                    height: 630,
-                    alt: `${siteConfig.name} - GPT Image 2 Generator`,
+                    url: `${siteConfig.url}/web-app-manifest-512x512.png`,
+                    width: 512,
+                    height: 512,
+                    alt: `${siteConfig.name} logo`,
                 },
             ],
         },
@@ -64,7 +64,7 @@ export async function generateMetadata(props: { params: Promise<{ locale: string
             card: "summary_large_image",
             title: messages.metadata.title,
             description: messages.metadata.description,
-            images: [`${siteConfig.url}/og-image.png`],
+            images: [`${siteConfig.url}/web-app-manifest-512x512.png`],
         },
 
         robots: {
