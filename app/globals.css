@@ -115,6 +115,14 @@
       linear-gradient(90deg, rgba(255, 138, 61, 0.06) 1px, transparent 1px);
     background-size: 92px 92px;
   }
+
+  .prose img {
+    aspect-ratio: 16 / 9;
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+    background-color: #fff4ea;
+  }
 }
 
 @layer utilities {
