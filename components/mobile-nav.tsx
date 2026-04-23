@@ -36,35 +36,35 @@ export function MobileNav({ items, user, isDashboard, currentLocale = 'en' }: Mo
   return (
     <Sheet>
       <SheetTrigger asChild>
-        <Button variant="ghost" size="icon" className="md:hidden">
+        <Button variant="ghost" size="icon" className="border border-orange-100 bg-white/80 shadow-[0_10px_24px_rgba(232,145,73,0.08)] md:hidden">
           <Menu className="h-5 w-5" />
           <span className="sr-only">Toggle menu</span>
         </Button>
       </SheetTrigger>
-      <SheetContent side="left" className="flex flex-col">
+      <SheetContent side="left" className="flex flex-col border-r border-orange-100 bg-[linear-gradient(180deg,#fffdf8_0%,#fff4e8_100%)]">
         <SheetHeader>
-          <SheetTitle>{currentLocale === 'zh' ? '导航' : 'Navigation'}</SheetTitle>
+          <SheetTitle className="text-slate-900">{currentLocale === 'zh' ? '导航' : 'Navigation'}</SheetTitle>
         </SheetHeader>
 
         {/* Language Switcher for Mobile */}
-        <div className="flex items-center gap-2 mt-4 pb-4 border-b">
+        <div className="mt-4 flex items-center gap-2 border-b border-orange-100 pb-4">
           <span className="text-sm text-muted-foreground">
             {currentLocale === 'zh' ? '语言:' : 'Language:'}
           </span>
           <Link
             href={`/en${pathWithoutLocale}`}
-            className={`px-3 py-1.5 rounded text-sm transition-colors ${currentLocale === 'en'
+            className={`rounded-full px-3 py-1.5 text-sm transition-colors ${currentLocale === 'en'
               ? 'bg-primary text-primary-foreground'
-              : 'bg-muted text-muted-foreground hover:text-foreground'
+              : 'bg-white text-muted-foreground hover:text-foreground'
               }`}
           >
             EN
           </Link>
           <Link
             href={`/zh${pathWithoutLocale}`}
-            className={`px-3 py-1.5 rounded text-sm transition-colors ${currentLocale === 'zh'
+            className={`rounded-full px-3 py-1.5 text-sm transition-colors ${currentLocale === 'zh'
               ? 'bg-primary text-primary-foreground'
-              : 'bg-muted text-muted-foreground hover:text-foreground'
+              : 'bg-white text-muted-foreground hover:text-foreground'
               }`}
           >
             中文
@@ -76,13 +76,13 @@ export function MobileNav({ items, user, isDashboard, currentLocale = 'en' }: Mo
             <Link
               key={item.href}
               href={item.href}
-              className="text-lg font-semibold text-muted-foreground transition-colors hover:text-primary"
+              className="rounded-2xl border border-transparent px-3 py-2 text-lg font-semibold text-muted-foreground transition-colors hover:border-orange-100 hover:bg-white hover:text-primary"
             >
               {item.label}
             </Link>
           ))}
         </nav>
-        <div className="mt-auto pt-4 border-t">
+        <div className="mt-auto border-t border-orange-100 pt-4">
           {user ? (
             <div className="flex flex-col gap-2">
               <Button asChild variant="default" className="w-full">

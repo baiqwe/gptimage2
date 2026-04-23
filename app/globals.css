@@ -78,12 +78,24 @@
     @apply rounded-[28px] border border-orange-100 bg-white/85 shadow-[0_24px_80px_rgba(232,145,73,0.12)] backdrop-blur-sm;
   }
 
+  .section-shell {
+    @apply rounded-[32px] border border-orange-100 bg-white/90 shadow-[0_24px_70px_rgba(232,145,73,0.10)] backdrop-blur-sm;
+  }
+
+  .soft-panel {
+    @apply rounded-[24px] border border-orange-100 bg-[#fffaf4] shadow-[0_18px_45px_rgba(232,145,73,0.08)];
+  }
+
   .gradient-text {
     @apply bg-gradient-to-r from-orange-500 via-amber-500 to-rose-500 bg-clip-text text-transparent;
   }
 
   .btn-gradient {
     @apply bg-[#ff6b2c] text-white shadow-[0_18px_40px_rgba(255,107,44,0.28)] hover:bg-[#f86120];
+  }
+
+  .btn-secondary-soft {
+    @apply border border-orange-200 bg-[#fffaf4] text-slate-700 shadow-[0_10px_24px_rgba(232,145,73,0.06)] hover:bg-orange-50;
   }
 
   .bg-grid {

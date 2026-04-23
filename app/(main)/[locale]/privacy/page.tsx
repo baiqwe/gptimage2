@@ -51,24 +51,24 @@ export default async function PrivacyPage(props: { params: Promise<{ locale: str
     ];
 
     return (
-        <div className="min-h-screen bg-slate-950">
+        <div className="min-h-screen bg-[linear-gradient(180deg,#fffdf8_0%,#fff7ee_48%,#fff3e7_100%)]">
             <BreadcrumbSchema items={breadcrumbs} />
 
             {/* Visual Breadcrumb + Header */}
-            <div className="border-b border-slate-800 bg-slate-950/95 backdrop-blur">
+            <div className="border-b border-orange-100 bg-white/85 backdrop-blur">
                 <div className="container px-4 md:px-6 py-4">
                     {/* Visual Breadcrumb Navigation */}
-                    <nav className="flex items-center text-sm text-slate-400 mb-4 overflow-x-auto whitespace-nowrap">
-                        <Link href={localePrefix} className="hover:text-indigo-400 transition-colors">
+                    <nav className="mb-4 flex items-center overflow-x-auto whitespace-nowrap text-sm text-slate-500">
+                        <Link href={localePrefix} className="transition-colors hover:text-orange-600">
                             {isZh ? '首页' : 'Home'}
                         </Link>
-                        <span className="mx-2 text-slate-600">/</span>
-                        <span className="text-white font-medium">{isZh ? '隐私政策' : 'Privacy Policy'}</span>
+                        <span className="mx-2 text-orange-200">/</span>
+                        <span className="font-medium text-slate-900">{isZh ? '隐私政策' : 'Privacy Policy'}</span>
                     </nav>
                     <div className="flex items-center gap-4">
                         <div>
-                            <h1 className="text-xl font-bold text-white">{isZh ? '隐私政策' : 'Privacy Policy'}</h1>
-                            <p className="text-sm text-slate-400">
+                            <h1 className="text-xl font-bold text-slate-950">{isZh ? '隐私政策' : 'Privacy Policy'}</h1>
+                            <p className="text-sm text-slate-500">
                                 {isZh ? '最后更新：2026年1月' : 'Last updated: January 2026'}
                             </p>
                         </div>
@@ -81,14 +81,14 @@ export default async function PrivacyPage(props: { params: Promise<{ locale: str
                 <div className="max-w-4xl mx-auto space-y-12">
                     {/* Hero */}
                     <div className="text-center space-y-6">
-                        <div className="inline-flex items-center rounded-full px-4 py-2 text-sm bg-indigo-500/20 text-indigo-300">
+                        <div className="inline-flex items-center rounded-full border border-orange-100 bg-white/80 px-4 py-2 text-sm text-orange-600">
                             <Shield className="mr-2 h-5 w-5" />
                             {isZh ? '您的隐私很重要' : 'Your Privacy Matters'}
                         </div>
-                        <h2 className="text-4xl font-bold tracking-tight text-white sm:text-5xl">
+                        <h2 className="text-4xl font-bold tracking-tight text-slate-950 sm:text-5xl">
                             {isZh ? '透明的数据处理' : 'Transparent Data Handling'}
                         </h2>
-                        <p className="text-xl text-slate-400 max-w-3xl mx-auto">
+                        <p className="mx-auto max-w-3xl text-xl text-slate-600">
                             {isZh
                                 ? `${siteConfig.name} 致力于保护您的隐私。本政策说明我们收集哪些数据、如何使用以及如何保护它们。`
                                 : `${siteConfig.name} is committed to protecting your privacy. This policy explains what data we collect, how we use it, and how we protect it.`}
@@ -97,14 +97,14 @@ export default async function PrivacyPage(props: { params: Promise<{ locale: str
 
                     {/* Data Collection Cards */}
                     <div className="grid md:grid-cols-2 gap-6">
-                        <Card className="bg-slate-800/50 border-slate-700">
+                        <Card className="border-orange-100 bg-white/90 shadow-[0_16px_40px_rgba(255,107,44,0.06)]">
                             <CardHeader>
-                                <CardTitle className="flex items-center gap-2 text-white">
-                                    <Database className="h-5 w-5 text-indigo-400" />
+                                <CardTitle className="flex items-center gap-2 text-slate-900">
+                                    <Database className="h-5 w-5 text-orange-500" />
                                     {isZh ? '账户数据' : 'Account Data'}
                                 </CardTitle>
                             </CardHeader>
-                            <CardContent className="space-y-3 text-sm text-slate-400">
+                            <CardContent className="space-y-3 text-sm text-slate-600">
                                 <p>
                                     {isZh
                                         ? '当您注册账户时，我们通过 Supabase Auth 收集：'
@@ -118,7 +118,7 @@ export default async function PrivacyPage(props: { params: Promise<{ locale: str
                             </CardContent>
                         </Card>
 
-                        <Card className="bg-slate-800/50 border-slate-700">
+                        <Card className="border-orange-100 bg-white/90 shadow-[0_16px_40px_rgba(255,107,44,0.06)]">
                             <CardHeader>
                                 <CardTitle className="flex items-center gap-2 text-white">
                                     <Eye className="h-5 w-5 text-purple-400" />
@@ -141,12 +141,12 @@ export default async function PrivacyPage(props: { params: Promise<{ locale: str
 
                         <Card className="bg-slate-800/50 border-slate-700">
                             <CardHeader>
-                                <CardTitle className="flex items-center gap-2 text-white">
-                                    <Globe className="h-5 w-5 text-cyan-400" />
+                                <CardTitle className="flex items-center gap-2 text-slate-900">
+                                    <Globe className="h-5 w-5 text-orange-500" />
                                     {isZh ? '分析数据' : 'Analytics'}
                                 </CardTitle>
                             </CardHeader>
-                            <CardContent className="space-y-3 text-sm text-slate-400">
+                            <CardContent className="space-y-3 text-sm text-slate-600">
                                 <p>
                                     {isZh
                                         ? '我们使用 Google Analytics 收集匿名使用数据：'
@@ -160,14 +160,14 @@ export default async function PrivacyPage(props: { params: Promise<{ locale: str
                             </CardContent>
                         </Card>
 
-                        <Card className="bg-slate-800/50 border-slate-700">
+                        <Card className="border-orange-100 bg-white/90 shadow-[0_16px_40px_rgba(255,107,44,0.06)]">
                             <CardHeader>
-                                <CardTitle className="flex items-center gap-2 text-white">
-                                    <CreditCard className="h-5 w-5 text-emerald-400" />
+                                <CardTitle className="flex items-center gap-2 text-slate-900">
+                                    <CreditCard className="h-5 w-5 text-orange-500" />
                                     {isZh ? '支付数据' : 'Payment Data'}
                                 </CardTitle>
                             </CardHeader>
-                            <CardContent className="space-y-3 text-sm text-slate-400">
+                            <CardContent className="space-y-3 text-sm text-slate-600">
                                 <p>
                                     {isZh
                                         ? '支付由 Creem 安全处理：'
@@ -183,12 +183,12 @@ export default async function PrivacyPage(props: { params: Promise<{ locale: str
                     </div>
 
                     {/* Data Protection */}
-                    <div className="bg-slate-800/30 rounded-2xl p-8 border border-slate-700">
-                        <h3 className="text-2xl font-bold mb-6 flex items-center gap-3 text-white">
-                            <Lock className="h-6 w-6 text-indigo-400" />
+                    <div className="rounded-2xl border border-orange-100 bg-white/85 p-8 shadow-[0_20px_60px_rgba(255,107,44,0.06)]">
+                        <h3 className="mb-6 flex items-center gap-3 text-2xl font-bold text-slate-900">
+                            <Lock className="h-6 w-6 text-orange-500" />
                             {isZh ? '数据保护' : 'Data Protection'}
                         </h3>
-                        <div className="space-y-4 text-slate-400">
+                        <div className="space-y-4 text-slate-600">
                             <p>
                                 {isZh
                                     ? '我们采取以下措施保护您的数据：'
@@ -204,16 +204,16 @@ export default async function PrivacyPage(props: { params: Promise<{ locale: str
                     </div>
 
                     {/* Your Rights */}
-                    <div className="bg-indigo-500/10 rounded-2xl p-8 border border-indigo-500/30">
-                        <h3 className="text-2xl font-bold mb-4 text-white">
+                    <div className="rounded-2xl border border-orange-100 bg-[linear-gradient(135deg,rgba(255,255,255,0.94)_0%,rgba(255,246,236,0.94)_100%)] p-8 shadow-[0_20px_60px_rgba(255,107,44,0.08)]">
+                        <h3 className="mb-4 text-2xl font-bold text-slate-900">
                             {isZh ? '您的权利' : 'Your Rights'}
                         </h3>
-                        <p className="text-slate-400 mb-4">
+                        <p className="mb-4 text-slate-600">
                             {isZh
                                 ? '您有权随时：'
                                 : 'You have the right to:'}
                         </p>
-                        <ul className="space-y-2 text-slate-400 list-disc list-inside">
+                        <ul className="list-inside list-disc space-y-2 text-slate-600">
                             <li>{isZh ? '请求访问您的个人数据' : 'Request access to your personal data'}</li>
                             <li>{isZh ? '请求删除您的账户和数据' : 'Request deletion of your account and data'}</li>
                             <li>{isZh ? '选择退出分析追踪' : 'Opt out of analytics tracking'}</li>

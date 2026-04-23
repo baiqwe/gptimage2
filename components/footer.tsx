@@ -29,9 +29,9 @@ export function Footer() {
   ];
 
   return (
-    <footer className="border-t border-orange-100 bg-white/70">
+    <footer className="border-t border-orange-100 bg-[linear-gradient(180deg,rgba(255,252,247,0.85)_0%,rgba(255,246,236,0.92)_100%)]">
       <div className="container px-4 py-12 md:py-16">
-        <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
+        <div className="section-shell grid grid-cols-2 gap-8 px-6 py-8 md:grid-cols-4 md:px-8">
           {/* Brand */}
           <div className="col-span-2">
             <Logo />
@@ -79,7 +79,7 @@ export function Footer() {
         </div>
 
         {/* Friends / 友链 */}
-        <div className="mt-8 pt-6 border-t border-orange-100">
+        <div className="soft-panel mt-8 border border-orange-100 px-6 py-6">
           <h3 className="text-sm font-semibold text-slate-900 mb-4">
             {currentLocale === 'zh' ? '友情链接' : 'Friends'}
           </h3>
@@ -176,7 +176,7 @@ export function Footer() {
         </div>
 
         {/* Bottom */}
-        <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-orange-100 pt-8 md:flex-row">
+        <div className="mt-8 flex flex-col items-center justify-between gap-4 px-2 pt-2 md:flex-row">
           <p className="text-center text-sm text-slate-500 md:text-left">
             © {new Date().getFullYear()} {siteConfig.domain}. {t('rights')}
           </p>

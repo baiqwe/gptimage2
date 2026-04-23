@@ -66,9 +66,9 @@ export default async function BlogPage(props: { params: Promise<{ locale: string
 
     return (
         <div className="min-h-screen bg-[linear-gradient(180deg,#fffaf4_0%,#fff7ef_46%,#fffdf9_100%)]">
-            <div className="container max-w-6xl mx-auto px-4 py-16">
+            <div className="container mx-auto max-w-6xl px-4 py-16 md:py-20">
                 {/* Header */}
-                <div className="text-center mb-16">
+                <div className="mb-14 text-center md:mb-16">
                     <div className="inline-flex items-center gap-2 rounded-full border border-orange-200 bg-white px-4 py-2 text-sm font-semibold text-orange-700 mb-6">
                         <Sparkles className="w-4 h-4" />
                         {isZh ? '精选内容' : 'Featured Reads'}
@@ -83,8 +83,8 @@ export default async function BlogPage(props: { params: Promise<{ locale: string
                     </p>
                 </div>
 
-                <div className="grid gap-6 md:grid-cols-2 mb-14">
-                    <div className="rounded-[28px] border border-orange-100 bg-white p-6 shadow-[0_20px_50px_rgba(235,145,71,0.08)]">
+                <div className="mb-14 grid gap-6 md:grid-cols-2">
+                    <div className="section-shell p-6 md:p-7">
                         <div className="flex items-center gap-3 text-slate-900">
                             <BookOpen className="h-5 w-5 text-orange-500" />
                             <h2 className="text-xl font-bold">{isZh ? '你能在这里看到什么' : 'What You Can Find Here'}</h2>
@@ -95,7 +95,7 @@ export default async function BlogPage(props: { params: Promise<{ locale: string
                                 : 'This section brings together GPT Image 2 explainers, ChatGPT Image 2 usage guides, and comparisons with tools like Nano Banana 2, Pollo AI, Lovart, and Kimi K2.6. If you want prompt ideas, visual examples, or a clearer workflow choice, this is the place to start.'}
                         </p>
                     </div>
-                    <div className="rounded-[28px] border border-orange-100 bg-[#fffaf4] p-6 shadow-[0_20px_50px_rgba(235,145,71,0.08)]">
+                    <div className="section-shell bg-[#fffaf4] p-6 md:p-7">
                         <div className="flex items-center gap-3 text-slate-900">
                             <ShieldCheck className="h-5 w-5 text-orange-500" />
                             <h2 className="text-xl font-bold">{isZh ? '为什么这些文章值得读' : 'Why These Guides Are Useful'}</h2>
@@ -109,7 +109,7 @@ export default async function BlogPage(props: { params: Promise<{ locale: string
                 </div>
 
                 {/* Posts Grid */}
-                <div className="grid md:grid-cols-2 gap-8 mb-16">
+                <div className="mb-16 grid gap-8 md:grid-cols-2">
                     {posts.map(post => (
                         <Link key={post.slug} href={`${localePrefix}/blog/${post.slug}`} className="group">
                             <Card className="h-full overflow-hidden border-orange-100 bg-white transition-all hover:-translate-y-1 hover:shadow-[0_24px_54px_rgba(235,145,71,0.12)]">
@@ -117,7 +117,7 @@ export default async function BlogPage(props: { params: Promise<{ locale: string
                                     <div className="relative aspect-[16/9] overflow-hidden border-b border-orange-100 bg-[#fff7ef]">
                                         <Image
                                             src={post.heroImage}
-                                            alt={post.title}
+                                            alt={`${post.title}. ${post.excerpt}`}
                                             fill
                                             className="object-cover transition-transform duration-500 group-hover:scale-[1.02]"
                                         />
@@ -153,8 +153,8 @@ export default async function BlogPage(props: { params: Promise<{ locale: string
                     ))}
                 </div>
 
-                <div className="grid gap-6 lg:grid-cols-2 mb-16">
-                    <div className="rounded-[28px] border border-orange-100 bg-white p-8 shadow-[0_24px_54px_rgba(235,145,71,0.10)]">
+                <div className="mb-16 grid gap-6 lg:grid-cols-2">
+                    <div className="section-shell p-8">
                         <h2 className="text-2xl font-bold text-slate-900">
                             {isZh ? '为什么这些文章适合分开阅读' : 'Why These Guides Work Better as Separate Reads'}
                         </h2>
@@ -170,7 +170,7 @@ export default async function BlogPage(props: { params: Promise<{ locale: string
                         </p>
                     </div>
 
-                    <div className="rounded-[28px] border border-orange-100 bg-[#fffaf4] p-8 shadow-[0_24px_54px_rgba(235,145,71,0.10)]">
+                    <div className="section-shell bg-[#fffaf4] p-8">
                         <h2 className="text-2xl font-bold text-slate-900">
                             {isZh ? '读完后下一步去哪里' : 'Where to Go Next After Reading'}
                         </h2>
@@ -192,7 +192,7 @@ export default async function BlogPage(props: { params: Promise<{ locale: string
                 </div>
 
                 {/* CTA Section */}
-                <div className="text-center p-12 rounded-[32px] border border-orange-100 bg-white shadow-[0_24px_64px_rgba(235,145,71,0.10)]">
+                <div className="section-shell p-12 text-center">
                     <h2 className="text-2xl font-bold text-slate-900 mb-4">
                         {isZh ? '准备好开始创作了吗？' : 'Ready to Start Creating?'}
                     </h2>
@@ -203,12 +203,12 @@ export default async function BlogPage(props: { params: Promise<{ locale: string
                     </p>
                     <div className="flex flex-wrap items-center justify-center gap-3">
                         <Link href={`${localePrefix}/create`}>
-                            <Button size="lg" className="rounded-full px-8 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700">
+                            <Button size="lg" className="px-8 bg-[#ff6b2c] hover:bg-[#f86120]">
                                 {isZh ? '进入生成器' : 'Open Generator'} <ArrowRight className="ml-2 h-5 w-5" />
                             </Button>
                         </Link>
                         <Link href={`${localePrefix}/developer-api`}>
-                            <Button size="lg" variant="outline" className="rounded-full px-8 border-orange-200 bg-[#fffaf4] text-slate-700 hover:bg-orange-50">
+                            <Button size="lg" variant="outline" className="px-8 border-orange-200 bg-[#fffaf4] text-slate-700 hover:bg-orange-50">
                                 {isZh ? '查看 API 指南' : 'View API Guide'}
                             </Button>
                         </Link>

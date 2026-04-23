@@ -66,7 +66,7 @@ export default async function ArenaPage(props: { params: Promise<{ locale: strin
 
     return (
         <div className="min-h-screen bg-[linear-gradient(180deg,#fff8f0_0%,#fffdf9_100%)]">
-            <div className="container px-4 py-16 md:px-6">
+            <div className="container px-4 py-16 md:px-6 md:py-20">
                 <div className="mx-auto max-w-6xl">
                     <div className="text-center">
                         <div className="inline-flex rounded-full border border-orange-200 bg-white px-4 py-2 text-sm font-semibold text-orange-700">
@@ -82,9 +82,9 @@ export default async function ArenaPage(props: { params: Promise<{ locale: strin
                         </p>
                     </div>
 
-                    <div className="mt-12 grid gap-6 lg:grid-cols-3">
+                    <div className="mt-12 grid gap-6 md:mt-14 lg:grid-cols-3">
                         {prompts.map((item, index) => (
-                            <div key={item.title} className="rounded-[24px] border border-orange-100 bg-white p-6 shadow-[0_20px_50px_rgba(235,145,71,0.08)]">
+                            <div key={item.title} className="soft-panel bg-white p-6">
                                 <div className="text-sm font-semibold uppercase tracking-[0.2em] text-orange-500">
                                     {isZh ? `Round ${index + 1}` : `Round ${index + 1}`}
                                 </div>
@@ -94,7 +94,7 @@ export default async function ArenaPage(props: { params: Promise<{ locale: strin
                         ))}
                     </div>
 
-                    <div className="mt-10 rounded-[24px] border border-orange-100 bg-white p-8 shadow-[0_20px_50px_rgba(235,145,71,0.08)]">
+                    <div className="section-shell mt-10 p-8 md:mt-12">
                         <h2 className="text-2xl font-bold text-slate-900">{isZh ? '如何使用这个页面' : 'How to use this page'}</h2>
                         <div className="mt-5 space-y-3 leading-8 text-slate-600">
                             <p>{isZh ? '1. 复制上面的任一 prompt。' : '1. Copy one of the prompts above.'}</p>
@@ -106,7 +106,7 @@ export default async function ArenaPage(props: { params: Promise<{ locale: strin
                             <Link href={`${localePrefix}/create`} className="rounded-full bg-[#ff6b2c] px-6 py-3 text-sm font-semibold text-white shadow-[0_16px_30px_rgba(255,107,44,0.2)] transition-colors hover:bg-[#f86120]">
                                 {isZh ? '进入生成器测试' : 'Test in the generator'}
                             </Link>
-                            <Link href={`${localePrefix}/blog`} className="rounded-full border border-orange-200 bg-white px-6 py-3 text-sm font-semibold text-slate-700 transition-colors hover:bg-orange-50">
+                            <Link href={`${localePrefix}/blog`} className="btn-secondary-soft rounded-full px-6 py-3 text-sm font-semibold">
                                 {isZh ? '查看对比文章' : 'Read comparison posts'}
                             </Link>
                         </div>

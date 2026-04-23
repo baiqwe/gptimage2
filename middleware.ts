@@ -20,7 +20,9 @@ export async function middleware(request: NextRequest) {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-    if (supabaseUrl && supabaseKey) {
+    const isProtectedRoute = /^\/(en|zh)\/dashboard(?:\/|$)/.test(request.nextUrl.pathname)
+
+    if (supabaseUrl && supabaseKey && isProtectedRoute) {
       const supabase = createServerClient(
         supabaseUrl,
         supabaseKey,
@@ -44,10 +46,8 @@ export async function middleware(request: NextRequest) {
         }
       )
 
-      // 3. 刷新 Session (这会触发上面的 setAll)
+      // 3. 仅在受保护路由刷新 Session，避免公开页面白白阻塞 TTFB
       await supabase.auth.getUser()
-    } else {
-      // console.warn("Middleware: Supabase env vars missing, skipping auth check.")
     }
 
     return response

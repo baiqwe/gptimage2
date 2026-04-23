@@ -8,6 +8,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { ChevronRight, Calendar, User, Clock, ArrowRight, Sparkles, FileText } from 'lucide-react';
 import { siteConfig } from '@/config/site';
 import { blogPosts, BlogPost } from '@/config/blog-posts';
+import { routing } from '@/i18n/routing';
 
 // 静态页面 - 使用 generateStaticParams 预生成所有博客文章
 export const dynamic = 'force-static';
@@ -61,9 +62,12 @@ function getRelatedPosts(currentSlug: string, limit: number = 3) {
 }
 
 export async function generateStaticParams() {
-    return blogPosts.map(post => ({
-        slug: post.slug,
-    }));
+    return routing.locales.flatMap((locale) =>
+        blogPosts.map((post) => ({
+            locale,
+            slug: post.slug,
+        }))
+    );
 }
 
 export async function generateMetadata(props: { params: Promise<{ slug: string; locale: string }> }): Promise<Metadata> {
@@ -100,10 +104,26 @@ export async function generateMetadata(props: { params: Promise<{ slug: string; 
 
 // 处理内容：添加 id 到 h2 标签
 function processContent(content: string): string {
-    return content.replace(/<h2([^>]*)>(.*?)<\/h2>/gi, (match, attrs, title) => {
+    const contentWithHeadingIds = content.replace(/<h2([^>]*)>(.*?)<\/h2>/gi, (match, attrs, title) => {
         const cleanTitle = title.replace(/<[^>]*>/g, '').trim();
         const id = cleanTitle.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
         return `<h2 id="${id}"${attrs}>${title}</h2>`;
+    });
+
+    return contentWithHeadingIds.replace(/<img([^>]*?)>/gi, (match, attrs) => {
+        const hasLoading = /\sloading=/.test(attrs);
+        const hasDecoding = /\sdecoding=/.test(attrs);
+        const hasFetchPriority = /\sfetchpriority=/.test(attrs);
+        const hasSizes = /\ssizes=/.test(attrs);
+
+        const extraAttrs = [
+            hasLoading ? '' : ' loading="lazy"',
+            hasDecoding ? '' : ' decoding="async"',
+            hasFetchPriority ? '' : ' fetchpriority="low"',
+            hasSizes ? '' : ' sizes="(min-width: 1280px) 768px, 100vw"',
+        ].join('');
+
+        return `<img${attrs}${extraAttrs}>`;
     });
 }
 
@@ -119,7 +139,7 @@ export default async function BlogPostPage(props: { params: Promise<{ slug: stri
 
     return (
         <div className="min-h-screen bg-[linear-gradient(180deg,#fffaf4_0%,#fff7ef_46%,#fffdf9_100%)]">
-            <div className="container max-w-7xl mx-auto px-4 py-12">
+            <div className="container mx-auto max-w-7xl px-4 py-12 md:py-16">
                 {/* Breadcrumb Navigation */}
                 <nav className="flex items-center text-sm text-slate-500 mb-8 overflow-x-auto whitespace-nowrap">
                     <Link href={localePrefix} className="hover:text-orange-600 transition-colors">
@@ -133,11 +153,11 @@ export default async function BlogPostPage(props: { params: Promise<{ slug: stri
                     <span className="text-slate-900 font-medium truncate max-w-[200px] md:max-w-none">{post.title}</span>
                 </nav>
 
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
+                <div className="grid grid-cols-1 gap-10 lg:grid-cols-12 lg:gap-12">
                     {/* Main Content Area (8/12) */}
                     <main className="lg:col-span-8">
                         {/* Article Header */}
-                        <header className="mb-10 rounded-[32px] border border-orange-100 bg-white p-8 shadow-[0_24px_64px_rgba(235,145,71,0.10)]">
+                        <header className="section-shell mb-10 p-8 md:p-10">
                             <div className="flex flex-wrap gap-2 mb-4">
                                 {post.tags.map(tag => (
                                     <Badge key={tag} variant="secondary" className="bg-[#fff3ea] text-orange-700 border border-orange-100">
@@ -170,13 +190,13 @@ export default async function BlogPostPage(props: { params: Promise<{ slug: stri
 
                             {post.heroImage && (
                                 <div className="relative mt-8 aspect-[16/9] overflow-hidden rounded-[28px] border border-orange-100 bg-[#fff7ef]">
-                                    <Image src={post.heroImage} alt={post.title} fill className="object-cover" />
+                                    <Image src={post.heroImage} alt={`${post.title}. ${post.description}`} fill className="object-cover" />
                                 </div>
                             )}
                         </header>
 
                         {/* Article Body (Prose Styling) */}
-                        <article className="prose prose-lg max-w-none rounded-[32px] border border-orange-100 bg-white p-8 shadow-[0_24px_64px_rgba(235,145,71,0.10)]
+                        <article className="section-shell prose prose-lg max-w-none p-8 md:p-10
               prose-headings:font-bold prose-headings:tracking-tight prose-headings:text-slate-900
               prose-p:text-slate-700 prose-p:leading-8
               prose-a:text-orange-700 prose-a:no-underline hover:prose-a:underline
@@ -191,7 +211,7 @@ export default async function BlogPostPage(props: { params: Promise<{ slug: stri
                         </article>
 
                         {/* Bottom CTA Card */}
-                        <div className="mt-16 rounded-[32px] border border-orange-100 bg-white p-8 text-center shadow-[0_24px_64px_rgba(235,145,71,0.10)]">
+                        <div className="section-shell mt-16 p-8 text-center md:p-10">
                             <h3 className="text-2xl font-bold mb-4 text-slate-900">
                                 {isZh ? '准备好创作惊艳的 AI 艺术了吗？' : 'Ready to Create Stunning AI Art?'}
                             </h3>
@@ -201,7 +221,7 @@ export default async function BlogPostPage(props: { params: Promise<{ slug: stri
                                     : 'Start with free trial credits, then continue into pricing, API guidance, or model comparisons as your workflow grows.'}
                             </p>
                             <Link href={`${localePrefix}/create`}>
-                                <Button size="lg" className="rounded-full px-8 text-lg bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white shadow-xl shadow-indigo-500/20">
+                                <Button size="lg" className="px-8 text-lg bg-[#ff6b2c] text-white hover:bg-[#f86120]">
                                     {isZh ? '进入 GPT Image 2 生成器' : 'Open the GPT Image 2 Generator'} <ArrowRight className="ml-2 h-5 w-5" />
                                 </Button>
                             </Link>
@@ -234,7 +254,7 @@ export default async function BlogPostPage(props: { params: Promise<{ slug: stri
 
                             {/* Table of Contents */}
                             {post.toc.length > 0 && (
-                                <div className="hidden lg:block rounded-xl border border-orange-100 bg-white p-6 shadow-[0_20px_50px_rgba(235,145,71,0.08)]">
+                                <div className="soft-panel hidden p-6 lg:block">
                                     <h4 className="font-semibold text-sm uppercase tracking-wider text-slate-500 mb-4">
                                         {isZh ? '本文目录' : 'On this page'}
                                     </h4>
@@ -254,7 +274,7 @@ export default async function BlogPostPage(props: { params: Promise<{ slug: stri
                             )}
 
                             {/* Related Articles */}
-                            <div className="rounded-xl border border-orange-100 bg-white p-6 shadow-[0_20px_50px_rgba(235,145,71,0.08)]">
+                            <div className="soft-panel bg-white p-6">
                                 <h4 className="font-bold mb-4 text-slate-900">{isZh ? '相关文章' : 'Related Articles'}</h4>
                                 <ul className="space-y-4">
                                     {relatedPosts.map(related => (

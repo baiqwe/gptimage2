@@ -20,6 +20,10 @@ const geistSans = Geist({
     subsets: ["latin"],
 });
 
+export function generateStaticParams() {
+    return routing.locales.map((locale) => ({ locale }));
+}
+
 export async function generateMetadata(props: { params: Promise<{ locale: string }> }) {
     const params = await props.params;
     const { locale } = params;
@@ -110,15 +114,15 @@ export default async function LocaleLayout(props: {
     // 不在服务端获取，以便页面可以被缓存
 
     return (
-        <html lang={locale} className={`${geistSans.className} dark`} suppressHydrationWarning>
-            <body className="bg-slate-950 text-slate-50 antialiased" suppressHydrationWarning>
+        <html lang={locale} className={geistSans.className} suppressHydrationWarning>
+            <body className="bg-background text-foreground antialiased" suppressHydrationWarning>
                 <GoogleAnalytics />
                 <Clarity />
                 <NextIntlClientProvider messages={messages} locale={locale}>
                     <ThemeProvider
                         attribute="class"
-                        defaultTheme="dark"
-                        forcedTheme="dark"
+                        defaultTheme="light"
+                        forcedTheme="light"
                         disableTransitionOnChange
                     >
                         <div className="relative min-h-screen flex flex-col">

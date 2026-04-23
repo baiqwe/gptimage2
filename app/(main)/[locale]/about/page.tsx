@@ -91,8 +91,8 @@ export default async function AboutPage(props: { params: Promise<{ locale: strin
                 </div>
             </div>
 
-            <div className="container px-4 py-16 md:px-6">
-                <div className="mx-auto max-w-5xl space-y-12">
+            <div className="container px-4 py-16 md:px-6 md:py-20">
+                <div className="mx-auto max-w-5xl space-y-10 md:space-y-12">
                     <div className="text-center">
                         <div className="inline-flex items-center gap-2 rounded-full border border-orange-200 bg-white px-4 py-2 text-sm font-semibold text-orange-700">
                             <Sparkles className="h-4 w-4" />
@@ -108,7 +108,7 @@ export default async function AboutPage(props: { params: Promise<{ locale: strin
                         </p>
                     </div>
 
-                    <section className="rounded-[32px] border border-orange-100 bg-white p-8 shadow-[0_24px_60px_rgba(235,145,71,0.10)] md:p-10">
+                    <section className="section-shell p-8 md:p-10">
                         <h2 className="text-2xl font-bold text-slate-900">
                             {isZh ? '我们希望这个产品解决什么问题' : 'What we want this product to solve'}
                         </h2>
@@ -128,7 +128,7 @@ export default async function AboutPage(props: { params: Promise<{ locale: strin
 
                     <section className="grid gap-6 md:grid-cols-3">
                         {cards.map((card) => (
-                            <div key={card.title} className="rounded-[28px] border border-orange-100 bg-white p-6 shadow-[0_20px_50px_rgba(235,145,71,0.08)]">
+                            <div key={card.title} className="soft-panel p-6">
                                 <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-[#fff5ec]">
                                     {card.icon}
                                 </div>
@@ -138,12 +138,12 @@ export default async function AboutPage(props: { params: Promise<{ locale: strin
                         ))}
                     </section>
 
-                    <section className="rounded-[32px] border border-orange-100 bg-[#fffaf4] p-8 shadow-[0_24px_60px_rgba(235,145,71,0.08)] md:p-10">
+                    <section className="section-shell bg-[#fffaf4] p-8 md:p-10">
                         <h2 className="text-2xl font-bold text-slate-900">
                             {isZh ? '如果你是第一次来到这里' : 'If this is your first time here'}
                         </h2>
                         <div className="mt-5 grid gap-5 md:grid-cols-2">
-                            <div className="rounded-[24px] border border-orange-100 bg-white p-6">
+                            <div className="soft-panel bg-white p-6">
                                 <h3 className="text-lg font-bold text-slate-900">{isZh ? '想直接开始生成' : 'Want to generate right away?'}</h3>
                                 <p className="mt-3 leading-7 text-slate-600">
                                     {isZh
@@ -154,7 +154,7 @@ export default async function AboutPage(props: { params: Promise<{ locale: strin
                                     {isZh ? '进入生成器' : 'Open the generator'} <ArrowRight className="ml-2 h-4 w-4" />
                                 </Link>
                             </div>
-                            <div className="rounded-[24px] border border-orange-100 bg-white p-6">
+                            <div className="soft-panel bg-white p-6">
                                 <h3 className="text-lg font-bold text-slate-900">{isZh ? '想继续研究和比较' : 'Want to research and compare?'}</h3>
                                 <p className="mt-3 leading-7 text-slate-600">
                                     {isZh
@@ -170,7 +170,7 @@ export default async function AboutPage(props: { params: Promise<{ locale: strin
                         </div>
                     </section>
 
-                    <section className="text-center rounded-[32px] border border-orange-100 bg-white p-10 shadow-[0_24px_60px_rgba(235,145,71,0.10)]">
+                    <section className="section-shell p-10 text-center">
                         <h2 className="text-2xl font-bold text-slate-900">
                             {isZh ? '开始试一张图，看看它是否适合你的工作流' : 'Try a prompt and see if it fits your workflow'}
                         </h2>

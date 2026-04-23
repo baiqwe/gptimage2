@@ -65,7 +65,7 @@ const INSPIRATION_PROMPTS = [
 
 const SAMPLE_PREVIEW_SLIDES = [
     {
-        src: "/examples/tiktok-live-stream.png",
+        src: "/examples/tiktok-live-stream.webp",
         title: "TikTok Live Stream",
         titleZh: "TikTok 直播截图",
         subtitle: "A preset social-content example with mobile livestream framing and creator-first composition.",
@@ -74,7 +74,7 @@ const SAMPLE_PREVIEW_SLIDES = [
         promptZh: "生成一张 TikTok 直播截图，画面是一位漂亮女生正在直播。",
     },
     {
-        src: "/examples/design-system-board.png",
+        src: "/examples/design-system-board.webp",
         title: "XX Design System",
         titleZh: "XX 设计系统",
         subtitle: "A clean system board covering web, mobile, controls, cards, and reusable interface patterns.",
@@ -83,7 +83,7 @@ const SAMPLE_PREVIEW_SLIDES = [
         promptZh: "请用 xx 风格为我生成一套 UI design system，包括 Web 页面、移动端、卡片、控件、按钮等。",
     },
     {
-        src: "/examples/cyberpunk-silver-portrait.png",
+        src: "/examples/cyberpunk-silver-portrait.webp",
         title: "Cyberpunk Portrait",
         titleZh: "赛博朋克人像",
         subtitle: "A close-up futuristic portrait with neon reflections, rain-soaked surfaces, and cinematic bokeh depth.",
@@ -92,7 +92,7 @@ const SAMPLE_PREVIEW_SLIDES = [
         promptZh: "一位短银发女性的近景人像，站在雨夜赛博朋克城市中。粉色和青绿色霓虹招牌倒映在潮湿地面与她的金属感外套上，皮肤下若隐若现的未来感面部植入物柔和发光。使用大光圈镜头拍摄，背景是城市灯光形成的散景。",
     },
     {
-        src: "/examples/pixel-ramen-shop.png",
+        src: "/examples/pixel-ramen-shop.webp",
         title: "Pixel Ramen Shop",
         titleZh: "像素拉面店",
         subtitle: "A nostalgic 16-bit alley scene with warm shop light, rainy reflections, and a cozy late-night mood.",
@@ -611,12 +611,14 @@ export default function HomeHeroGenerator({ onShowStaticContent, user }: HomeHer
                                             <div className="rounded-[28px] border border-orange-100 bg-[linear-gradient(180deg,#fff7ef_0%,#fffefb_100%)] p-4 shadow-[0_18px_40px_rgba(235,145,71,0.12)]">
                                                 <div className="relative aspect-[4/3] overflow-hidden rounded-[24px] border border-[#ead8c7] bg-[#f7efe6]">
                                                     {activeResultImage && (
-                                                        <Image
-                                                            src={activeResultImage}
-                                                            alt={`Generated image ${activePreviewIndex + 1}`}
-                                                            fill
-                                                            className="object-contain"
-                                                            unoptimized
+                                                    <Image
+                                                        src={activeResultImage}
+                                                        alt={prompt
+                                                            ? `${locale === 'zh' ? '根据以下提示词生成的图片：' : 'Generated image based on prompt: '}${prompt}`
+                                                            : `Generated image ${activePreviewIndex + 1}`}
+                                                        fill
+                                                        className="object-contain"
+                                                        unoptimized
                                                         />
                                                     )}
                                                     {resultImages.length > 1 && (
@@ -675,7 +677,9 @@ export default function HomeHeroGenerator({ onShowStaticContent, user }: HomeHer
                                                         >
                                                             <Image
                                                                 src={imageSrc}
-                                                                alt={`Generated thumbnail ${index + 1}`}
+                                                                alt={prompt
+                                                                    ? `${locale === 'zh' ? '生成结果缩略图：' : 'Generated thumbnail for prompt: '}${prompt}`
+                                                                    : `Generated thumbnail ${index + 1}`}
                                                                 fill
                                                                 className="object-cover"
                                                                 unoptimized
@@ -738,9 +742,10 @@ export default function HomeHeroGenerator({ onShowStaticContent, user }: HomeHer
                                                 <div className="relative aspect-[4/3] overflow-hidden rounded-[28px] border border-orange-100 bg-white shadow-[0_24px_54px_rgba(235,145,71,0.16)]">
                                                     <Image
                                                         src={activeSample.src}
-                                                        alt={locale === 'zh' ? activeSample.titleZh : activeSample.title}
+                                                        alt={locale === 'zh' ? activeSample.promptZh : activeSample.prompt}
                                                         fill
                                                         className="object-cover"
+                                                        priority
                                                     />
                                                     <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/55 via-black/10 to-transparent p-5 text-left text-white">
                                                         <p className="text-lg font-semibold">
@@ -825,9 +830,10 @@ export default function HomeHeroGenerator({ onShowStaticContent, user }: HomeHer
                                         <div className="relative aspect-[4/3] overflow-hidden rounded-[22px] border border-orange-100 bg-white shadow-[0_12px_30px_rgba(235,145,71,0.12)]">
                                             <Image
                                                 src={item.src}
-                                                alt={locale === 'zh' ? item.titleZh : item.title}
+                                                alt={locale === 'zh' ? item.promptZh : item.prompt}
                                                 fill
                                                 className="object-cover"
+                                                priority={index === 0}
                                             />
                                         </div>
                                         <div className="rounded-[18px] bg-white/80 px-4 py-3 text-sm text-slate-600">

@@ -66,7 +66,7 @@ export default async function DeveloperApiPage(props: { params: Promise<{ locale
 
     return (
         <div className="min-h-screen bg-[linear-gradient(180deg,#fff9f2_0%,#fff6ed_48%,#fffdf9_100%)]">
-            <div className="container px-4 py-16 md:px-6">
+            <div className="container px-4 py-16 md:px-6 md:py-20">
                 <div className="mx-auto max-w-5xl">
                     <div className="text-center">
                         <div className="inline-flex rounded-full border border-orange-200 bg-white px-4 py-2 text-sm font-semibold text-orange-700">
@@ -82,16 +82,16 @@ export default async function DeveloperApiPage(props: { params: Promise<{ locale
                         </p>
                     </div>
 
-                    <div className="mt-12 grid gap-6">
+                    <div className="mt-12 grid gap-6 md:mt-14">
                         {sections.map((section) => (
-                            <section key={section.title} className="rounded-[24px] border border-orange-100 bg-white p-8 shadow-[0_20px_50px_rgba(235,145,71,0.08)]">
+                            <section key={section.title} className="section-shell p-8">
                                 <h2 className="text-2xl font-bold text-slate-900">{section.title}</h2>
                                 <p className="mt-4 leading-8 text-slate-600">{section.body}</p>
                             </section>
                         ))}
                     </div>
 
-                    <div className="mt-10 rounded-[24px] border border-orange-100 bg-[#fffaf4] p-8">
+                    <div className="section-shell mt-10 bg-[#fffaf4] p-8 md:mt-12">
                         <h2 className="text-2xl font-bold text-slate-900">{isZh ? '官方与站内资源' : 'Official and on-site resources'}</h2>
                         <ul className="mt-5 space-y-3 text-slate-700">
                             <li>

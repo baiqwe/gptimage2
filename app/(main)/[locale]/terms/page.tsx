@@ -49,24 +49,24 @@ export default async function TermsPage(props: { params: Promise<{ locale: strin
     ];
 
     return (
-        <div className="min-h-screen bg-slate-950">
+        <div className="min-h-screen bg-[linear-gradient(180deg,#fffdf8_0%,#fff7ee_48%,#fff3e7_100%)]">
             <BreadcrumbSchema items={breadcrumbs} />
 
             {/* Visual Breadcrumb + Header */}
-            <div className="border-b border-slate-800 bg-slate-950/95 backdrop-blur">
+            <div className="border-b border-orange-100 bg-white/85 backdrop-blur">
                 <div className="container px-4 md:px-6 py-4">
                     {/* Visual Breadcrumb Navigation */}
-                    <nav className="flex items-center text-sm text-slate-400 mb-4 overflow-x-auto whitespace-nowrap">
-                        <Link href={localePrefix} className="hover:text-indigo-400 transition-colors">
+                    <nav className="mb-4 flex items-center overflow-x-auto whitespace-nowrap text-sm text-slate-500">
+                        <Link href={localePrefix} className="transition-colors hover:text-orange-600">
                             {isZh ? '首页' : 'Home'}
                         </Link>
-                        <span className="mx-2 text-slate-600">/</span>
-                        <span className="text-white font-medium">{isZh ? '服务条款' : 'Terms of Service'}</span>
+                        <span className="mx-2 text-orange-200">/</span>
+                        <span className="font-medium text-slate-900">{isZh ? '服务条款' : 'Terms of Service'}</span>
                     </nav>
                     <div className="flex items-center gap-4">
                         <div>
-                            <h1 className="text-xl font-bold text-white">{isZh ? '服务条款' : 'Terms of Service'}</h1>
-                            <p className="text-sm text-slate-400">
+                            <h1 className="text-xl font-bold text-slate-950">{isZh ? '服务条款' : 'Terms of Service'}</h1>
+                            <p className="text-sm text-slate-500">
                                 {isZh ? '最后更新：2026年1月' : 'Last updated: January 2026'}
                             </p>
                         </div>
@@ -79,14 +79,14 @@ export default async function TermsPage(props: { params: Promise<{ locale: strin
                 <div className="max-w-4xl mx-auto space-y-12">
                     {/* Hero */}
                     <div className="text-center space-y-6">
-                        <div className="inline-flex items-center rounded-full px-4 py-2 text-sm bg-indigo-500/20 text-indigo-300">
+                        <div className="inline-flex items-center rounded-full border border-orange-100 bg-white/80 px-4 py-2 text-sm text-orange-600">
                             <Scale className="mr-2 h-5 w-5" />
                             {isZh ? '法律条款' : 'Legal Terms'}
                         </div>
-                        <h2 className="text-4xl font-bold tracking-tight text-white sm:text-5xl">
+                        <h2 className="text-4xl font-bold tracking-tight text-slate-950 sm:text-5xl">
                             {isZh ? '服务条款' : 'Terms of Service'}
                         </h2>
-                        <p className="text-xl text-slate-400 max-w-3xl mx-auto">
+                        <p className="mx-auto max-w-3xl text-xl text-slate-600">
                             {isZh
                                 ? `使用 ${siteConfig.name} 即表示您同意以下条款。请仔细阅读。`
                                 : `By using ${siteConfig.name}, you agree to these terms. Please read them carefully.`}
@@ -94,14 +94,14 @@ export default async function TermsPage(props: { params: Promise<{ locale: strin
                     </div>
 
                     {/* Key Points */}
-                    <div className="bg-indigo-500/10 rounded-2xl p-6 border border-indigo-500/30">
-                        <h3 className="text-xl font-bold mb-4 text-indigo-300">
+                    <div className="rounded-2xl border border-orange-100 bg-white/85 p-6 shadow-[0_20px_60px_rgba(255,107,44,0.06)]">
+                        <h3 className="mb-4 text-xl font-bold text-slate-900">
                             {isZh ? '简要概述' : 'Quick Summary'}
                         </h3>
                         <div className="space-y-3">
                             <div className="flex items-start gap-3">
                                 <CheckCircle className="w-5 h-5 text-emerald-400 mt-0.5" />
-                                <p className="text-slate-400">
+                                <p className="text-slate-600">
                                     {isZh
                                         ? 'AI 生成服务 - 使用积分生成 AI 图像，新用户获得免费试用积分'
                                         : 'AI Generation Service - Use credits to generate AI images, new users get free trial credits'}
@@ -109,7 +109,7 @@ export default async function TermsPage(props: { params: Promise<{ locale: strin
                             </div>
                             <div className="flex items-start gap-3">
                                 <CheckCircle className="w-5 h-5 text-emerald-400 mt-0.5" />
-                                <p className="text-slate-400">
+                                <p className="text-slate-600">
                                     {isZh
                                         ? '您的图像 - 生成的图像归您所有，可用于商业用途'
                                         : 'Your Images - Generated images belong to you and can be used commercially'}

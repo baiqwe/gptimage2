@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { getTranslations } from 'next-intl/server';
 import { Sparkles, Lock, Zap, Palette, Smartphone, Printer, Heart, ArrowRight, Star } from 'lucide-react';
 import { PricingSection } from '@/components/marketing/pricing-section';
@@ -16,6 +17,7 @@ export default async function HomeStaticContent({ locale }: HomeStaticContentPro
             <WhatSection t={tHome} />
             <HowSection t={tHome} />
             <FeaturesSection t={tFeatures} />
+            <SocialProofSection locale={locale} />
             <ResearchSection locale={locale} />
             <EditorialHighlightsSection locale={locale} />
             <HomePricingSection locale={locale} />
@@ -24,6 +26,84 @@ export default async function HomeStaticContent({ locale }: HomeStaticContentPro
             <FAQSection t={tHome} />
             <CTASection t={tHome} locale={locale} />
         </div>
+    );
+}
+
+function SocialProofSection({ locale }: { locale: string }) {
+    const isZh = locale === 'zh';
+    const examples = [
+        {
+            src: '/examples/cyberpunk-silver-portrait.webp',
+            alt: 'Photorealistic cyberpunk silver portrait of a woman, glowing neon lights, rainy city night, metallic jacket, generated with GPT Image 2',
+            altZh: '使用 GPT Image 2 生成的写实赛博朋克银发女性人像，霓虹灯、雨夜城市和金属外套细节清晰',
+            title: isZh ? '角色与海报方向' : 'Character and poster concepts',
+            quote: isZh
+                ? '“我们先用这类图快速对齐视觉方向，再决定哪张值得继续精修。”'
+                : '"We use outputs like this to align on visual direction before choosing what to refine."',
+            author: isZh ? '品牌设计师' : 'Brand designer',
+        },
+        {
+            src: '/examples/t800-taobao-detail.webp',
+            alt: 'Taobao-style product detail page layout for a T-800 robot, with structured panels, price block, and feature sections, generated with GPT Image 2',
+            altZh: '使用 GPT Image 2 生成的 T-800 机器人淘宝风商品详情页，包含价格区、卖点区和结构化信息模块',
+            title: isZh ? '商品页与商业视觉' : 'Product pages and commercial visuals',
+            quote: isZh
+                ? '“把商品图、信息分区和卖点氛围先跑出来，能省掉很多前期排版摸索。”'
+                : '"Getting the product layout and visual hierarchy first saves a surprising amount of production time."',
+            author: isZh ? '电商运营' : 'E-commerce operator',
+        },
+        {
+            src: '/examples/design-system-board.webp',
+            alt: 'SaaS design system board with cards, buttons, form inputs, desktop pages, and mobile screens, generated with GPT Image 2',
+            altZh: '使用 GPT Image 2 生成的 SaaS 设计系统展示板，包含卡片、按钮、表单、桌面页面和移动端界面',
+            title: isZh ? '界面板与设计参考' : 'UI boards and design references',
+            quote: isZh
+                ? '“当团队要快速讨论风格、模块和排版时，这种成品板比口头描述更高效。”'
+                : '"For early layout and style conversations, a finished board is more useful than a vague verbal brief."',
+            author: isZh ? '产品团队' : 'Product team',
+        },
+    ];
+
+    return (
+        <section className="border-t border-orange-100 bg-[linear-gradient(180deg,#fffdf8_0%,#fff8f1_100%)] py-20">
+            <div className="container px-4 md:px-6">
+                <div className="mx-auto max-w-6xl">
+                    <SectionTitle
+                        title={isZh ? '看看别人会用它完成什么' : 'See the kinds of visuals people use it for'}
+                        subtitle={isZh
+                            ? '从角色海报、商品详情页到设计系统板，这些示例更接近真实工作流里的使用方式，而不是单纯的演示图。'
+                            : 'From character posters to product detail layouts and design-system boards, these examples are closer to real creative workflows than generic demo images.'}
+                    />
+
+                    <div className="grid gap-6 lg:grid-cols-3">
+                        {examples.map((example, index) => (
+                            <article key={example.src} className="overflow-hidden rounded-[28px] border border-orange-100 bg-white shadow-[0_20px_50px_rgba(235,145,71,0.08)]">
+                                <div className="relative aspect-[4/3] bg-[#fff6ee]">
+                                    <Image
+                                        src={example.src}
+                                        alt={isZh ? example.altZh : example.alt}
+                                        fill
+                                        className="object-cover"
+                                        priority={index === 0}
+                                    />
+                                </div>
+                                <div className="p-6">
+                                    <p className="text-sm font-semibold text-orange-600">
+                                        {example.title}
+                                    </p>
+                                    <p className="mt-4 text-base leading-8 text-slate-700">
+                                        {example.quote}
+                                    </p>
+                                    <p className="mt-4 text-sm text-slate-500">
+                                        {example.author}
+                                    </p>
+                                </div>
+                            </article>
+                        ))}
+                    </div>
+                </div>
+            </div>
+        </section>
     );
 }
 
