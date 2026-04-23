@@ -62,3 +62,38 @@ export async function SoftwareApplicationSchema({ locale, pagePath = '' }: { loc
         />
     );
 }
+
+export function WebsiteEntitySchema() {
+    const schema = {
+        "@context": "https://schema.org",
+        "@graph": [
+            {
+                "@type": "WebSite",
+                "@id": `${siteConfig.url}/#website`,
+                "name": "GPT Image 2",
+                "alternateName": ["GPT Image 2 Generator", "ChatGPT Image 2 Generator", "GPT Image 2.0 Studio"],
+                "url": `${siteConfig.url}/`,
+                "publisher": {
+                    "@id": `${siteConfig.url}/#organization`
+                }
+            },
+            {
+                "@type": "Organization",
+                "@id": `${siteConfig.url}/#organization`,
+                "name": "GPT Image 2 Studio",
+                "url": `${siteConfig.url}/`,
+                "logo": {
+                    "@type": "ImageObject",
+                    "url": `${siteConfig.url}/og-image.png`
+                }
+            }
+        ]
+    };
+
+    return (
+        <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+        />
+    );
+}

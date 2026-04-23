@@ -357,6 +357,24 @@ export default function HomeHeroGenerator({ onShowStaticContent, user }: HomeHer
         }
     };
 
+    const handleUseSamplePrompt = async (samplePrompt: string) => {
+        setPrompt(samplePrompt);
+        try {
+            await navigator.clipboard.writeText(samplePrompt);
+            toast({
+                title: locale === 'zh' ? '提示词已复制' : 'Prompt copied',
+                description: locale === 'zh' ? '提示词已填入输入框，你现在可以直接生成。' : 'The prompt is in the input box and ready to use.',
+            });
+        } catch {
+            toast({
+                title: locale === 'zh' ? '提示词已填入' : 'Prompt inserted',
+                description: locale === 'zh' ? '你现在可以直接生成。' : 'You can generate with it right away.',
+            });
+        }
+
+        document.getElementById('generator-workspace')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    };
+
     const activeResultImage = resultImages[activePreviewIndex] ?? resultImages[0];
     const activeSample = SAMPLE_PREVIEW_SLIDES[activeSampleIndex];
     const heroBadge = locale === 'zh'
@@ -365,10 +383,10 @@ export default function HomeHeroGenerator({ onShowStaticContent, user }: HomeHer
     const heroTitle = locale === 'zh'
         ? (isCreatePage
             ? '立即使用 GPT Image 2 生成海报、产品图与概念视觉'
-            : '用 GPT Image 2 生成 AI 艺术图、产品视觉与设计概念')
+            : '用 GPT Image 2 免费生成 AI 艺术图、产品视觉与设计概念')
         : (isCreatePage
             ? 'Generate AI Art, Product Visuals, and Concepts with GPT Image 2'
-            : 'Create AI Art, Product Visuals, and Design Concepts with GPT Image 2');
+            : 'Create with GPT Image 2: A Free AI Art Generator for Product Visuals and Concepts');
     const heroSubtitle = locale === 'zh'
         ? (isCreatePage
             ? '在这个 AI 绘图工作台里输入提示词，选择尺寸、质量和导出格式，快速生成高清图像并立即下载。'
@@ -756,7 +774,7 @@ export default function HomeHeroGenerator({ onShowStaticContent, user }: HomeHer
                                                         </p>
                                                     </div>
                                                 </div>
-                                                <div className="mt-4 flex items-center justify-center gap-2">
+                                        <div className="mt-4 flex items-center justify-center gap-2">
                                                     {SAMPLE_PREVIEW_SLIDES.map((slide, index) => (
                                                         <button
                                                             key={`sample-dot-bottom-${slide.src}`}
@@ -776,6 +794,16 @@ export default function HomeHeroGenerator({ onShowStaticContent, user }: HomeHer
                                                     ? '你生成成功后，这里会自动切换成你的结果轮播，方便连续预览和下载。'
                                                     : 'Once your images are ready, this preview area automatically switches to your own result carousel.'}
                                             </p>
+                                            <div className="mt-4 flex justify-center">
+                                                <Button
+                                                    variant="outline"
+                                                    className="h-11 rounded-2xl border-orange-200 bg-white text-orange-700 hover:bg-orange-50"
+                                                    onClick={() => handleUseSamplePrompt(locale === 'zh' ? activeSample.promptZh : activeSample.prompt)}
+                                                >
+                                                    <Sparkles className="mr-2 h-4 w-4" />
+                                                    {locale === 'zh' ? '复制并试玩这个提示词' : 'Copy & try this prompt'}
+                                                </Button>
+                                            </div>
                                         </div>
                                     )}
                                 </div>
@@ -824,6 +852,23 @@ export default function HomeHeroGenerator({ onShowStaticContent, user }: HomeHer
                                         <p className="mt-3 text-base leading-8 text-slate-700">
                                             {locale === 'zh' ? item.promptZh : item.prompt}
                                         </p>
+                                        <div className="mt-5 flex flex-wrap gap-3">
+                                            <button
+                                                type="button"
+                                                onClick={() => handleUseSamplePrompt(locale === 'zh' ? item.promptZh : item.prompt)}
+                                                className="inline-flex items-center rounded-full bg-[#ff6b2c] px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#f86120]"
+                                            >
+                                                <Sparkles className="mr-2 h-4 w-4" />
+                                                {locale === 'zh' ? '复制并试玩' : 'Copy & Try'}
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={() => setActiveSampleIndex(index)}
+                                                className="inline-flex items-center rounded-full border border-orange-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition-colors hover:bg-orange-50"
+                                            >
+                                                {locale === 'zh' ? '在右侧预览' : 'Preview on the right'}
+                                            </button>
+                                        </div>
                                     </div>
 
                                     <div className={`space-y-3 ${index === 1 ? 'lg:order-1' : ''}`}>

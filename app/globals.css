@@ -38,6 +38,18 @@
     scroll-behavior: smooth;
   }
 
+  @media (min-width: 1200px) {
+    html {
+      font-size: 15.5px;
+    }
+  }
+
+  @media (min-width: 1600px) {
+    html {
+      font-size: 15px;
+    }
+  }
+
   body {
     @apply bg-background text-foreground antialiased;
     font-family: "Manrope", sans-serif;

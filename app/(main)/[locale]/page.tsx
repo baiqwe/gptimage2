@@ -1,7 +1,9 @@
 import HomeClientWrapper from '@/components/home/HomeClientWrapper';
 import HomeStaticContent from '@/components/home/HomeStaticContent';
-import { SoftwareApplicationSchema } from '@/components/json-ld-schema';
+import { SoftwareApplicationSchema, WebsiteEntitySchema } from '@/components/json-ld-schema';
+import { FAQSchema } from '@/components/breadcrumb-schema';
 import { siteConfig } from '@/config/site';
+import { getTranslations } from 'next-intl/server';
 
 // ✅ This is now a Server Component (no 'use client')
 // Hero/Interactive content is client-side, static content is server-rendered for SEO
@@ -49,6 +51,7 @@ export async function generateMetadata(props: { params: Promise<{ locale: string
 export default async function HomePage(props: { params: Promise<{ locale: string }> }) {
     const params = await props.params;
     const { locale } = params;
+    const tHome = await getTranslations({ locale, namespace: 'home' });
 
     // 用户状态在客户端 HomeHeroGenerator 中实时获取
     // 服务端传递 null，让客户端自己获取最新状态
@@ -57,9 +60,18 @@ export default async function HomePage(props: { params: Promise<{ locale: string
     // Server-rendered static content for better LCP and SEO
     const staticContent = await HomeStaticContent({ locale });
 
+    const faqItems = [
+        { question: tHome('faq.q1'), answer: tHome('faq.a1') },
+        { question: tHome('faq.q2'), answer: tHome('faq.a2') },
+        { question: tHome('faq.q3'), answer: tHome('faq.a3') },
+        { question: tHome('faq.q4'), answer: tHome('faq.a4') },
+    ];
+
     return (
         <>
+            <WebsiteEntitySchema />
             <SoftwareApplicationSchema locale={locale} />
+            <FAQSchema items={faqItems} />
             <HomeClientWrapper staticContent={staticContent} user={user} />
         </>
     );

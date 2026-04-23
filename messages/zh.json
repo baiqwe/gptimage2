@@ -140,8 +140,8 @@
     },
     "home": {
         "what": {
-            "title": "什么是 GPT Image 2 Generator？",
-            "desc": "GPT Image 2 Generator 是一个在线 AI 图像生成工作台，帮助你用简单提示词快速生成高质量视觉内容，适合设计、营销、内容创作和产品原型。",
+            "title": "为什么选择 GPT Image 2.0 工作台？",
+            "desc": "GPT Image 2 Generator 是一个可免费试用的文生图工作台，适合想更快做出海报、产品图、界面概念图和高质量 AI 视觉的创作者。",
             "feature_1_title": "文生图",
             "feature_1_desc": "直接用自然语言描述画面，让 GPT Image 2 Generator 生成符合想法的图片。",
             "feature_2_title": "图像变换",
@@ -208,15 +208,15 @@
         },
         "faq": {
             "title": "GPT Image 2 Generator 常见问题",
-            "subtitle": "关于 GPT Image 2 Generator 的常见问题",
-            "q1": "什么是 GPT Image 2 Generator？",
-            "a1": "GPT Image 2 Generator 是一个在线 AI 图像生成器，围绕现代提示词工作流设计，帮助你把文字描述快速转换成可下载的图片。",
-            "q2": "GPT Image 2 Generator 可以免费使用吗？",
-            "a2": "可以。新用户可以先获得免费生成次数，用于体验 GPT Image 2 Generator 的效果。",
+            "subtitle": "开始生成前，你可能最关心的几个问题",
+            "q1": "GPT Image 2 可以免费用吗？",
+            "a1": "可以。新用户可以先获得免费试用次数，用来测试 GPT Image 2 的提示词效果、尺寸预设和导出格式，再决定是否购买更多积分。",
+            "q2": "它和普通的 ChatGPT 图片生成有什么区别？",
+            "a2": "这个 GPT Image 2 工作台把尺寸、质量和导出格式直接放在可见位置，更像一个专门的 AI 绘图工作区，方便你快速判断结果是否适合海报、商品图或概念视觉。",
             "q3": "如何使用 GPT Image 2 Generator？",
-            "a3": "输入提示词，选择尺寸、质量和导出格式，然后点击生成。几秒后即可得到可下载的图片结果。",
-            "q4": "GPT Image 2 Generator 适合什么样的提示词？",
-            "a4": "主体、环境、光线、镜头、材质、风格这些元素写得越清楚，通常越容易获得理想结果。"
+            "a3": "输入提示词，选择尺寸、质量和导出格式，然后点击生成。结果会直接出现在右侧预览区，并且可以马上下载。",
+            "q4": "什么样的提示词更适合 GPT Image 2？",
+            "a4": "主体、场景、光线、构图和风格方向写得越清楚，通常越容易得到理想结果。海报、产品图、人像和界面板这类需求尤其适合用更明确的布局语言。"
         },
         "cta": {
             "title": "开始使用 GPT Image 2 Generator 创作",

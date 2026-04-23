@@ -22,7 +22,7 @@ export async function middleware(request: NextRequest) {
 
     const isProtectedRoute = /^\/(en|zh)\/dashboard(?:\/|$)/.test(request.nextUrl.pathname)
 
-    if (supabaseUrl && supabaseKey && isProtectedRoute) {
+    if (supabaseUrl && supabaseKey) {
       const supabase = createServerClient(
         supabaseUrl,
         supabaseKey,
@@ -46,8 +46,11 @@ export async function middleware(request: NextRequest) {
         }
       )
 
-      // 3. 仅在受保护路由刷新 Session，避免公开页面白白阻塞 TTFB
-      await supabase.auth.getUser()
+      // 3. 始终初始化客户端以保持 Cookie 读写链路可用，
+      // 但只在受保护路由刷新 Session，避免公开页面白白阻塞 TTFB
+      if (isProtectedRoute) {
+        await supabase.auth.getUser()
+      }
     }
 
     return response

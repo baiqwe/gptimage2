@@ -294,25 +294,25 @@ function EditorialHighlightsSection({ locale }: { locale: string }) {
     const localePrefix = `/${locale}`;
     const posts = [
         {
-            href: `${localePrefix}/blog/openai-image-2-vs-chatgpt-image-2-naming-guide`,
-            title: isZh ? 'OpenAI Image 2 vs ChatGPT Image 2 命名指南' : 'OpenAI Image 2 vs ChatGPT Image 2 naming guide',
+            href: `${localePrefix}/blog/how-to-use-gpt-image-2-for-commercial-product-photography`,
+            title: isZh ? '如何用 GPT Image 2 做商业产品视觉' : 'How to use GPT Image 2 for commercial product photography',
             desc: isZh
-                ? '帮助你弄清 OpenAI Image 2、ChatGPT Image 2、GPT-Image-2 这些叫法之间的关系。'
-                : 'Clarifies how names like OpenAI Image 2, ChatGPT Image 2, and GPT-Image-2 are usually used.',
+                ? '围绕商品主图、详情页头图和广告视觉，讲清楚 prompt 结构、复审方式和实际工作流。'
+                : 'Covers prompt structure, review criteria, and practical workflow decisions for product heroes, detail pages, and ad visuals.',
         },
         {
-            href: `${localePrefix}/blog/gpt-image-2-release-date-features-and-what-we-can-verify`,
-            title: isZh ? 'GPT Image 2 发布时间与可验证功能' : 'GPT Image 2 release date and verifiable features',
+            href: `${localePrefix}/blog/chatgpt-image-2-limitations-and-best-free-alternatives-2026`,
+            title: isZh ? 'ChatGPT Image 2 的限制与免费替代方案' : 'ChatGPT Image 2 limitations and free alternatives',
             desc: isZh
-                ? '把已确认信息、实测结论和传闻分开整理，避免资讯页变成薄内容。'
-                : 'Separates confirmed information, first-hand testing, and rumor so the page stays useful over time.',
+                ? '不做泛泛的工具列表，而是按工作流、控制力和试用门槛来判断替代方案是否真的可用。'
+                : 'Evaluates alternatives by workflow fit, control, and trial access instead of using a generic “top tools” list.',
         },
         {
-            href: `${localePrefix}/blog/nano-banana-2-vs-gpt-image-2-benchmark`,
-            title: isZh ? 'Nano Banana 2 vs GPT Image 2 基准对比' : 'Nano Banana 2 vs GPT Image 2 benchmark',
+            href: `${localePrefix}/blog/top-50-gpt-image-2-prompts-for-anime-and-realistic-portraits`,
+            title: isZh ? '50 条适合动漫与写实人像的 GPT Image 2 提示词' : '50 GPT Image 2 prompts for anime and realistic portraits',
             desc: isZh
-                ? '围绕 prompt fidelity、布局完整度和可读文字做对比，而不是泛泛列功能。'
-                : 'Compares prompt fidelity, layout quality, and readable text rather than generic feature lists.',
+                ? '把动漫和写实人像拆成可直接测试的 prompt 库，并说明如何改写、如何迭代。'
+                : 'Turns anime and realistic portrait prompting into a reusable library you can adapt and iterate on immediately.',
         },
         {
             href: `${localePrefix}/blog/llm-arena-for-image-generation-how-to-run-a-fair-prompt-test`,

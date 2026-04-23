@@ -140,8 +140,8 @@
     },
     "home": {
         "what": {
-            "title": "What is GPT Image 2 Generator?",
-            "desc": "GPT Image 2 Generator is an online text-to-image workspace for creating detailed AI visuals from simple prompts. It is designed for creators who want speed, clarity, and a clean prompt workflow.",
+            "title": "Why Choose the GPT Image 2.0 Workspace?",
+            "desc": "GPT Image 2 Generator is a free-to-try text-to-image workspace for creators who want a faster way to make posters, product visuals, and polished AI artwork from simple prompts.",
             "feature_1_title": "Text to Image",
             "feature_1_desc": "Describe your idea in natural language and let GPT Image 2 Generator turn it into a polished image.",
             "feature_2_title": "Image Variations",
@@ -208,15 +208,15 @@
         },
         "faq": {
             "title": "GPT Image 2 Generator FAQ",
-            "subtitle": "Common questions about GPT Image 2 Generator",
-            "q1": "What is GPT Image 2 Generator?",
-            "a1": "GPT Image 2 Generator is an online AI image generator built around a modern prompt-to-image workflow. It helps you create detailed visuals from text prompts in just a few steps.",
-            "q2": "Is GPT Image 2 Generator free to use?",
-            "a2": "Yes. New users get free generations to test GPT Image 2 Generator before upgrading to paid credits or plans.",
+            "subtitle": "Quick answers before you start generating",
+            "q1": "Is GPT Image 2 free to use?",
+            "a1": "Yes. New users get free trial generations so you can test GPT Image 2 prompts, sizes, and export formats before paying for more credits.",
+            "q2": "How is it different from standard ChatGPT image generation?",
+            "a2": "This GPT Image 2 workspace gives you a dedicated prompt-to-image flow with visible size, quality, and format controls, so it feels faster and easier to evaluate than a general chat interface.",
             "q3": "How do I use GPT Image 2 Generator?",
-            "a3": "Write a clear prompt, choose your size, quality, and export format, then click generate. GPT Image 2 Generator returns a downloadable image in seconds.",
+            "a3": "Write a clear prompt, choose your size, quality, and export format, then click generate. The result appears in the preview area and can be downloaded immediately.",
             "q4": "What prompts work best in GPT Image 2 Generator?",
-            "a4": "Prompts with subject, setting, lighting, camera angle, style, and material details usually work best. The more specific your prompt is, the better the result tends to be."
+            "a4": "Prompts with a clear subject, scene, lighting, composition, and style direction usually perform best. Product ads, portraits, posters, and UI boards all benefit from concrete layout language."
         },
         "cta": {
             "title": "Start Creating with GPT Image 2 Generator",
