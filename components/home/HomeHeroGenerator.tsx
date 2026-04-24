@@ -243,6 +243,27 @@ export default function HomeHeroGenerator({ onShowStaticContent, user }: HomeHer
     };
 
     useEffect(() => {
+        const promptPrefill = localStorage.getItem("prompt_gallery_prefill");
+        if (promptPrefill) {
+            try {
+                const parsed = JSON.parse(promptPrefill);
+                if (parsed?.timestamp && Date.now() - parsed.timestamp < 30 * 60 * 1000) {
+                    setPrompt(parsed.prompt || defaultPrompt);
+                    setAspectRatio(parsed.aspectRatio || "auto");
+                    localStorage.removeItem("prompt_gallery_prefill");
+
+                    toast({
+                        title: locale === "zh" ? "提示词已带入" : "Prompt ready",
+                        description: locale === "zh"
+                            ? "已将所选 prompt 和比例带入生成器。"
+                            : "The selected prompt and aspect ratio are now in the generator.",
+                    });
+                }
+            } catch {
+                localStorage.removeItem("prompt_gallery_prefill");
+            }
+        }
+
         const query = new URLSearchParams(window.location.search);
         if (query.get("checkout") === "success") {
             const savedState = localStorage.getItem("pending_gpt_image_2_generation");

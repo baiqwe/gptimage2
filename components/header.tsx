@@ -3,6 +3,7 @@
 import { signOutAction } from "@/app/actions";
 import Link from "next/link";
 import { Button } from "./ui/button";
+import { Badge } from "./ui/badge";
 import { Logo } from "./logo";
 import { usePathname } from "next/navigation";
 import { MobileNav } from "./mobile-nav";
@@ -17,6 +18,7 @@ interface HeaderProps {
 interface NavItem {
   label: string;
   href: string;
+  hot?: boolean;
 }
 
 export default function Header({ user: initialUser }: HeaderProps) {
@@ -39,6 +41,7 @@ export default function Header({ user: initialUser }: HeaderProps) {
 
   const mainNavItems: NavItem[] = [
     { label: t('home'), href: localePrefix },
+    { label: currentLocale === 'zh' ? '提示词' : 'Prompts', href: `${localePrefix}/prompts`, hot: true },
     { label: t('pricing'), href: `${localePrefix}/pricing` },
     { label: currentLocale === 'zh' ? '博客' : 'Blog', href: `${localePrefix}/blog` },
     { label: t('about'), href: `${localePrefix}/about` },
@@ -55,9 +58,14 @@ export default function Header({ user: initialUser }: HeaderProps) {
               <Link
                 key={item.href}
                 href={item.href}
-                className="rounded-full px-4 py-2 text-sm font-semibold text-slate-500 transition-all hover:bg-orange-50 hover:text-orange-600"
+                className="inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-semibold text-slate-500 transition-all hover:bg-orange-50 hover:text-orange-600"
               >
                 {item.label}
+                {item.hot ? (
+                  <Badge className="bg-[#fff2e8] px-1.5 py-0 text-[10px] font-bold uppercase tracking-[0.16em] text-orange-700 hover:bg-[#fff2e8]">
+                    Hot
+                  </Badge>
+                ) : null}
               </Link>
             ))}
           </nav>

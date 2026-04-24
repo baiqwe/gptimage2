@@ -12,6 +12,17 @@ function extractBlogSlugs() {
     }
 }
 
+function extractPromptCategorySlugs() {
+    try {
+        const source = fs.readFileSync(path.join(__dirname, 'config', 'prompts-data.ts'), 'utf8');
+        const matches = [...source.matchAll(/slug:\s*"([^"]+)"/g)];
+        return matches.map((match) => match[1]);
+    } catch (error) {
+        console.warn('Failed to extract prompt category slugs for sitemap:', error);
+        return [];
+    }
+}
+
 /** @type {import('next-sitemap').IConfig} */
 module.exports = {
     siteUrl: process.env.NEXT_PUBLIC_SITE_URL || 'https://gptimage2.online',
@@ -54,6 +65,7 @@ module.exports = {
         const locales = ['en', 'zh'];
         const staticPages = [
             'create',          // AI Studio (public landing page)
+            'prompts',
             'pricing',
             'privacy',
             'terms',
@@ -64,6 +76,7 @@ module.exports = {
         ];
 
         const blogSlugs = extractBlogSlugs();
+        const promptCategorySlugs = extractPromptCategorySlugs();
 
         const result = [];
 
@@ -94,6 +107,15 @@ module.exports = {
                     loc: `/${locale}/${page}`,
                     changefreq,
                     priority,
+                    lastmod: new Date().toISOString(),
+                });
+            }
+
+            for (const category of promptCategorySlugs) {
+                result.push({
+                    loc: `/${locale}/prompts/${category}`,
+                    changefreq: 'weekly',
+                    priority: 0.82,
                     lastmod: new Date().toISOString(),
                 });
             }
