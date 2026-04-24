@@ -22,6 +22,7 @@ export interface PricingPlan {
     badge?: string;
     badgeZh?: string;
     isPopular?: boolean;
+    discountOverride?: number;
     priceNote?: string;
     priceNoteZh?: string;
     features: string[];
@@ -93,7 +94,7 @@ export const PLAN_PRO_YEARLY: PricingPlan = {
     description: 'Best value for long-term creators',
     descriptionZh: '最适合长期创作团队',
     price: 149.99,
-    originalPrice: 239.88,
+    originalPrice: 479.88,
     credits: 12000,          // 1200张/年
     type: 'subscription',
     interval: 'year',
@@ -101,6 +102,7 @@ export const PLAN_PRO_YEARLY: PricingPlan = {
     badge: 'Best Value',
     badgeZh: '最佳选择',
     isPopular: true,
+    discountOverride: 65,
     priceNote: 'Billed annually at $149.99 ($12.49/month)',
     priceNoteZh: '按年支付 $149.99（约 $12.49 / 月）',
     features: [
@@ -132,6 +134,9 @@ export function calculateCostPerGeneration(plan: PricingPlan): number {
 
 // 计算折扣百分比
 export function calculateDiscount(plan: PricingPlan): number {
+    if (typeof plan.discountOverride === 'number') {
+        return plan.discountOverride;
+    }
     if (plan.originalPrice <= plan.price) return 0;
     return Math.round(((plan.originalPrice - plan.price) / plan.originalPrice) * 100);
 }

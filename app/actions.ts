@@ -21,6 +21,22 @@ function resolveLocalePrefix(referer: string | null) {
   return "/en";
 }
 
+function resolveSafeNextPath(
+  nextPath: string | null | undefined,
+  localePrefix: string,
+  fallback: string = "/dashboard"
+) {
+  if (!nextPath) {
+    return `${localePrefix}${fallback}`;
+  }
+
+  if (!nextPath.startsWith("/") || nextPath.startsWith("//")) {
+    return `${localePrefix}${fallback}`;
+  }
+
+  return nextPath;
+}
+
 function humanizeAuthError(message: string, locale: "en" | "zh") {
   const normalized = message.toLowerCase();
 
@@ -99,11 +115,13 @@ export const signUpAction = async (formData: FormData) => {
   const email = formData.get("email")?.toString();
   const password = formData.get("password")?.toString();
   const turnstileToken = formData.get("turnstile_token")?.toString();
+  const requestedNextPath = formData.get("next")?.toString();
   const supabase = await createClient();
   const headersList = await headers();
   const origin = headersList.get("origin");
   const localePrefix = resolveLocalePrefix(headersList.get("referer"));
   const locale = localePrefix === "/zh" ? "zh" : "en";
+  const nextPath = resolveSafeNextPath(requestedNextPath, localePrefix);
 
   if (!email || !password) {
     return encodedRedirect(
@@ -132,7 +150,7 @@ export const signUpAction = async (formData: FormData) => {
     email,
     password,
     options: {
-      emailRedirectTo: `${origin}/auth/callback`,
+      emailRedirectTo: `${origin}/auth/callback?redirect_to=${encodeURIComponent(nextPath)}`,
     },
   });
 
@@ -146,12 +164,12 @@ export const signUpAction = async (formData: FormData) => {
   }
 
   if (data.session) {
-    return redirect(`${localePrefix}/dashboard`);
+    return redirect(nextPath);
   }
 
   return encodedRedirect(
     "success",
-    `${localePrefix}/sign-in`,
+    `${localePrefix}/sign-in?next=${encodeURIComponent(nextPath)}`,
     locale === "zh"
       ? "账号已创建，请先去邮箱点击验证链接，完成后再登录。"
       : "Your account has been created. Please confirm your email first, then sign in."
@@ -161,10 +179,12 @@ export const signUpAction = async (formData: FormData) => {
 export const signInAction = async (formData: FormData) => {
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
+  const requestedNextPath = formData.get("next")?.toString();
   const supabase = await createClient();
   const headersList = await headers();
   const localePrefix = resolveLocalePrefix(headersList.get("referer"));
   const locale = localePrefix === "/zh" ? "zh" : "en";
+  const nextPath = resolveSafeNextPath(requestedNextPath, localePrefix);
 
   const { error } = await supabase.auth.signInWithPassword({
     email,
@@ -174,12 +194,12 @@ export const signInAction = async (formData: FormData) => {
   if (error) {
     return encodedRedirect(
       "error",
-      `${localePrefix}/sign-in`,
+      `${localePrefix}/sign-in?next=${encodeURIComponent(nextPath)}`,
       humanizeAuthError(error.message, locale)
     );
   }
 
-  return redirect(`${localePrefix}/dashboard`);
+  return redirect(nextPath);
 };
 
 export const forgotPasswordAction = async (formData: FormData) => {

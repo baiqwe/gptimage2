@@ -37,7 +37,7 @@ export function PromotionBanner() {
                             : 'and annual billing saves'}
                     </span>
                     <span className="font-bold underline decoration-white/50 decoration-2 underline-offset-2">
-                        37%
+                        65%
                     </span>
                     <span>
                         {locale === 'zh'

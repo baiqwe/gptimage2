@@ -11,7 +11,6 @@ import {
     Download,
     ImagePlus,
     Dices,
-    Lock,
     ChevronLeft,
     ChevronRight,
     GalleryHorizontal,
@@ -487,6 +486,14 @@ export default function HomeHeroGenerator({ onShowStaticContent, user }: HomeHer
         : (isCreatePage
             ? 'Generate AI Art, Product Visuals, and Concepts with GPT Image 2'
             : 'Create with GPT Image 2: A Free AI Art Generator for Product Visuals and Concepts');
+    const heroTitleContent = !isCreatePage && locale === 'en'
+        ? (
+            <>
+                <span className="block">Create with GPT Image 2: A Free AI Art</span>
+                <span className="block">Generator for Product Visuals and Concepts</span>
+            </>
+        )
+        : heroTitle;
     const heroSubtitle = locale === 'zh'
         ? (isCreatePage
             ? '在这个 AI 绘图工作台里输入提示词，选择画面比例，快速生成高清图像；也可以上传参考图进行图生图编辑。'
@@ -504,19 +511,19 @@ export default function HomeHeroGenerator({ onShowStaticContent, user }: HomeHer
                 locale={locale}
             />
 
-            <section id="generator-workspace" className="relative overflow-hidden pb-14 pt-6 sm:pt-8 lg:pb-20">
+            <section id="generator-workspace" className="relative overflow-hidden pb-12 pt-3 sm:pt-4 lg:pb-16">
                 <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top_left,rgba(255,178,105,0.22),transparent_28%),radial-gradient(circle_at_top_right,rgba(255,112,52,0.12),transparent_20%),linear-gradient(180deg,#fffdf8_0%,#fff7ee_52%,#fff3e7_100%)]" />
                 <div className="container px-4">
-                    <div className="mx-auto max-w-5xl">
-                        <div className="mb-8 text-center lg:mb-10">
+                    <div className="mx-auto max-w-6xl">
+                        <div className="mb-5 text-center lg:mb-6">
                             <div className="inline-flex items-center gap-2 rounded-full border border-orange-200 bg-white/90 px-4 py-1.5 text-[13px] font-semibold text-orange-700 shadow-[0_10px_26px_rgba(255,138,61,0.08)]">
                                 <Sparkles className="h-4 w-4" />
                                 {heroBadge}
                             </div>
-                            <h1 className="mt-4 text-4xl font-semibold tracking-tight text-slate-900 sm:text-5xl lg:text-[3.75rem] lg:leading-[1.04]">
-                                {heroTitle}
+                            <h1 className="mx-auto mt-2.5 max-w-[74rem] text-[2.85rem] font-semibold tracking-tight text-slate-900 sm:text-[3rem] sm:leading-[1.06] lg:text-[3.08rem] lg:leading-[1.02]">
+                                {heroTitleContent}
                             </h1>
-                            <p className="mx-auto mt-3 max-w-3xl text-[15px] leading-7 text-slate-600 sm:text-base">
+                            <p className="mx-auto mt-2 max-w-[46rem] text-[15px] leading-7 text-slate-600 sm:text-[15.5px]">
                                 {heroSubtitle}
                             </p>
                         </div>
@@ -729,7 +736,6 @@ export default function HomeHeroGenerator({ onShowStaticContent, user }: HomeHer
                                                 </>
                                             ) : (
                                                 <span className="inline-flex items-center gap-2">
-                                                    {!currentUser && <Lock className="h-4.5 w-4.5 opacity-80" />}
                                                     <Wand2 className="h-5 w-5" />
                                                     {generationMode === "image-to-image"
                                                         ? (locale === 'zh' ? '开始编辑' : 'Start Editing')

@@ -10,20 +10,26 @@ import { createClient } from "@/utils/supabase/server";
 import { encodedRedirect } from "@/utils/utils";
 import { redirect } from "next/navigation";
 
-
+type SignUpSearchParams = Message & { next?: string };
 
 export default async function SignUp(props: {
-  searchParams: Promise<Message>;
+  searchParams: Promise<SignUpSearchParams>;
   params: Promise<{ locale: string }>;
 }) {
   const searchParams = await props.searchParams;
   const { locale } = await props.params;
   const localePrefix = `/${locale}`;
   const turnstileSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
+  const nextPath = typeof searchParams?.next === "string" ? searchParams.next : `${localePrefix}`;
 
-  const signUpWithGoogle = async () => {
+  const signUpWithGoogle = async (formData: FormData) => {
     "use server";
     const supabase = await createClient();
+    const requestedNextPath = formData.get("next")?.toString();
+    const safeNextPath =
+      requestedNextPath && requestedNextPath.startsWith("/") && !requestedNextPath.startsWith("//")
+        ? requestedNextPath
+        : `/${locale}`;
 
     // 动态获取当前域名，支持多域名部署
     const headersList = await import('next/headers').then(m => m.headers());
@@ -34,7 +40,7 @@ export default async function SignUp(props: {
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: `${origin}/auth/callback`,
+        redirectTo: `${origin}/auth/callback?redirect_to=${encodeURIComponent(safeNextPath)}`,
         queryParams: {
           access_type: "offline",
           prompt: "select_account",
@@ -61,6 +67,7 @@ export default async function SignUp(props: {
       </div>
       <div className="grid gap-6">
         <form className="grid gap-4">
+          <input type="hidden" name="next" value={nextPath} />
           <div className="grid gap-2">
             <Label htmlFor="email">Email</Label>
             <Input
@@ -109,6 +116,7 @@ export default async function SignUp(props: {
           </div>
         </div>
         <form action={signUpWithGoogle}>
+          <input type="hidden" name="next" value={nextPath} />
           <Button
             type="submit"
             variant="outline"
@@ -138,7 +146,7 @@ export default async function SignUp(props: {
         <div className="text-sm text-muted-foreground text-center">
           Already have an account?{" "}
           <Link
-            href={`${localePrefix}/sign-in`}
+            href={`${localePrefix}/sign-in?next=${encodeURIComponent(nextPath)}`}
             className="text-primary underline underline-offset-4 hover:text-primary/90"
           >
             Sign in

@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { Sparkles, ShieldCheck, Wand2, Lock } from "lucide-react";
+import { Sparkles, ShieldCheck, Wand2 } from "lucide-react";
+import { usePathname } from "next/navigation";
 import {
   Dialog,
   DialogContent,
@@ -32,6 +33,8 @@ export function AdaptiveAuthModal({
 }: AdaptiveAuthModalProps) {
   const isDesktop = useMediaQuery("(min-width: 768px)");
   const localePrefix = `/${locale}`;
+  const pathname = usePathname();
+  const nextPath = pathname?.startsWith(localePrefix) ? pathname : `${localePrefix}`;
 
   const title =
     locale === "zh" ? "登录后即可开始生成" : "Sign in to start creating";
@@ -86,12 +89,12 @@ export function AdaptiveAuthModal({
 
       <div className="grid gap-3">
         <Button asChild className="h-12 rounded-2xl bg-[#ff6b2c] text-base font-semibold text-white shadow-[0_16px_30px_rgba(255,107,44,0.24)] hover:bg-[#f86120]">
-          <Link href={`${localePrefix}/sign-up`}>
+          <Link href={`${localePrefix}/sign-up?next=${encodeURIComponent(nextPath)}`}>
             {locale === "zh" ? "免费注册并继续" : "Create account and continue"}
           </Link>
         </Button>
         <Button asChild variant="outline" className="h-12 rounded-2xl border-orange-200 bg-white text-slate-700 hover:bg-orange-50">
-          <Link href={`${localePrefix}/sign-in`}>
+          <Link href={`${localePrefix}/sign-in?next=${encodeURIComponent(nextPath)}`}>
             {locale === "zh" ? "我已有账号，去登录" : "I already have an account"}
           </Link>
         </Button>

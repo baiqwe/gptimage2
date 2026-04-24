@@ -46,7 +46,12 @@ export async function GET(request: Request) {
         const code = requestUrl.searchParams.get("code");
         const errorParam = requestUrl.searchParams.get("error");
         const errorDescription = requestUrl.searchParams.get("error_description");
+        const redirectTo = requestUrl.searchParams.get("redirect_to");
         const locale = getLocaleFromRequest(request);
+        const safeRedirectTarget =
+            redirectTo && redirectTo.startsWith("/") && !redirectTo.startsWith("//")
+                ? redirectTo
+                : `/${locale}`;
 
         // 如果 OAuth 返回了错误
         if (errorParam) {
@@ -91,7 +96,7 @@ export async function GET(request: Request) {
         }
 
         // 成功 - 重定向到首页
-        const response = NextResponse.redirect(`${origin}/${locale}`);
+        const response = NextResponse.redirect(`${origin}${safeRedirectTarget}`);
 
         // 设置 session cookies
         for (const cookie of cookiesToSet) {
