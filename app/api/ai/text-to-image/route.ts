@@ -10,13 +10,14 @@ import {
 
 // Use Node.js runtime for Vercel
 export const runtime = 'nodejs';
-export const maxDuration = 60; // 1 minute timeout
+export const maxDuration = 180;
 
 const KIE_API_BASE_URL = process.env.KIE_API_BASE_URL || "https://api.kie.ai";
 const KIE_TEXT_TO_IMAGE_MODEL = "gpt-image-2-text-to-image";
 const KIE_IMAGE_TO_IMAGE_MODEL = "gpt-image-2-image-to-image";
 const KIE_POLL_INTERVAL_MS = 2500;
-const KIE_POLL_TIMEOUT_MS = 45000;
+const KIE_TEXT_TO_IMAGE_TIMEOUT_MS = 90000;
+const KIE_IMAGE_TO_IMAGE_TIMEOUT_MS = 165000;
 
 interface KieCreateTaskResponse {
     code: number;
@@ -114,8 +115,9 @@ async function generateWithKie({
 
     const taskId = createData.data.taskId;
     const startedAt = Date.now();
+    const pollTimeoutMs = hasInputImage ? KIE_IMAGE_TO_IMAGE_TIMEOUT_MS : KIE_TEXT_TO_IMAGE_TIMEOUT_MS;
 
-    while (Date.now() - startedAt < KIE_POLL_TIMEOUT_MS) {
+    while (Date.now() - startedAt < pollTimeoutMs) {
         await sleep(KIE_POLL_INTERVAL_MS);
 
         const recordInfoUrl = `${recordInfoBaseUrl}?taskId=${encodeURIComponent(taskId)}`;
@@ -161,7 +163,7 @@ async function generateWithKie({
         }
     }
 
-    throw new Error("Kie generation timed out while waiting for task completion");
+    throw new Error(`Kie generation timed out while waiting for task completion (taskId: ${taskId})`);
 }
 
 async function generateWithOpenAI({
