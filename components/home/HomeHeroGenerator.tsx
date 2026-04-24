@@ -11,6 +11,7 @@ import {
     Download,
     ImagePlus,
     Dices,
+    Lock,
     ChevronLeft,
     ChevronRight,
     GalleryHorizontal,
@@ -21,6 +22,7 @@ import { QuickRefillModal } from '@/components/payment/quick-refill-modal';
 import { useToast } from '@/hooks/use-toast';
 import { useCredits } from '@/hooks/use-credits';
 import { createClient } from '@/utils/supabase/client';
+import { AdaptiveAuthModal } from '@/components/auth/adaptive-auth-modal';
 import {
     ASPECT_RATIO_OPTIONS,
     DEFAULT_PROMPTS,
@@ -496,6 +498,11 @@ export default function HomeHeroGenerator({ onShowStaticContent, user }: HomeHer
     return (
         <>
             <QuickRefillModal isOpen={isRefillModalOpen} onClose={() => setIsRefillModalOpen(false)} />
+            <AdaptiveAuthModal
+                isOpen={showLoginPrompt && !currentUser}
+                onOpenChange={setShowLoginPrompt}
+                locale={locale}
+            />
 
             <section id="generator-workspace" className="relative overflow-hidden pb-14 pt-6 sm:pt-8 lg:pb-20">
                 <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top_left,rgba(255,178,105,0.22),transparent_28%),radial-gradient(circle_at_top_right,rgba(255,112,52,0.12),transparent_20%),linear-gradient(180deg,#fffdf8_0%,#fff7ee_52%,#fff3e7_100%)]" />
@@ -721,12 +728,13 @@ export default function HomeHeroGenerator({ onShowStaticContent, user }: HomeHer
                                                     {locale === 'zh' ? '正在生成图片...' : 'Generating image...'}
                                                 </>
                                             ) : (
-                                                <>
-                                                    <Wand2 className="mr-2 h-5 w-5" />
+                                                <span className="inline-flex items-center gap-2">
+                                                    {!currentUser && <Lock className="h-4.5 w-4.5 opacity-80" />}
+                                                    <Wand2 className="h-5 w-5" />
                                                     {generationMode === "image-to-image"
                                                         ? (locale === 'zh' ? '开始编辑' : 'Start Editing')
                                                         : (locale === 'zh' ? '生成图片' : 'Generate Image')}
-                                                </>
+                                                </span>
                                             )}
                                         </Button>
 
@@ -736,19 +744,6 @@ export default function HomeHeroGenerator({ onShowStaticContent, user }: HomeHer
                                             </p>
                                         )}
 
-                                        {showLoginPrompt && !currentUser && (
-                                            <div className="rounded-[24px] border border-orange-100 bg-[#fffaf4] p-4 text-center">
-                                                <p className="mb-3 text-sm text-slate-600">
-                                                    {locale === 'zh' ? '登录后即可开始真实生成。' : 'Sign in to start real generations.'}
-                                                </p>
-                                                <Button
-                                                    onClick={() => window.location.href = `/${locale}/sign-in`}
-                                                    className="rounded-full bg-white text-orange-700 shadow-sm hover:bg-orange-50"
-                                                >
-                                                    {locale === 'zh' ? '登录 / 注册' : 'Sign In / Sign Up'}
-                                                </Button>
-                                            </div>
-                                        )}
                                     </div>
                                 </div>
 

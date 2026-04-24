@@ -4,6 +4,7 @@ import { SubmitButton } from "@/components/submit-button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import { TurnstileWidget } from "@/components/auth/turnstile-widget";
 import Link from "next/link";
 import { createClient } from "@/utils/supabase/server";
 import { encodedRedirect } from "@/utils/utils";
@@ -18,6 +19,7 @@ export default async function SignUp(props: {
   const searchParams = await props.searchParams;
   const { locale } = await props.params;
   const localePrefix = `/${locale}`;
+  const turnstileSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
 
   const signUpWithGoogle = async () => {
     "use server";
@@ -83,6 +85,10 @@ export default async function SignUp(props: {
               required
             />
           </div>
+          <TurnstileWidget
+            siteKey={turnstileSiteKey}
+            locale={locale === "zh" ? "zh" : "en"}
+          />
           <SubmitButton
             className="w-full"
             pendingText="Creating account..."

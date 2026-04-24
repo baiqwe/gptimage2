@@ -1,67 +1,59 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { X } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 export function PromotionBanner() {
     const [isVisible, setIsVisible] = useState(true);
-    const [timeLeft, setTimeLeft] = useState({ hours: 23, minutes: 59, seconds: 59 });
     const pathname = usePathname();
 
     const locale = pathname?.split('/')[1] === 'zh' ? 'zh' : 'en';
     const localePrefix = `/${locale}`;
 
-    useEffect(() => {
-        const timer = setInterval(() => {
-            setTimeLeft(prev => {
-                if (prev.seconds > 0) {
-                    return { ...prev, seconds: prev.seconds - 1 };
-                } else if (prev.minutes > 0) {
-                    return { ...prev, minutes: prev.minutes - 1, seconds: 59 };
-                } else if (prev.hours > 0) {
-                    return { hours: prev.hours - 1, minutes: 59, seconds: 59 };
-                } else {
-                    return { hours: 23, minutes: 59, seconds: 59 };
-                }
-            });
-        }, 1000);
-
-        return () => clearInterval(timer);
-    }, []);
-
     if (!isVisible) return null;
 
-    const pad = (n: number) => n.toString().padStart(2, '0');
-
     return (
-        <div className="relative bg-gradient-to-r from-red-600 via-orange-500 to-red-600 text-white text-center py-2.5 px-4 text-sm font-medium">
-            <div className="flex items-center justify-center gap-2 flex-wrap">
-                <span className="text-xl">🎉</span>
-                <span>
-                    {locale === 'zh' ? '首发特惠：Pro 套餐最高' : 'Launch Special: Get up to'}
-                </span>
-                <span className="font-bold underline decoration-2">
-                    {locale === 'zh' ? '7折' : '70% OFF'}
-                </span>
-                <span>
-                    {locale === 'zh' ? '！优惠倒计时：' : '! Ends in:'}
-                </span>
-                <span className="font-mono font-bold bg-white/20 px-2 py-0.5 rounded">
-                    {pad(timeLeft.hours)}:{pad(timeLeft.minutes)}:{pad(timeLeft.seconds)}
-                </span>
-                <Link
-                    href={`${localePrefix}/pricing`}
-                    className="underline hover:no-underline ml-1 font-bold"
-                >
-                    {locale === 'zh' ? '立即查看 →' : 'Claim Now →'}
-                </Link>
-            </div>
+        <div className="relative overflow-hidden bg-gradient-to-r from-orange-600 via-[#ff7a34] to-orange-600 text-white">
+            <Link
+                href={`${localePrefix}/pricing`}
+                className="block px-4 py-2.5 text-center text-sm font-medium"
+                aria-label={locale === 'zh' ? '查看套餐与付款页面' : 'View pricing and checkout options'}
+            >
+                <div className="pointer-events-none flex items-center justify-center gap-2.5 pr-8 flex-wrap">
+                    <span className="text-lg">✨</span>
+                    <span>
+                        {locale === 'zh'
+                            ? '现在可直接购买：套餐'
+                            : 'Plans are live now:'}
+                    </span>
+                    <span className="font-bold">
+                        {locale === 'zh' ? '$9.99 起' : 'from $9.99'}
+                    </span>
+                    <span>
+                        {locale === 'zh'
+                            ? '，年付相较按月订阅可节省'
+                            : 'and annual billing saves'}
+                    </span>
+                    <span className="font-bold underline decoration-white/50 decoration-2 underline-offset-2">
+                        37%
+                    </span>
+                    <span>
+                        {locale === 'zh'
+                            ? '。点击查看定价 →'
+                            : 'vs monthly. View pricing →'}
+                    </span>
+                </div>
+            </Link>
 
             <button
-                onClick={() => setIsVisible(false)}
-                className="absolute right-2 top-1/2 -translate-y-1/2 p-1 hover:bg-white/20 rounded transition-colors"
+                onClick={(event) => {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    setIsVisible(false);
+                }}
+                className="absolute right-2 top-1/2 z-10 -translate-y-1/2 rounded p-1 transition-colors hover:bg-white/20"
                 aria-label="Close"
             >
                 <X className="w-4 h-4" />
