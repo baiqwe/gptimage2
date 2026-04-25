@@ -1,26 +1,15 @@
-const fs = require('fs');
-const path = require('path');
+require('tsx/cjs');
 
-function extractBlogSlugs() {
-    try {
-        const source = fs.readFileSync(path.join(__dirname, 'config', 'blog-posts.ts'), 'utf8');
-        const matches = [...source.matchAll(/slug:\s*'([^']+)'/g)];
-        return matches.map((match) => match[1]);
-    } catch (error) {
-        console.warn('Failed to extract blog slugs for sitemap:', error);
-        return [];
-    }
-}
+const { BLOG_POST_SLUGS } = require('./config/blog-posts.ts');
+const { PROMPT_CATEGORY_SLUGS } = require('./config/prompts-data.ts');
 
-function extractPromptCategorySlugs() {
-    try {
-        const source = fs.readFileSync(path.join(__dirname, 'config', 'prompts-data.ts'), 'utf8');
-        const matches = [...source.matchAll(/slug:\s*"([^"]+)"/g)];
-        return matches.map((match) => match[1]);
-    } catch (error) {
-        console.warn('Failed to extract prompt category slugs for sitemap:', error);
-        return [];
-    }
+function getAlternateRefs(siteUrl, loc) {
+    const pathWithoutLocale = loc.replace(/^\/(en|zh)/, '') || '';
+    return [
+        { href: `${siteUrl}/en${pathWithoutLocale}`, hreflang: 'en' },
+        { href: `${siteUrl}/zh${pathWithoutLocale}`, hreflang: 'zh' },
+        { href: `${siteUrl}/en${pathWithoutLocale}`, hreflang: 'x-default' },
+    ];
 }
 
 /** @type {import('next-sitemap').IConfig} */
@@ -75,8 +64,8 @@ module.exports = {
             'arena'
         ];
 
-        const blogSlugs = extractBlogSlugs();
-        const promptCategorySlugs = extractPromptCategorySlugs();
+        const blogSlugs = BLOG_POST_SLUGS;
+        const promptCategorySlugs = PROMPT_CATEGORY_SLUGS;
 
         const result = [];
 
@@ -87,6 +76,7 @@ module.exports = {
                 changefreq: 'daily',
                 priority: 1.0,
                 lastmod: new Date().toISOString(),
+                alternateRefs: getAlternateRefs(config.siteUrl, `/${locale}`),
             });
 
             for (const page of staticPages) {
@@ -108,6 +98,7 @@ module.exports = {
                     changefreq,
                     priority,
                     lastmod: new Date().toISOString(),
+                    alternateRefs: getAlternateRefs(config.siteUrl, `/${locale}/${page}`),
                 });
             }
 
@@ -117,6 +108,7 @@ module.exports = {
                     changefreq: 'weekly',
                     priority: 0.82,
                     lastmod: new Date().toISOString(),
+                    alternateRefs: getAlternateRefs(config.siteUrl, `/${locale}/prompts/${category}`),
                 });
             }
 
@@ -126,6 +118,7 @@ module.exports = {
                 changefreq: 'daily',
                 priority: 0.9,
                 lastmod: new Date().toISOString(),
+                alternateRefs: getAlternateRefs(config.siteUrl, `/${locale}/blog`),
             });
 
             // Add individual blog posts
@@ -135,6 +128,7 @@ module.exports = {
                     changefreq: 'weekly',
                     priority: 0.85,
                     lastmod: new Date().toISOString(),
+                    alternateRefs: getAlternateRefs(config.siteUrl, `/${locale}/blog/${slug}`),
                 });
             }
         }
@@ -166,6 +160,7 @@ module.exports = {
             changefreq,
             priority,
             lastmod: new Date().toISOString(),
+            alternateRefs: getAlternateRefs(config.siteUrl, path),
         };
     },
 };

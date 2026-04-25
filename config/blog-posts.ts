@@ -1190,3 +1190,5 @@ export const blogPosts: BlogPost[] = [
     `
   }
 ];
+
+export const BLOG_POST_SLUGS = blogPosts.map((post) => post.slug);

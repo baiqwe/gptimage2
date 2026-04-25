@@ -26,6 +26,8 @@ Target pages:
 Rule:
 
 - Keep these synonyms consolidated into the homepage and create page.
+- Treat `/[locale]` as the primary page for brand, overview, examples, pricing, prompts, and trust.
+- Treat `/[locale]/create` as the primary page for direct generator and workspace intent.
 - Do not create one page per spelling variant.
 
 ### Developer / technical intent

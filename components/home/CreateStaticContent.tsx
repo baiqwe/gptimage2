@@ -14,8 +14,8 @@ export default function CreateStaticContent({ locale }: { locale: string }) {
         {
             title: isZh ? '界面聚焦真正常用的控制项' : 'The interface keeps only the controls that matter',
             description: isZh
-                ? '你可以直接控制提示词、尺寸、质量和导出格式，更快完成测试、迭代和交付。'
-                : 'You can directly control the prompt, size, quality, and export format so it is easier to test, iterate, and deliver assets.',
+                ? '你可以直接控制提示词、画面比例，以及在文生图与图生图之间切换，更快完成测试、迭代和交付。'
+                : 'You can directly control the prompt, aspect ratio, and whether you are working in text-to-image or image-to-image mode, making it easier to test and iterate quickly.',
         },
         {
             title: isZh ? '需要更多资料时也有清晰入口' : 'There are clear paths when you need more context',
