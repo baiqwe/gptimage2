@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
+import dynamic from 'next/dynamic';
 import {
     Loader2,
     Sparkles,
@@ -17,17 +18,25 @@ import {
     X,
 } from 'lucide-react';
 import Image from 'next/image';
-import { QuickRefillModal } from '@/components/payment/quick-refill-modal';
 import { useToast } from '@/hooks/use-toast';
 import { useCredits } from '@/hooks/use-credits';
 import { createClient } from '@/utils/supabase/client';
-import { AdaptiveAuthModal } from '@/components/auth/adaptive-auth-modal';
 import {
     ASPECT_RATIO_OPTIONS,
     DEFAULT_PROMPTS,
     type AspectRatioOption,
 } from '@/config/gpt-image';
 import { CREDITS_PER_GENERATION } from '@/config/pricing';
+
+const QuickRefillModal = dynamic(
+    () => import('@/components/payment/quick-refill-modal').then((mod) => mod.QuickRefillModal),
+    { ssr: false }
+);
+
+const AdaptiveAuthModal = dynamic(
+    () => import('@/components/auth/adaptive-auth-modal').then((mod) => mod.AdaptiveAuthModal),
+    { ssr: false }
+);
 
 type GenerationMode = 'text-to-image' | 'image-to-image';
 
@@ -112,11 +121,10 @@ const SAMPLE_PREVIEW_SLIDES = [
 ] as const;
 
 interface HomeHeroGeneratorProps {
-    onShowStaticContent: (show: boolean) => void;
     user?: any;
 }
 
-export default function HomeHeroGenerator({ onShowStaticContent, user }: HomeHeroGeneratorProps) {
+export default function HomeHeroGenerator({ user }: HomeHeroGeneratorProps) {
     const pathname = usePathname();
     const locale = pathname?.split('/')[1] === 'zh' ? 'zh' : 'en';
     const isCreatePage = pathname?.endsWith('/create');
@@ -172,10 +180,6 @@ export default function HomeHeroGenerator({ onShowStaticContent, user }: HomeHer
 
         return () => subscription.unsubscribe();
     }, []);
-
-    useEffect(() => {
-        onShowStaticContent(resultImages.length === 0);
-    }, [resultImages, onShowStaticContent]);
 
     useEffect(() => {
         if (resultImages.length <= 1) return;

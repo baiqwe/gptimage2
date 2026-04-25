@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, type ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import dynamic from 'next/dynamic';
 import { Loader2 } from 'lucide-react';
 
@@ -28,12 +28,10 @@ interface HomeClientWrapperProps {
 }
 
 export default function HomeClientWrapper({ staticContent, user }: HomeClientWrapperProps) {
-    const [showStaticContent, setShowStaticContent] = useState(true);
-
     return (
         <div className="min-h-screen">
             {/* Hero + AI Generator */}
-            <HomeHeroGenerator onShowStaticContent={setShowStaticContent} user={user} />
+            <HomeHeroGenerator user={user} />
 
             {/* SEO Static Content - always visible below the generator */}
             <div className="bg-background">

@@ -2,7 +2,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { getTranslations } from 'next-intl/server';
 import { Sparkles, Lock, Zap, Palette, Smartphone, Printer, Heart, ArrowRight, Star } from 'lucide-react';
-import { PricingSection } from '@/components/marketing/pricing-section';
+import { HomePricingTeaser } from '@/components/marketing/home-pricing-teaser';
 
 interface HomeStaticContentProps {
     locale: string;
@@ -111,7 +111,7 @@ function HomePricingSection({ locale }: { locale: string }) {
     return (
         <section className="border-t border-orange-100 bg-[linear-gradient(180deg,#fff8f0_0%,#fffdf9_100%)] py-16">
             <div className="container px-4 md:px-6">
-                <PricingSection locale={locale} />
+                <HomePricingTeaser locale={locale} />
             </div>
         </section>
     );

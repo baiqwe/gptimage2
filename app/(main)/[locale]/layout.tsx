@@ -127,9 +127,9 @@ export default async function LocaleLayout(props: {
                     >
                         <div className="relative min-h-screen flex flex-col">
                             <PromotionBanner />
-                            <Header user={null} />
+                            <Header user={null} locale={locale as 'en' | 'zh'} />
                             <main className="flex-1">{children}</main>
-                            <Footer />
+                            <Footer locale={locale as 'en' | 'zh'} />
                         </div>
                         <Toaster />
                     </ThemeProvider>

@@ -1,17 +1,14 @@
-"use client";
-
-import { Logo } from "./logo";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useTranslations } from "next-intl";
+import Image from "next/image";
+import { getTranslations } from "next-intl/server";
 import { siteConfig } from "@/config/site";
 
-export function Footer() {
-  const pathname = usePathname();
-  const t = useTranslations('footer');
+interface FooterProps {
+  locale: 'en' | 'zh';
+}
 
-  const pathParts = pathname?.split('/') || [];
-  const currentLocale = (pathParts[1] === 'en' || pathParts[1] === 'zh') ? pathParts[1] : 'en';
+export async function Footer({ locale: currentLocale }: FooterProps) {
+  const t = await getTranslations({ locale: currentLocale, namespace: 'footer' });
   const localePrefix = `/${currentLocale}`;
 
   const productLinks = [
@@ -34,7 +31,26 @@ export function Footer() {
         <div className="section-shell grid grid-cols-2 gap-8 px-6 py-8 md:grid-cols-4 md:px-8">
           {/* Brand */}
           <div className="col-span-2">
-            <Logo />
+            <Link
+              href={localePrefix}
+              className="flex items-center gap-3 transition-opacity hover:opacity-90"
+            >
+              <Image
+                src="/favicon.svg"
+                alt={siteConfig.name}
+                width={40}
+                height={40}
+                className="h-10 w-10 rounded-xl shadow-lg shadow-orange-500/10"
+              />
+              <span className="flex flex-col leading-none">
+                <span className="bg-gradient-to-r from-orange-500 via-amber-500 to-rose-500 bg-clip-text text-base font-bold text-transparent sm:text-lg">
+                  GPT Image 2
+                </span>
+                <span className="text-[11px] uppercase tracking-[0.28em] text-slate-500 sm:text-xs">
+                  Generator
+                </span>
+              </span>
+            </Link>
             <p className="mt-4 text-sm text-slate-600 max-w-sm">
               {t('tagline')}
             </p>
@@ -116,6 +132,7 @@ export function Footer() {
               <img
                 src="https://goodaitools.com/assets/images/badge.png"
                 alt="Badge"
+                width={175}
                 height={54}
                 className="h-[54px] w-auto opacity-90 transition-opacity hover:opacity-100"
               />
@@ -129,6 +146,7 @@ export function Footer() {
               <img
                 src="https://apphublist.com/assets/images/badge.png"
                 alt="App Hub List"
+                width={175}
                 height={54}
                 className="h-[54px] w-auto opacity-90 transition-opacity hover:opacity-100"
               />
@@ -142,6 +160,7 @@ export function Footer() {
               <img
                 src="https://tooldynamo.com/assets/images/badge.png"
                 alt="Tool Dynamo"
+                width={175}
                 height={54}
                 className="h-[54px] w-auto opacity-90 transition-opacity hover:opacity-100"
               />
@@ -155,6 +174,7 @@ export function Footer() {
               <img
                 src="https://aixcollection.com/assets/images/badge.png"
                 alt="AI X Collection"
+                width={175}
                 height={54}
                 className="h-[54px] w-auto opacity-90 transition-opacity hover:opacity-100"
               />
@@ -168,6 +188,7 @@ export function Footer() {
               <img
                 src="https://weliketools.com/assets/images/badge.png"
                 alt="We Like Tools"
+                width={175}
                 height={54}
                 className="h-[54px] w-auto opacity-90 transition-opacity hover:opacity-100"
               />

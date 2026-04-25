@@ -1,14 +1,13 @@
-"use client";
-
 import Link from "next/link";
 import Image from "next/image";
-import { usePathname } from "next/navigation";
 import { siteConfig } from "@/config/site";
 
-export function Logo() {
-  const pathname = usePathname();
-  const currentLocale = pathname?.split('/')[1] || 'en';
-  const localePrefix = `/${currentLocale}`;
+interface LogoProps {
+  locale?: string;
+}
+
+export function Logo({ locale = 'en' }: LogoProps) {
+  const localePrefix = `/${locale}`;
 
   return (
     <Link
