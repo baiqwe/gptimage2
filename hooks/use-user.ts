@@ -14,8 +14,8 @@ export function useUser() {
       return;
     }
 
-    // Get user on mount
-    getUser();
+    // Read the local session first to avoid a visible auth-state flash in the header.
+    getSessionUser();
 
     // Listen for changes on auth state (login, sign out, etc.)
     const {
@@ -30,7 +30,7 @@ export function useUser() {
     };
   }, [supabase]);
 
-  async function getUser() {
+  async function getSessionUser() {
     if (!supabase) {
       setUser(null);
       setLoading(false);
@@ -39,11 +39,11 @@ export function useUser() {
 
     try {
       const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      setUser(user);
+        data: { session },
+      } = await supabase.auth.getSession();
+      setUser(session?.user ?? null);
     } catch (error) {
-      console.error("Error getting user:", error);
+      console.error("Error getting session user:", error);
     } finally {
       setLoading(false);
     }

@@ -64,7 +64,12 @@ export function HeaderClientControls({ user: initialUser, locale, navItems }: He
         </Link>
       </div>
 
-      {user ? (
+      {loading ? (
+        <div className="hidden items-center gap-2 md:flex">
+          <div className="h-9 w-[92px] rounded-full border border-orange-100 bg-white/80" />
+          <div className="h-9 w-[92px] rounded-full border border-orange-100 bg-white/80" />
+        </div>
+      ) : user ? (
         <div className="hidden items-center gap-2 md:flex">
           <Button asChild size="sm" variant="ghost" className="text-slate-600 hover:bg-orange-50 hover:text-orange-700">
             <Link href={`${localePrefix}/dashboard`} rel="nofollow">
