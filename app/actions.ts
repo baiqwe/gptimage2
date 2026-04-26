@@ -111,6 +111,10 @@ async function verifyTurnstileToken({
   };
 }
 
+function isTurnstileSignupEnabled() {
+  return process.env.TURNSTILE_SIGNUP_ENABLED === "true";
+}
+
 export const signUpAction = async (formData: FormData) => {
   const email = formData.get("email")?.toString();
   const password = formData.get("password")?.toString();
@@ -131,19 +135,21 @@ export const signUpAction = async (formData: FormData) => {
     );
   }
 
-  const turnstile = await verifyTurnstileToken({
-    token: turnstileToken,
-    ip: headersList.get("x-forwarded-for")?.split(",")[0]?.trim() || null,
-  });
+  if (isTurnstileSignupEnabled()) {
+    const turnstile = await verifyTurnstileToken({
+      token: turnstileToken,
+      ip: headersList.get("x-forwarded-for")?.split(",")[0]?.trim() || null,
+    });
 
-  if (!turnstile.success) {
-    return encodedRedirect(
-      "error",
-      `${localePrefix}/sign-up`,
-      locale === "zh"
-        ? "请先完成安全验证后再注册。"
-        : "Please complete the security check before signing up."
-    );
+    if (!turnstile.success) {
+      return encodedRedirect(
+        "error",
+        `${localePrefix}/sign-up`,
+        locale === "zh"
+          ? "请先完成安全验证后再注册。"
+          : "Please complete the security check before signing up."
+      );
+    }
   }
 
   const { data, error } = await supabase.auth.signUp({

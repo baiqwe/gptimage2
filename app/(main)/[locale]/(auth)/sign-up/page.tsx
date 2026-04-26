@@ -20,6 +20,7 @@ export default async function SignUp(props: {
   const { locale } = await props.params;
   const localePrefix = `/${locale}`;
   const turnstileSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
+  const turnstileEnabled = process.env.TURNSTILE_SIGNUP_ENABLED === "true";
   const nextPath = typeof searchParams?.next === "string" ? searchParams.next : `${localePrefix}`;
 
   const signUpWithGoogle = async (formData: FormData) => {
@@ -92,10 +93,12 @@ export default async function SignUp(props: {
               required
             />
           </div>
-          <TurnstileWidget
-            siteKey={turnstileSiteKey}
-            locale={locale === "zh" ? "zh" : "en"}
-          />
+          {turnstileEnabled ? (
+            <TurnstileWidget
+              siteKey={turnstileSiteKey}
+              locale={locale === "zh" ? "zh" : "en"}
+            />
+          ) : null}
           <SubmitButton
             className="w-full"
             pendingText="Creating account..."
