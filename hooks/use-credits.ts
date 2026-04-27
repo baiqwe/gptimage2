@@ -9,6 +9,7 @@ interface Credits {
   user_id: string;
   total_credits: number;
   remaining_credits: number;
+  has_paid_access?: boolean;
   created_at: string;
   updated_at: string;
 }

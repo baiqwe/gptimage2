@@ -30,6 +30,7 @@ export async function GET(request: Request) {
             user_id: customer.user_id,
             total_credits: customer.credits, // Assuming current balance is total for now, or maybe we don't track historical total
             remaining_credits: customer.credits,
+            has_paid_access: Boolean(customer.creem_customer_id),
             created_at: customer.created_at,
             updated_at: customer.updated_at
         };
@@ -85,6 +86,7 @@ export async function POST(request: Request) {
             user_id: customer.user_id,
             total_credits: customer.credits,
             remaining_credits: customer.credits,
+            has_paid_access: Boolean(customer.creem_customer_id),
             created_at: customer.created_at,
             updated_at: customer.updated_at
         };

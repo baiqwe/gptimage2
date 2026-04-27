@@ -16,6 +16,33 @@ export default async function Login(props: { searchParams: Promise<LoginSearchPa
   const { locale } = await props.params;
   const localePrefix = `/${locale}`;
   const nextPath = typeof searchParams?.next === "string" ? searchParams.next : `${localePrefix}`;
+  const copy = locale === "zh"
+    ? {
+        title: "欢迎回来",
+        subtitle: "输入你的邮箱和密码，继续使用 GPT Image 2。",
+        email: "邮箱",
+        password: "密码",
+        forgot: "忘记密码？",
+        submit: "登录",
+        pending: "登录中...",
+        divider: "或使用以下方式继续",
+        google: "使用 Google 登录",
+        footer: "还没有账号？",
+        footerLink: "立即注册",
+      }
+    : {
+        title: "Welcome back",
+        subtitle: "Enter your email to sign in to your account",
+        email: "Email",
+        password: "Password",
+        forgot: "Forgot password?",
+        submit: "Sign in",
+        pending: "Signing in...",
+        divider: "Or continue with",
+        google: "Sign in with Google",
+        footer: "Don't have an account?",
+        footerLink: "Sign up",
+      };
 
   const signInWithGoogle = async (formData: FormData) => {
     "use server";
@@ -55,16 +82,16 @@ export default async function Login(props: { searchParams: Promise<LoginSearchPa
   return (
     <>
       <div className="flex flex-col space-y-2 text-center">
-        <h1 className="text-2xl font-semibold tracking-tight">Welcome back</h1>
+        <h1 className="text-2xl font-semibold tracking-tight">{copy.title}</h1>
         <p className="text-sm text-muted-foreground">
-          Enter your email to sign in to your account
+          {copy.subtitle}
         </p>
       </div>
       <div className="grid gap-6">
         <form className="grid gap-4">
           <input type="hidden" name="next" value={nextPath} />
           <div className="grid gap-2">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email">{copy.email}</Label>
             <Input
               id="email"
               name="email"
@@ -78,12 +105,12 @@ export default async function Login(props: { searchParams: Promise<LoginSearchPa
           </div>
           <div className="grid gap-2">
             <div className="flex items-center justify-between">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">{copy.password}</Label>
               <Link
                 href={`${localePrefix}/forgot-password`}
                 className="text-sm font-medium text-primary hover:underline"
               >
-                Forgot password?
+                {copy.forgot}
               </Link>
             </div>
             <Input
@@ -97,10 +124,10 @@ export default async function Login(props: { searchParams: Promise<LoginSearchPa
           </div>
           <SubmitButton
             className="w-full"
-            pendingText="Signing in..."
+            pendingText={copy.pending}
             formAction={signInAction}
           >
-            Sign in
+            {copy.submit}
           </SubmitButton>
           <FormMessage message={searchParams} />
         </form>
@@ -110,7 +137,7 @@ export default async function Login(props: { searchParams: Promise<LoginSearchPa
           </div>
           <div className="relative flex justify-center text-xs uppercase">
             <span className="bg-background px-2 text-muted-foreground">
-              Or continue with
+              {copy.divider}
             </span>
           </div>
         </div>
@@ -139,16 +166,16 @@ export default async function Login(props: { searchParams: Promise<LoginSearchPa
                 fill="#EA4335"
               />
             </svg>
-            Sign in with Google
+            {copy.google}
           </Button>
         </form>
         <div className="text-sm text-muted-foreground text-center">
-          Don't have an account?{" "}
+          {copy.footer}{" "}
           <Link
             href={`${localePrefix}/sign-up?next=${encodeURIComponent(nextPath)}`}
             className="text-primary underline underline-offset-4 hover:text-primary/90"
           >
-            Sign up
+            {copy.footerLink}
           </Link>
         </div>
       </div>

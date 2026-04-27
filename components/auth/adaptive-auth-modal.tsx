@@ -73,8 +73,8 @@ export function AdaptiveAuthModal({
           <Wand2 className="mt-0.5 h-4 w-4 text-orange-500" />
           <span>
             {locale === "zh"
-              ? "继续当前文生图或图生图流程，不会丢失已填写的内容。"
-              : "Continue your text-to-image or image-to-image flow without losing what you already entered."}
+              ? "继续当前创作流程，不会丢失已经填写的提示词和选项。"
+              : "Continue your current creation flow without losing the prompt and options you already entered."}
           </span>
         </div>
         <div className="flex items-start gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3">

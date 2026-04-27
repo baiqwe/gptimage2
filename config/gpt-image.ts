@@ -14,13 +14,24 @@ export const ASPECT_RATIO_OPTIONS = [
   { id: "3:4", label: "3:4", labelZh: "3:4" },
 ] as const;
 
+export const RESOLUTION_OPTIONS = [
+  { id: "1K", label: "1K", labelZh: "1K" },
+  { id: "2K", label: "2K", labelZh: "2K" },
+  { id: "4K", label: "4K", labelZh: "4K" },
+] as const;
+
 export const COUNT_OPTIONS = [1, 2, 4] as const;
 
 export type AspectRatioOption = (typeof ASPECT_RATIO_OPTIONS)[number]["id"];
+export type ResolutionOption = (typeof RESOLUTION_OPTIONS)[number]["id"];
 export type CountOption = (typeof COUNT_OPTIONS)[number];
 
 export function resolveAspectRatio(aspectRatio: string): AspectRatioOption {
   return ASPECT_RATIO_OPTIONS.find((option) => option.id === aspectRatio)?.id ?? "auto";
+}
+
+export function resolveResolution(resolution: string): ResolutionOption {
+  return RESOLUTION_OPTIONS.find((option) => option.id === resolution)?.id ?? "1K";
 }
 
 export function resolveOpenAISize(aspectRatio: string) {

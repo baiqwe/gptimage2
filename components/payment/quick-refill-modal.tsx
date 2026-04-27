@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useTranslations } from "next-intl";
 import { Loader2, Zap } from "lucide-react";
 import { useState } from "react";
+import { usePathname } from "next/navigation";
 import { PLAN_MINI, PLAN_PRO_MONTHLY, PricingPlan } from "@/config/pricing";
 import { toast } from "@/hooks/use-toast";
 
@@ -17,6 +18,8 @@ interface QuickRefillModalProps {
 export function QuickRefillModal({ isOpen, onClose, currentPath }: QuickRefillModalProps) {
     const t = useTranslations('Pricing');
     const [loadingPlanId, setLoadingPlanId] = useState<string | null>(null);
+    const pathname = usePathname();
+    const locale = pathname?.split("/")[1] === "zh" ? "zh" : "en";
 
     const handlePurchase = async (plan: PricingPlan) => {
         try {
@@ -46,6 +49,16 @@ export function QuickRefillModal({ isOpen, onClose, currentPath }: QuickRefillMo
             const data = await response.json();
 
             if (!response.ok) {
+                if (response.status === 401) {
+                    toast({
+                        title: locale === 'zh' ? '请先登录' : 'Sign in first',
+                        description: locale === 'zh'
+                            ? '登录后即可继续购买并解锁更高分辨率。'
+                            : 'Please sign in before purchasing and unlocking higher resolutions.',
+                    });
+                    window.location.href = `/${locale}/sign-in?next=${encodeURIComponent(window.location.pathname)}`;
+                    return;
+                }
                 throw new Error(data.error || 'Checkout failed');
             }
 

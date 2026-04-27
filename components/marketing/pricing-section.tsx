@@ -84,6 +84,16 @@ export function PricingSection({ locale }: PricingSectionProps) {
             const data = await response.json();
 
             if (!response.ok) {
+                if (response.status === 401) {
+                    toast({
+                        title: locale === 'zh' ? '请先登录' : 'Sign in first',
+                        description: locale === 'zh'
+                            ? '登录后即可继续购买并解锁更高分辨率。'
+                            : 'Please sign in before purchasing and unlocking higher resolutions.',
+                    });
+                    window.location.href = `/${locale}/sign-in?next=${encodeURIComponent(window.location.pathname)}`;
+                    return;
+                }
                 throw new Error(data.error || 'Checkout failed');
             }
 

@@ -5,6 +5,20 @@ import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
     try {
+        if (!process.env.CREEM_API_URL || !process.env.CREEM_API_KEY) {
+            return NextResponse.json(
+                {
+                    error: "Creem is not configured",
+                    code: "CREEM_CONFIG_MISSING",
+                    details: {
+                        hasApiUrl: Boolean(process.env.CREEM_API_URL),
+                        hasApiKey: Boolean(process.env.CREEM_API_KEY),
+                    },
+                },
+                { status: 500 }
+            );
+        }
+
         // 1. 验证用户登录
         const supabase = await createClient();
         const { data: { user }, error: userError } = await supabase.auth.getUser();
@@ -75,7 +89,10 @@ export async function POST(request: Request) {
     } catch (error) {
         console.error("Checkout error:", error);
         return NextResponse.json(
-            { error: "Internal Server Error" },
+            {
+                error: "Internal Server Error",
+                details: error instanceof Error ? error.message : "Unknown error",
+            },
             { status: 500 }
         );
     }

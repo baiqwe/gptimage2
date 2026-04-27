@@ -22,6 +22,31 @@ export default async function SignUp(props: {
   const turnstileSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
   const turnstileEnabled = process.env.TURNSTILE_SIGNUP_ENABLED === "true";
   const nextPath = typeof searchParams?.next === "string" ? searchParams.next : `${localePrefix}`;
+  const copy = locale === "zh"
+    ? {
+        title: "创建你的账号",
+        subtitle: "注册后即可使用 GPT Image 2，保存结果并继续你的创作流程。",
+        email: "邮箱",
+        password: "密码",
+        submit: "创建账号",
+        pending: "创建账号中...",
+        divider: "或使用以下方式继续",
+        google: "使用 Google 注册",
+        footer: "已经有账号了？",
+        footerLink: "去登录",
+      }
+    : {
+        title: "Create your account",
+        subtitle: "Sign up to access global authentication and payment solutions",
+        email: "Email",
+        password: "Password",
+        submit: "Create account",
+        pending: "Creating account...",
+        divider: "Or continue with",
+        google: "Sign up with Google",
+        footer: "Already have an account?",
+        footerLink: "Sign in",
+      };
 
   const signUpWithGoogle = async (formData: FormData) => {
     "use server";
@@ -61,16 +86,16 @@ export default async function SignUp(props: {
   return (
     <>
       <div className="flex flex-col space-y-2 text-center">
-        <h1 className="text-2xl font-semibold tracking-tight">Create your account</h1>
+        <h1 className="text-2xl font-semibold tracking-tight">{copy.title}</h1>
         <p className="text-sm text-muted-foreground">
-          Sign up to access global authentication and payment solutions
+          {copy.subtitle}
         </p>
       </div>
       <div className="grid gap-6">
         <form className="grid gap-4">
           <input type="hidden" name="next" value={nextPath} />
           <div className="grid gap-2">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email">{copy.email}</Label>
             <Input
               id="email"
               name="email"
@@ -83,7 +108,7 @@ export default async function SignUp(props: {
             />
           </div>
           <div className="grid gap-2">
-            <Label htmlFor="password">Password</Label>
+            <Label htmlFor="password">{copy.password}</Label>
             <Input
               id="password"
               name="password"
@@ -101,10 +126,10 @@ export default async function SignUp(props: {
           ) : null}
           <SubmitButton
             className="w-full"
-            pendingText="Creating account..."
+            pendingText={copy.pending}
             formAction={signUpAction}
           >
-            Create account
+            {copy.submit}
           </SubmitButton>
           <FormMessage message={searchParams} />
         </form>
@@ -114,7 +139,7 @@ export default async function SignUp(props: {
           </div>
           <div className="relative flex justify-center text-xs uppercase">
             <span className="bg-background px-2 text-muted-foreground">
-              Or continue with
+              {copy.divider}
             </span>
           </div>
         </div>
@@ -143,16 +168,16 @@ export default async function SignUp(props: {
                 fill="#EA4335"
               />
             </svg>
-            Sign up with Google
+            {copy.google}
           </Button>
         </form>
         <div className="text-sm text-muted-foreground text-center">
-          Already have an account?{" "}
+          {copy.footer}{" "}
           <Link
             href={`${localePrefix}/sign-in?next=${encodeURIComponent(nextPath)}`}
             className="text-primary underline underline-offset-4 hover:text-primary/90"
           >
-            Sign in
+            {copy.footerLink}
           </Link>
         </div>
       </div>

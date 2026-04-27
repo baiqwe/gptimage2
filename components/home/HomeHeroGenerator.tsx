@@ -25,6 +25,8 @@ import {
     ASPECT_RATIO_OPTIONS,
     DEFAULT_PROMPTS,
     type AspectRatioOption,
+    RESOLUTION_OPTIONS,
+    type ResolutionOption,
 } from '@/config/gpt-image';
 import { CREDITS_PER_GENERATION } from '@/config/pricing';
 
@@ -42,6 +44,12 @@ type GenerationMode = 'text-to-image' | 'image-to-image';
 
 interface ReferenceImage {
     url: string;
+    name: string;
+}
+
+interface PendingReferenceFile {
+    file: File;
+    previewUrl: string;
     name: string;
 }
 
@@ -138,6 +146,7 @@ export default function HomeHeroGenerator({ user }: HomeHeroGeneratorProps) {
     const [prompt, setPrompt] = useState<string>(defaultPrompt);
     const [generationMode, setGenerationMode] = useState<GenerationMode>("text-to-image");
     const [aspectRatio, setAspectRatio] = useState<AspectRatioOption>("auto");
+    const [resolution, setResolution] = useState<ResolutionOption>("1K");
     const [resultImages, setResultImages] = useState<string[]>([]);
     const [isGenerating, setIsGenerating] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -147,7 +156,9 @@ export default function HomeHeroGenerator({ user }: HomeHeroGeneratorProps) {
     const [activePreviewIndex, setActivePreviewIndex] = useState(0);
     const [activeSampleIndex, setActiveSampleIndex] = useState(0);
     const [referenceImages, setReferenceImages] = useState<ReferenceImage[]>([]);
+    const [pendingReferenceFiles, setPendingReferenceFiles] = useState<PendingReferenceFile[]>([]);
     const [isUploadingReference, setIsUploadingReference] = useState(false);
+    const canUseHighResolution = Boolean(credits?.has_paid_access);
 
     useEffect(() => {
         const checkUser = async () => {
@@ -241,9 +252,31 @@ export default function HomeHeroGenerator({ user }: HomeHeroGeneratorProps) {
             prompt,
             generationMode,
             aspectRatio,
+            resolution,
             referenceImages,
+            pendingReferenceNames: pendingReferenceFiles.map((image) => image.name),
             timestamp: Date.now()
         }));
+    };
+
+    const needsReferenceBeforeEdit =
+        generationMode === "image-to-image" &&
+        referenceImages.length === 0 &&
+        pendingReferenceFiles.length === 0;
+
+    const handlePrimaryAction = () => {
+        if (needsReferenceBeforeEdit) {
+            if (!currentUser) {
+                saveStateForLater();
+                setShowLoginPrompt(true);
+                return;
+            }
+
+            fileInputRef.current?.click();
+            return;
+        }
+
+        handleGenerate();
     };
 
     useEffect(() => {
@@ -277,6 +310,7 @@ export default function HomeHeroGenerator({ user }: HomeHeroGeneratorProps) {
                     setPrompt(parsed.prompt || defaultPrompt);
                     setGenerationMode(parsed.generationMode || "text-to-image");
                     setAspectRatio(parsed.aspectRatio || "auto");
+                    setResolution(parsed.resolution || "1K");
                     setReferenceImages(Array.isArray(parsed.referenceImages) ? parsed.referenceImages : []);
                     localStorage.removeItem("pending_gpt_image_2_generation");
 
@@ -308,14 +342,19 @@ export default function HomeHeroGenerator({ user }: HomeHeroGeneratorProps) {
                     setPrompt(parsed.prompt || defaultPrompt);
                     setGenerationMode(parsed.generationMode || "text-to-image");
                     setAspectRatio(parsed.aspectRatio || "auto");
+                    setResolution(parsed.resolution || "1K");
                     setReferenceImages(Array.isArray(parsed.referenceImages) ? parsed.referenceImages : []);
                     localStorage.removeItem("pending_gpt_image_2_generation");
 
                     toast({
                         title: locale === "zh" ? "欢迎！" : "Welcome!",
                         description: locale === "zh"
-                            ? "您的创作设置已恢复。"
-                            : "Your creation settings have been restored.",
+                            ? (parsed.pendingReferenceNames?.length
+                                ? "提示词和设置已恢复；本地参考图需要重新选择后再继续图生图。"
+                                : "您的创作设置已恢复。")
+                            : (parsed.pendingReferenceNames?.length
+                                ? "Your prompt and settings are restored. Please reselect local reference images before editing."
+                                : "Your creation settings have been restored."),
                     });
                 }
             } catch {
@@ -324,19 +363,66 @@ export default function HomeHeroGenerator({ user }: HomeHeroGeneratorProps) {
         }
     }, [defaultPrompt, locale, refetchCredits, toast, user]);
 
+    useEffect(() => {
+        return () => {
+            pendingReferenceFiles.forEach((image) => {
+                URL.revokeObjectURL(image.previewUrl);
+            });
+        };
+    }, [pendingReferenceFiles]);
+
+    const handleResolutionSelect = (nextResolution: ResolutionOption) => {
+        if (nextResolution === "1K") {
+            setResolution(nextResolution);
+            return;
+        }
+
+        if (canUseHighResolution) {
+            setResolution(nextResolution);
+            return;
+        }
+
+        saveStateForLater();
+
+        if (!currentUser) {
+            setShowLoginPrompt(true);
+            return;
+        }
+
+        setIsRefillModalOpen(true);
+        toast({
+            title: locale === "zh" ? "升级解锁高清输出" : "Unlock high-resolution output",
+            description: locale === "zh"
+                ? "购买任意积分包后即可使用 2K 和 4K。"
+                : "2K and 4K unlock after any paid credits package or subscription.",
+        });
+    };
+
     const handleGenerate = async (force = false) => {
+        let effectiveReferenceImages = referenceImages;
+
         if (!prompt.trim()) {
             setError(locale === "zh" ? "请输入描述" : "Please enter a prompt");
             return;
         }
 
         if (generationMode === "image-to-image" && referenceImages.length === 0) {
-            setError(locale === "zh" ? "请先上传至少一张参考图" : "Please upload at least one reference image first");
-            return;
+            if (pendingReferenceFiles.length === 0) {
+                setError(locale === "zh" ? "请先上传至少一张参考图" : "Please upload at least one reference image first");
+                return;
+            }
         }
 
         if (!currentUser) {
             saveStateForLater();
+            if (generationMode === "image-to-image" && pendingReferenceFiles.length > 0) {
+                toast({
+                    title: locale === "zh" ? "请先登录" : "Sign in first",
+                    description: locale === "zh"
+                        ? "提示词和比例会保留；本地参考图出于浏览器安全限制，登录后需要重新选择。"
+                        : "Your prompt and ratio will stay in place, but local reference images need to be selected again after sign-in.",
+                });
+            }
             setShowLoginPrompt(true);
             return;
         }
@@ -344,6 +430,52 @@ export default function HomeHeroGenerator({ user }: HomeHeroGeneratorProps) {
         if (!force && credits && credits.remaining_credits < CREDITS_PER_GENERATION) {
             saveStateForLater();
             setIsRefillModalOpen(true);
+            return;
+        }
+
+        if (generationMode === "image-to-image" && pendingReferenceFiles.length > 0 && referenceImages.length === 0) {
+            setIsUploadingReference(true);
+            try {
+                const uploadedImages: ReferenceImage[] = [];
+
+                for (const pendingImage of pendingReferenceFiles) {
+                    const formData = new FormData();
+                    formData.append("file", pendingImage.file);
+
+                    const response = await fetch("/api/ai/upload-reference", {
+                        method: "POST",
+                        body: formData,
+                    });
+
+                    const data = await response.json();
+                    if (!response.ok) {
+                        throw new Error(data?.error || "Upload failed");
+                    }
+
+                    uploadedImages.push({
+                        url: data.url,
+                        name: pendingImage.name,
+                    });
+                }
+
+                setReferenceImages(uploadedImages);
+                effectiveReferenceImages = uploadedImages;
+                setPendingReferenceFiles((current) => {
+                    current.forEach((image) => URL.revokeObjectURL(image.previewUrl));
+                    return [];
+                });
+            } catch (uploadError: any) {
+                setError(uploadError.message || "Upload failed");
+                return;
+            } finally {
+                setIsUploadingReference(false);
+                if (fileInputRef.current) {
+                    fileInputRef.current.value = "";
+                }
+            }
+        }
+
+        if (generationMode === "image-to-image" && referenceImages.length === 0 && pendingReferenceFiles.length === 0) {
             return;
         }
 
@@ -358,8 +490,9 @@ export default function HomeHeroGenerator({ user }: HomeHeroGeneratorProps) {
                 body: JSON.stringify({
                     prompt: prompt.trim(),
                     aspect_ratio: aspectRatio,
+                    resolution,
                     input_urls: generationMode === "image-to-image"
-                        ? referenceImages.map((image) => image.url)
+                        ? effectiveReferenceImages.map((image) => image.url)
                         : [],
                 }),
             });
@@ -406,45 +539,23 @@ export default function HomeHeroGenerator({ user }: HomeHeroGeneratorProps) {
         const selectedFiles = Array.from(files || []).slice(0, 10 - referenceImages.length);
         if (selectedFiles.length === 0) return;
 
-        if (!currentUser) {
-            saveStateForLater();
-            setShowLoginPrompt(true);
-            return;
-        }
-
         setIsUploadingReference(true);
         setError(null);
 
         try {
-            const uploadedImages: ReferenceImage[] = [];
+            const newPendingFiles = selectedFiles.map((file) => ({
+                file,
+                name: file.name,
+                previewUrl: URL.createObjectURL(file),
+            }));
 
-            for (const file of selectedFiles) {
-                const formData = new FormData();
-                formData.append("file", file);
-
-                const response = await fetch("/api/ai/upload-reference", {
-                    method: "POST",
-                    body: formData,
-                });
-
-                const data = await response.json();
-                if (!response.ok) {
-                    throw new Error(data?.error || "Upload failed");
-                }
-
-                uploadedImages.push({
-                    url: data.url,
-                    name: file.name,
-                });
-            }
-
-            setReferenceImages((current) => [...current, ...uploadedImages].slice(0, 10));
+            setPendingReferenceFiles((current) => [...current, ...newPendingFiles].slice(0, 10));
             setGenerationMode("image-to-image");
             toast({
                 title: locale === "zh" ? "参考图已上传" : "Reference images uploaded",
                 description: locale === "zh"
-                    ? "生成时会自动使用 GPT Image 2 图生图模式。"
-                    : "Generation will now use GPT Image 2 image-to-image mode.",
+                    ? "图片已准备好，点击生成时会自动上传并进入图生图流程。"
+                    : "Images are ready. They will upload automatically when you start editing.",
             });
         } catch (uploadError: any) {
             setError(uploadError.message || "Upload failed");
@@ -536,7 +647,7 @@ export default function HomeHeroGenerator({ user }: HomeHeroGeneratorProps) {
                 locale={locale}
             />
 
-            <section id="generator-workspace" className="relative overflow-hidden pb-12 pt-3 sm:pt-4 lg:pb-16">
+            <section id="generator-workspace" className="relative overflow-hidden pb-28 pt-3 sm:pb-32 sm:pt-4 lg:pb-16">
                 <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top_left,rgba(255,178,105,0.22),transparent_28%),radial-gradient(circle_at_top_right,rgba(255,112,52,0.12),transparent_20%),linear-gradient(180deg,#fffdf8_0%,#fff7ee_52%,#fff3e7_100%)]" />
                 <div className="container px-4">
                     <div className="mx-auto max-w-6xl">
@@ -565,29 +676,33 @@ export default function HomeHeroGenerator({ user }: HomeHeroGeneratorProps) {
                                         onChange={(event) => handleReferenceUpload(event.target.files || undefined)}
                                     />
 
-                                    <div className="grid grid-cols-2 gap-2.5 rounded-[26px] border border-orange-100 bg-[#fffaf4] p-1.5">
-                                        <button
-                                            type="button"
-                                            onClick={() => setGenerationMode("image-to-image")}
-                                            className={`flex items-center justify-center gap-2 rounded-[18px] px-4 py-3 text-base font-semibold transition ${generationMode === "image-to-image"
-                                                ? "bg-[#ff6b2c] text-white shadow-[0_14px_34px_rgba(255,107,44,0.28)]"
-                                                : "border border-orange-100 bg-white text-slate-500 shadow-sm hover:border-orange-200 hover:bg-orange-50"
-                                                }`}
-                                        >
-                                            <ImagePlus className="h-5 w-5" />
-                                            {locale === 'zh' ? '图生图' : 'Edit Image'}
-                                        </button>
-                                        <button
-                                            type="button"
-                                            onClick={() => setGenerationMode("text-to-image")}
-                                            className={`flex items-center justify-center gap-2 rounded-[18px] px-4 py-3 text-base font-semibold transition ${generationMode === "text-to-image"
-                                                ? "bg-[#ff6b2c] text-white shadow-[0_14px_34px_rgba(255,107,44,0.28)]"
-                                                : "border border-orange-100 bg-white text-slate-500 shadow-sm hover:border-orange-200 hover:bg-orange-50"
-                                                }`}
-                                        >
-                                            <Sparkles className="h-5 w-5" />
-                                            {locale === 'zh' ? '文生图' : 'Create Image'}
-                                        </button>
+                                    <div className="rounded-[24px] border border-orange-100 bg-[#fffaf4] p-1">
+                                        <div className="grid grid-cols-2 gap-1.5">
+                                            <button
+                                                type="button"
+                                                onClick={() => setGenerationMode("image-to-image")}
+                                                className={`flex items-center justify-center gap-1.5 rounded-[16px] px-3 py-2 text-[14px] font-medium transition ${generationMode === "image-to-image"
+                                                    ? "bg-[#fff0e6] text-orange-700 ring-1 ring-orange-200"
+                                                    : "bg-transparent text-slate-500 hover:bg-white/75 hover:text-slate-700"
+                                                    }`}
+                                                aria-pressed={generationMode === "image-to-image"}
+                                            >
+                                                <ImagePlus className="h-4 w-4" />
+                                                {locale === 'zh' ? '图生图' : 'Edit Image'}
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={() => setGenerationMode("text-to-image")}
+                                                className={`flex items-center justify-center gap-1.5 rounded-[16px] px-3 py-2 text-[14px] font-medium transition ${generationMode === "text-to-image"
+                                                    ? "bg-[#fff0e6] text-orange-700 ring-1 ring-orange-200"
+                                                    : "bg-transparent text-slate-500 hover:bg-white/75 hover:text-slate-700"
+                                                    }`}
+                                                aria-pressed={generationMode === "text-to-image"}
+                                            >
+                                                <Sparkles className="h-4 w-4" />
+                                                {locale === 'zh' ? '文生图' : 'Create Image'}
+                                            </button>
+                                        </div>
                                     </div>
 
                                     {generationMode === "image-to-image" && (
@@ -624,23 +739,51 @@ export default function HomeHeroGenerator({ user }: HomeHeroGeneratorProps) {
                                                     </span>
                                                 </button>
 
-                                                {referenceImages.length > 0 ? (
+                                                {(pendingReferenceFiles.length > 0 || referenceImages.length > 0) ? (
                                                     <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
-                                                        {referenceImages.map((image, index) => (
+                                                        {[...pendingReferenceFiles.map((image) => ({
+                                                            key: image.previewUrl,
+                                                            src: image.previewUrl,
+                                                            name: image.name,
+                                                            isPending: true,
+                                                        })), ...referenceImages.map((image, index) => ({
+                                                            key: `${image.url}-${index}`,
+                                                            src: image.url,
+                                                            name: image.name,
+                                                            isPending: false,
+                                                        }))].map((image, index) => (
                                                             <div
-                                                                key={`${image.url}-${index}`}
+                                                                key={image.key}
                                                                 className="group relative aspect-square overflow-hidden rounded-[18px] border border-orange-100 bg-white"
                                                             >
                                                                 <Image
-                                                                    src={image.url}
+                                                                    src={image.src}
                                                                     alt={image.name || `Reference image ${index + 1}`}
                                                                     fill
                                                                     className="object-cover"
                                                                     unoptimized
                                                                 />
+                                                                {image.isPending && (
+                                                                    <span className="absolute left-1.5 top-1.5 rounded-full bg-white/90 px-2 py-1 text-[10px] font-semibold text-orange-700 shadow-sm">
+                                                                        {locale === 'zh' ? '待上传' : 'Ready'}
+                                                                    </span>
+                                                                )}
                                                                 <button
                                                                     type="button"
-                                                                    onClick={() => setReferenceImages((current) => current.filter((_, itemIndex) => itemIndex !== index))}
+                                                                    onClick={() => {
+                                                                        if (index < pendingReferenceFiles.length) {
+                                                                            setPendingReferenceFiles((current) => {
+                                                                                const target = current[index];
+                                                                                if (target) {
+                                                                                    URL.revokeObjectURL(target.previewUrl);
+                                                                                }
+                                                                                return current.filter((_, itemIndex) => itemIndex !== index);
+                                                                            });
+                                                                        } else {
+                                                                            const referenceIndex = index - pendingReferenceFiles.length;
+                                                                            setReferenceImages((current) => current.filter((_, itemIndex) => itemIndex !== referenceIndex));
+                                                                        }
+                                                                    }}
                                                                     className="absolute right-1.5 top-1.5 inline-flex h-7 w-7 items-center justify-center rounded-full bg-white/90 text-slate-600 opacity-0 shadow transition hover:bg-white hover:text-orange-700 group-hover:opacity-100"
                                                                     aria-label={locale === 'zh' ? '移除参考图' : 'Remove reference image'}
                                                                 >
@@ -652,8 +795,8 @@ export default function HomeHeroGenerator({ user }: HomeHeroGeneratorProps) {
                                                 ) : (
                                                     <div className="flex min-h-[132px] items-center justify-center rounded-[22px] border border-orange-100 bg-[#fff8f1] px-5 text-center text-sm leading-6 text-slate-500">
                                                         {locale === 'zh'
-                                                            ? '上传参考图后，GPT Image 2 会根据你的描述对图片进行编辑或重绘。'
-                                                            : 'After uploading references, GPT Image 2 will edit or redraw them based on your prompt.'}
+                                                            ? '先把参考图拖进来，点击生成时系统会自动上传并进入图生图。'
+                                                            : 'Add references first. They will upload automatically when you start editing.'}
                                                     </div>
                                                 )}
                                             </div>
@@ -662,7 +805,7 @@ export default function HomeHeroGenerator({ user }: HomeHeroGeneratorProps) {
 
                                     <div className="rounded-[28px] border border-[#f1dcc7] bg-[#fffdfa] p-5 shadow-[0_20px_60px_rgba(235,145,71,0.08)] sm:p-6">
                                         <div className="mb-3 flex items-center justify-between">
-                                            <label className="flex items-center gap-2 text-xl font-semibold text-slate-900">
+                                            <label className="flex items-center gap-2 text-lg font-semibold text-slate-900 sm:text-[1.15rem]">
                                                 <Sparkles className="h-5 w-5 text-orange-400" />
                                                 {locale === 'zh' ? '描述你的想法' : 'Describe your idea'}
                                             </label>
@@ -672,7 +815,7 @@ export default function HomeHeroGenerator({ user }: HomeHeroGeneratorProps) {
                                         <Textarea
                                             value={prompt}
                                             onChange={(e) => setPrompt(e.target.value)}
-                                            className="min-h-[170px] resize-none rounded-[22px] border-orange-200 bg-white text-lg text-slate-900 shadow-[inset_0_1px_6px_rgba(30,41,59,0.04)] placeholder:text-slate-400 focus:border-orange-300 focus:ring-orange-200"
+                                            className="min-h-[126px] resize-none rounded-[22px] border-orange-200 bg-white text-base leading-7 text-slate-900 shadow-[inset_0_1px_6px_rgba(30,41,59,0.04)] placeholder:text-slate-400 focus:border-orange-300 focus:ring-orange-200 sm:min-h-[136px]"
                                             maxLength={20000}
                                         />
 
@@ -702,6 +845,41 @@ export default function HomeHeroGenerator({ user }: HomeHeroGeneratorProps) {
 
                                     </div>
 
+                                    <div className="space-y-3">
+                                        <Button
+                                            size="lg"
+                                            className="hidden h-14 w-full rounded-[20px] bg-[#ff6b2c] text-base font-semibold text-white shadow-[0_18px_38px_rgba(255,107,44,0.32)] transition-transform hover:translate-y-[-1px] hover:bg-[#f86120] sm:flex"
+                                            onClick={handlePrimaryAction}
+                                            disabled={isGenerating || isUploadingReference}
+                                        >
+                                            {isGenerating ? (
+                                                <>
+                                                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                                                    {locale === 'zh' ? '正在生成图片...' : 'Generating image...'}
+                                                </>
+                                            ) : needsReferenceBeforeEdit ? (
+                                                <span className="inline-flex items-center gap-2">
+                                                    <ImagePlus className="h-5 w-5" />
+                                                    {locale === 'zh' ? '先上传参考图，再开始编辑' : 'Upload a reference, then start editing'}
+                                                </span>
+                                            ) : (
+                                                <span className="inline-flex items-center gap-2">
+                                                    <Wand2 className="h-5 w-5" />
+                                                    {generationMode === "image-to-image"
+                                                        ? (locale === 'zh' ? '开始编辑' : 'Start Editing')
+                                                        : (locale === 'zh' ? '生成图片' : 'Generate Image')}
+                                                </span>
+                                            )}
+                                        </Button>
+
+                                        {error && (
+                                            <p className="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-center text-sm text-rose-600">
+                                                {error}
+                                            </p>
+                                        )}
+
+                                    </div>
+
                                     <div className="rounded-[28px] border border-orange-100 bg-[#fffaf4] p-5 sm:p-6">
                                         <div className="mb-3 flex items-center justify-between gap-3">
                                             <p className="text-sm font-semibold uppercase tracking-[0.18em] text-slate-500">
@@ -723,6 +901,50 @@ export default function HomeHeroGenerator({ user }: HomeHeroGeneratorProps) {
                                                 </button>
                                             ))}
                                         </div>
+                                    </div>
+
+                                    <div className="rounded-[28px] border border-orange-100 bg-[#fffaf4] p-5 sm:p-6">
+                                        <div className="mb-3 flex items-center justify-between gap-3">
+                                            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-slate-500">
+                                                {locale === 'zh' ? '输出分辨率' : 'Resolution'}
+                                            </p>
+                                            {!canUseHighResolution && (
+                                                <span className="rounded-full bg-[#fff3ea] px-2.5 py-1 text-[11px] font-semibold text-orange-700">
+                                                    {locale === 'zh' ? '免费版仅支持 1K' : 'Free plan: 1K only'}
+                                                </span>
+                                            )}
+                                        </div>
+                                        <div className="grid grid-cols-3 gap-2">
+                                            {RESOLUTION_OPTIONS.map((option) => {
+                                                const isLocked = option.id !== "1K" && !canUseHighResolution;
+                                                const isActive = resolution === option.id;
+
+                                                return (
+                                                    <button
+                                                        key={option.id}
+                                                        type="button"
+                                                        onClick={() => handleResolutionSelect(option.id)}
+                                                        className={`flex min-h-10 items-center justify-center rounded-2xl border px-2.5 py-2 text-[12px] font-semibold transition-all sm:text-[13px] ${isActive
+                                                            ? 'border-orange-200 bg-[#ff6b2c] text-white shadow-[0_12px_28px_rgba(255,107,44,0.22)]'
+                                                            : isLocked
+                                                                ? 'border-[#ecd9c7] bg-white text-slate-400 hover:border-orange-200 hover:bg-orange-50'
+                                                                : 'border-[#ecd9c7] bg-white text-slate-700 hover:border-orange-200 hover:bg-orange-50'
+                                                            }`}
+                                                        aria-disabled={isLocked}
+                                                    >
+                                                        <span className="inline-flex items-center gap-1.5">
+                                                            {option.id}
+                                                            {isLocked && <span className="text-[10px] opacity-80">Pro</span>}
+                                                        </span>
+                                                    </button>
+                                                );
+                                            })}
+                                        </div>
+                                        <p className="mt-3 text-[12px] leading-5 text-slate-500">
+                                            {canUseHighResolution
+                                                ? (locale === 'zh' ? '已解锁 2K / 4K 输出，可在文生图和图生图中使用。' : '2K and 4K are unlocked for both text-to-image and image-to-image.')
+                                                : (locale === 'zh' ? '购买任意积分包或订阅后，即可解锁 2K 和 4K。' : 'Buy any credits pack or subscription to unlock 2K and 4K output.')}
+                                        </p>
                                     </div>
 
                                     {currentUser ? (
@@ -747,35 +969,6 @@ export default function HomeHeroGenerator({ user }: HomeHeroGeneratorProps) {
                                         </div>
                                     )}
 
-                                    <div className="space-y-3">
-                                        <Button
-                                            size="lg"
-                                            className="h-14 w-full rounded-[20px] bg-[#ff6b2c] text-base font-semibold text-white shadow-[0_18px_38px_rgba(255,107,44,0.32)] transition-transform hover:translate-y-[-1px] hover:bg-[#f86120]"
-                                            onClick={() => handleGenerate()}
-                                            disabled={isGenerating}
-                                        >
-                                            {isGenerating ? (
-                                                <>
-                                                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                                                    {locale === 'zh' ? '正在生成图片...' : 'Generating image...'}
-                                                </>
-                                            ) : (
-                                                <span className="inline-flex items-center gap-2">
-                                                    <Wand2 className="h-5 w-5" />
-                                                    {generationMode === "image-to-image"
-                                                        ? (locale === 'zh' ? '开始编辑' : 'Start Editing')
-                                                        : (locale === 'zh' ? '生成图片' : 'Generate Image')}
-                                                </span>
-                                            )}
-                                        </Button>
-
-                                        {error && (
-                                            <p className="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-center text-sm text-rose-600">
-                                                {error}
-                                            </p>
-                                        )}
-
-                                    </div>
                                 </div>
 
                                 <div className="rounded-[28px] border border-orange-100 bg-[#fffdf9] p-4 shadow-[0_20px_60px_rgba(235,145,71,0.08)] sm:p-5">
@@ -943,6 +1136,34 @@ export default function HomeHeroGenerator({ user }: HomeHeroGeneratorProps) {
                     </div>
                 </div>
             </section>
+
+            <div className="fixed inset-x-0 bottom-0 z-40 border-t border-orange-100 bg-white/90 px-4 pb-[calc(0.85rem+env(safe-area-inset-bottom))] pt-3 shadow-[0_-18px_36px_rgba(234,120,45,0.14)] backdrop-blur sm:hidden">
+                <Button
+                    size="lg"
+                    className="h-[3.25rem] w-full rounded-[18px] bg-[#ff6b2c] text-[15px] font-semibold text-white shadow-[0_16px_34px_rgba(255,107,44,0.28)] hover:bg-[#f86120]"
+                    onClick={handlePrimaryAction}
+                    disabled={isGenerating || isUploadingReference}
+                >
+                    {isGenerating ? (
+                        <>
+                            <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                            {locale === 'zh' ? '正在生成图片...' : 'Generating image...'}
+                        </>
+                    ) : needsReferenceBeforeEdit ? (
+                        <span className="inline-flex items-center gap-2">
+                            <ImagePlus className="h-5 w-5" />
+                            {locale === 'zh' ? '先上传参考图，再开始编辑' : 'Upload a reference, then start editing'}
+                        </span>
+                    ) : (
+                        <span className="inline-flex items-center gap-2">
+                            <Wand2 className="h-5 w-5" />
+                            {generationMode === "image-to-image"
+                                ? (locale === 'zh' ? '开始编辑' : 'Start Editing')
+                                : (locale === 'zh' ? '生成图片' : 'Generate Image')}
+                        </span>
+                    )}
+                </Button>
+            </div>
 
             <section className="bg-[linear-gradient(180deg,#fff8f0_0%,#fffdf9_100%)] py-20">
                 <div className="container px-4 md:px-6">
