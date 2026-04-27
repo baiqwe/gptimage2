@@ -9,6 +9,8 @@ export const siteConfig = {
   socialImage: "https://gptimage2.online/web-app-manifest-512x512.png",
   author: "GPT Image 2 Generator Team",                 // 作者
   supportEmail: "support@gptimage2.online",    // 联系邮箱
+  wecomLink: "https://work.weixin.qq.com/ca/cawcdebd5122068e22",
+  wecomImage: "/wecom-support.jpg",
 
   // === 分析追踪 ===
   gaId: "G-RF6Z4S359Y",                     // Google Analytics ID

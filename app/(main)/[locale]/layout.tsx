@@ -10,6 +10,7 @@ import { Geist } from "next/font/google";
 import { GoogleAnalytics } from "@/components/google-analytics";
 import { Clarity } from "@/components/clarity";
 import { PromotionBanner } from "@/components/feature/promotion-banner";
+import { SupportContactDock } from "@/components/feature/support-contact";
 import { siteConfig } from "@/config/site";
 import "../../globals.css";
 
@@ -48,7 +49,6 @@ export async function generateMetadata(props: { params: Promise<{ locale: string
             description: messages.metadata.description,
             type: "website",
             locale: locale === 'zh' ? 'zh_CN' : 'en_US',
-            url: `${siteConfig.url}/${locale}`,
             siteName: siteConfig.name,
             images: [
                 {
@@ -130,6 +130,7 @@ export default async function LocaleLayout(props: {
                             <Header user={null} locale={locale as 'en' | 'zh'} />
                             <main className="flex-1">{children}</main>
                             <Footer locale={locale as 'en' | 'zh'} />
+                            <SupportContactDock locale={locale as 'en' | 'zh'} />
                         </div>
                         <Toaster />
                     </ThemeProvider>

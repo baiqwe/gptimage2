@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Shield, Eye, Lock, Database, Globe, CreditCard } from "lucide-react";
 import { BreadcrumbSchema } from "@/components/breadcrumb-schema";
+import { SupportContactPanel } from "@/components/feature/support-contact";
 import { siteConfig } from "@/config/site";
 
 // Static page - enable CDN caching for better performance
@@ -261,6 +262,8 @@ export default async function PrivacyPage(props: { params: Promise<{ locale: str
                         </ul>
                     </div>
 
+                    <SupportContactPanel locale={locale as "en" | "zh"} compact />
+
                     {/* Contact */}
                     <div className="rounded-2xl border border-orange-100 bg-white/90 p-8 text-center shadow-[0_20px_60px_rgba(255,107,44,0.06)]">
                         <h3 className="mb-4 text-2xl font-bold text-slate-900">
@@ -271,12 +274,14 @@ export default async function PrivacyPage(props: { params: Promise<{ locale: str
                                 ? '如果您对隐私政策有任何疑问，请通过以下方式联系我们。'
                                 : 'If you have any questions about this privacy policy, please contact us.'}
                         </p>
-                        <p className="mb-6 text-slate-700">
-                            Email: privacy@{siteConfig.domain}
-                        </p>
-                        <Link href={localePrefix} className="inline-flex min-w-[220px] items-center justify-center rounded-full bg-[#ff6b2c] px-8 py-4 text-lg font-semibold text-white shadow-[0_18px_36px_rgba(255,107,44,0.24)] transition-colors hover:bg-[#f86120]">
-                            {isZh ? '返回首页' : 'Back to Home'}
-                        </Link>
+                        <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
+                            <a href={`mailto:privacy@${siteConfig.domain}`} className="inline-flex min-w-[220px] items-center justify-center rounded-full border border-orange-200 bg-[#fffaf4] px-8 py-4 text-lg font-semibold text-slate-700 transition-colors hover:bg-orange-50">
+                                {isZh ? '发送隐私相关邮件' : 'Email privacy questions'}
+                            </a>
+                            <Link href={`${localePrefix}/contact`} className="inline-flex min-w-[220px] items-center justify-center rounded-full bg-[#ff6b2c] px-8 py-4 text-lg font-semibold text-white shadow-[0_18px_36px_rgba(255,107,44,0.24)] transition-colors hover:bg-[#f86120]">
+                                {isZh ? '查看联系支持方式' : 'View support contact options'}
+                            </Link>
+                        </div>
                     </div>
                 </div>
             </div>

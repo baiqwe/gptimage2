@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Sparkles, Wand2, Globe, ShieldCheck, ArrowRight } from "lucide-react";
 import { BreadcrumbSchema } from "@/components/breadcrumb-schema";
+import { SupportContactPanel } from "@/components/feature/support-contact";
 import { siteConfig } from "@/config/site";
 
 export const dynamic = 'force-static';
@@ -236,6 +237,8 @@ export default async function AboutPage(props: { params: Promise<{ locale: strin
                         </div>
                     </section>
 
+                    <SupportContactPanel locale={locale as "en" | "zh"} compact />
+
                     <section className="section-shell p-10 text-center">
                         <h2 className="text-2xl font-bold text-slate-900">
                             {isZh ? '开始试一张图，看看它是否适合你的工作流' : 'Try a prompt and see if it fits your workflow'}
@@ -249,9 +252,9 @@ export default async function AboutPage(props: { params: Promise<{ locale: strin
                             <Link href={`${localePrefix}/create`} className="inline-flex min-w-[220px] items-center justify-center rounded-full bg-[#ff6b2c] px-8 py-4 text-lg font-semibold text-white shadow-[0_18px_36px_rgba(255,107,44,0.24)] transition-colors hover:bg-[#f86120]">
                                 {isZh ? '开始生成' : 'Start creating'}
                             </Link>
-                            <a href={`mailto:${siteConfig.supportEmail}`} className="inline-flex min-w-[220px] items-center justify-center rounded-full border border-orange-200 bg-[#fffaf4] px-8 py-4 text-lg font-semibold text-slate-700 transition-colors hover:bg-orange-50">
+                            <Link href={`${localePrefix}/contact`} className="inline-flex min-w-[220px] items-center justify-center rounded-full border border-orange-200 bg-[#fffaf4] px-8 py-4 text-lg font-semibold text-slate-700 transition-colors hover:bg-orange-50">
                                 {isZh ? '联系团队' : 'Contact us'}
-                            </a>
+                            </Link>
                         </div>
                     </section>
                 </div>

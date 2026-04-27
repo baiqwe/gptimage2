@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Check, ShieldCheck, Sparkles, Zap } from "lucide-react";
 import { PricingSection } from "@/components/marketing/pricing-section";
 import { FAQSchema } from "@/components/breadcrumb-schema";
+import { SupportContactPanel } from "@/components/feature/support-contact";
 import { setRequestLocale } from "next-intl/server";
 import { Metadata } from "next";
 import { siteConfig } from "@/config/site";
@@ -215,6 +216,8 @@ export default async function PricingPage({ params }: Props) {
                         </ul>
                     </div>
                 </section>
+
+                <SupportContactPanel locale={locale as "en" | "zh"} compact />
 
                 <section className="section-shell p-8 md:p-10">
                     <h2 className="text-2xl font-bold text-slate-900">

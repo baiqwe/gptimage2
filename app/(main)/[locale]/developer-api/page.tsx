@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Code2, Layers3, ShieldCheck, Workflow } from "lucide-react";
 import { BreadcrumbSchema } from "@/components/breadcrumb-schema";
+import { SupportContactPanel } from "@/components/feature/support-contact";
 import { siteConfig } from "@/config/site";
 
 export const dynamic = "force-static";
@@ -207,6 +208,8 @@ export default async function DeveloperApiPage(props: { params: Promise<{ locale
                             </li>
                         </ul>
                     </section>
+
+                    <SupportContactPanel locale={locale as "en" | "zh"} compact />
                 </div>
             </div>
         </div>

@@ -59,6 +59,7 @@ module.exports = {
             'privacy',
             'terms',
             'about',
+            'contact',
             'gallery',
             'developer-api',
             'arena'

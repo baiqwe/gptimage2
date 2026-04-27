@@ -165,7 +165,7 @@ export const blogPosts: BlogPost[] = [
 
 <h2>Final takeaway</h2>
 
-<p>If you want better output from <strong>GPT Image 2</strong> or <strong>ChatGPT Image 2</strong> for posters and product images, focus less on fancy adjectives and more on composition. Subject, scene, layout, and style are the four elements that make commercial prompts useful. If you want to test these ideas directly, open the <a href="/create">generator</a> and start with one product-ad prompt plus one Taobao-detail prompt. That will tell you more than ten generic “best prompt” lists.</p>
+<p>If you want better output from <strong>GPT Image 2</strong> or <strong>ChatGPT Image 2</strong> for posters and product images, focus less on fancy adjectives and more on composition. Subject, scene, layout, and style are the four elements that make commercial prompts useful. If you want to test these ideas directly, open the <a href="{{localePrefix}}/create">generator</a> and start with one product-ad prompt plus one Taobao-detail prompt. That will tell you more than ten generic “best prompt” lists.</p>
     `
   },
   {
@@ -199,8 +199,8 @@ export const blogPosts: BlogPost[] = [
 
 <p>A stronger site clusters naming variants by <strong>intent</strong>, not by spelling:</p>
 <ul>
-  <li><strong>Tool intent</strong>: homepage and <a href="/create">create page</a></li>
-  <li><strong>Technical intent</strong>: <a href="/developer-api">developer API guide</a></li>
+  <li><strong>Tool intent</strong>: homepage and <a href="{{localePrefix}}/create">create page</a></li>
+  <li><strong>Technical intent</strong>: <a href="{{localePrefix}}/developer-api">developer API guide</a></li>
   <li><strong>Editorial and benchmark intent</strong>: review posts and comparison hub</li>
 </ul>
 
@@ -253,17 +253,17 @@ export const blogPosts: BlogPost[] = [
 
 <h2>When to use the create page</h2>
 
-<p>If your search really means “I want to make an image right now,” go straight to the <a href="/create">generator page</a>. That page is built for prompt-to-image action, not taxonomy.</p>
+<p>If your search really means “I want to make an image right now,” go straight to the <a href="{{localePrefix}}/create">generator page</a>. That page is built for prompt-to-image action, not taxonomy.</p>
 
 <h2>When to use the API guide</h2>
 
-<p>If your search means “I need to integrate this workflow into my app,” then the <a href="/developer-api">API guide</a> is the better destination. Technical intent is different from tool intent, and the page should reflect that.</p>
+<p>If your search means “I need to integrate this workflow into my app,” then the <a href="{{localePrefix}}/developer-api">API guide</a> is the better destination. Technical intent is different from tool intent, and the page should reflect that.</p>
 
 <h2>How this naming problem shows up in real teams</h2>
 
 <p>In practice, naming confusion does not only affect SEO. It affects internal communication too. A marketer may say “ChatGPT image tool,” a developer may say “OpenAI image API,” and a founder may say “GPT Image 2.” They may all mean nearly the same workflow, but they are approaching it from different jobs. That is why strong information architecture matters. It gives each audience a page that feels native to their question without pretending every spelling deserves its own standalone destination.</p>
 
-<p>This is also why a naming guide can be useful even if it seems editorial rather than transactional. It reduces ambiguity. If a reader lands here and realizes they actually want to generate an image immediately, they can move to the <a href="/create">create page</a>. If they realize they need implementation details, they can move to the <a href="/developer-api">API guide</a>. In other words, the naming guide helps people self-sort into the correct workflow faster.</p>
+<p>This is also why a naming guide can be useful even if it seems editorial rather than transactional. It reduces ambiguity. If a reader lands here and realizes they actually want to generate an image immediately, they can move to the <a href="{{localePrefix}}/create">create page</a>. If they realize they need implementation details, they can move to the <a href="{{localePrefix}}/developer-api">API guide</a>. In other words, the naming guide helps people self-sort into the correct workflow faster.</p>
 
 <h2>What a good naming guide should help you decide next</h2>
 
@@ -277,19 +277,19 @@ export const blogPosts: BlogPost[] = [
   <tbody>
     <tr>
       <td>Can I generate an image from a prompt right now?</td>
-      <td><a href="/create">The generator workspace</a></td>
+      <td><a href="{{localePrefix}}/create">The generator workspace</a></td>
     </tr>
     <tr>
       <td>How does this compare with other tools?</td>
-      <td><a href="/arena">The arena and benchmark guides</a></td>
+      <td><a href="{{localePrefix}}/arena">The arena and benchmark guides</a></td>
     </tr>
     <tr>
       <td>How does the API path work?</td>
-      <td><a href="/developer-api">The developer API guide</a></td>
+      <td><a href="{{localePrefix}}/developer-api">The developer API guide</a></td>
     </tr>
     <tr>
       <td>What quality level should I expect?</td>
-      <td><a href="/gallery">The gallery</a></td>
+      <td><a href="{{localePrefix}}/gallery">The gallery</a></td>
     </tr>
   </tbody>
 </table>
@@ -368,15 +368,15 @@ export const blogPosts: BlogPost[] = [
   <tbody>
     <tr>
       <td>Can this workflow generate images right now?</td>
-      <td>Use the live <a href="/create">generator</a></td>
+      <td>Use the live <a href="{{localePrefix}}/create">generator</a></td>
     </tr>
     <tr>
       <td>Is there an API path or developer angle?</td>
-      <td>Read the <a href="/developer-api">developer API guide</a></td>
+      <td>Read the <a href="{{localePrefix}}/developer-api">developer API guide</a></td>
     </tr>
     <tr>
       <td>How does it compare with other tools?</td>
-      <td>Read benchmark-style blog posts and use the <a href="/arena">arena</a></td>
+      <td>Read benchmark-style blog posts and use the <a href="{{localePrefix}}/arena">arena</a></td>
     </tr>
   </tbody>
 </table>
@@ -400,7 +400,7 @@ export const blogPosts: BlogPost[] = [
   <li>Are they comparing a current workflow against a rumored next version?</li>
 </ul>
 
-<p>Once you know which of those three intents is dominant, the next step becomes clearer. Date curiosity belongs on a release explainer like this one. Feature testing belongs in the <a href="/create">generator</a>. Technical evaluation belongs in the <a href="/developer-api">API guide</a>. That separation makes the information more durable and reduces the temptation to turn every adjacent keyword into a separate low-value page.</p>
+<p>Once you know which of those three intents is dominant, the next step becomes clearer. Date curiosity belongs on a release explainer like this one. Feature testing belongs in the <a href="{{localePrefix}}/create">generator</a>. Technical evaluation belongs in the <a href="{{localePrefix}}/developer-api">API guide</a>. That separation makes the information more durable and reduces the temptation to turn every adjacent keyword into a separate low-value page.</p>
 
 <h2>A better way to use release pages as a reader</h2>
 
@@ -415,7 +415,7 @@ export const blogPosts: BlogPost[] = [
 
 <h2>What to do if your real goal is not the date but the workflow</h2>
 
-<p>Many readers come to release-date pages only to realize that their real need is practical. They want to know whether the workflow is good enough for posters, product visuals, portraits, or structured prompt testing. In those cases, the best next action is not to keep reading rumors. It is to look at live examples in the <a href="/gallery">gallery</a>, test a prompt in the <a href="/create">generator</a>, and compare the behavior against another tool using the <a href="/arena">arena</a>. That turns a curiosity-driven search into a decision-making workflow.</p>
+<p>Many readers come to release-date pages only to realize that their real need is practical. They want to know whether the workflow is good enough for posters, product visuals, portraits, or structured prompt testing. In those cases, the best next action is not to keep reading rumors. It is to look at live examples in the <a href="{{localePrefix}}/gallery">gallery</a>, test a prompt in the <a href="{{localePrefix}}/create">generator</a>, and compare the behavior against another tool using the <a href="{{localePrefix}}/arena">arena</a>. That turns a curiosity-driven search into a decision-making workflow.</p>
 
 <h2>Why this page stays useful even when the news cycle changes</h2>
 
@@ -527,7 +527,7 @@ export const blogPosts: BlogPost[] = [
 
 <p>Once you have a winner for a specific prompt category, the right move is not necessarily to declare one universal champion. The smarter move is to document which tool won for which job. A team may conclude that one system is fine for early mood exploration while another is stronger for layout-heavy deliverables. That is a much more actionable result than a generic “best AI image tool” verdict, and it is exactly the kind of nuance readers are usually looking for when they search for direct comparisons.</p>
 
-<p>That is also why benchmark pages should link back into action pages. After a comparison, readers usually want to test the stronger prompt themselves. Sending them from the benchmark to the <a href="/create">generator</a> or to the <a href="/arena">arena workflow</a> makes the page more useful than ending with a vague opinion and nowhere to go next.</p>
+<p>That is also why benchmark pages should link back into action pages. After a comparison, readers usually want to test the stronger prompt themselves. Sending them from the benchmark to the <a href="{{localePrefix}}/create">generator</a> or to the <a href="{{localePrefix}}/arena">arena workflow</a> makes the page more useful than ending with a vague opinion and nowhere to go next.</p>
 
 <h2>Why benchmark framing matters for search intent</h2>
 
@@ -539,7 +539,7 @@ export const blogPosts: BlogPost[] = [
 
 <h2>Final takeaway</h2>
 
-<p>If you only care about lightweight experimentation, Nano Banana 2 may be enough. If you care about prompt fidelity, poster structure, product composition, and images that feel closer to finished creative assets, GPT Image 2 is often the stronger choice. The best way to know is still to run one fair prompt benchmark and compare the outputs directly in an <a href="/arena">arena-style workflow</a>.</p>
+<p>If you only care about lightweight experimentation, Nano Banana 2 may be enough. If you care about prompt fidelity, poster structure, product composition, and images that feel closer to finished creative assets, GPT Image 2 is often the stronger choice. The best way to know is still to run one fair prompt benchmark and compare the outputs directly in an <a href="{{localePrefix}}/arena">arena-style workflow</a>.</p>
     `
   },
   {
@@ -626,7 +626,7 @@ export const blogPosts: BlogPost[] = [
 
 <p>If your bottleneck is planning, use the tool that helps planning. If your bottleneck is prompt clarity, use the tool that helps rewrite and structure prompts. If your bottleneck is the final visual itself, use the tool that gives you the most convincing image output for your category. This sounds simple, but it is a much healthier decision rule than following whichever name is currently trending on X or in tool directories.</p>
 
-<p>For many teams, the answer will not be a single platform. It will be a sequence: plan the brief, refine the prompt, generate the image, then compare variants. That is one reason it makes sense to keep the <a href="/create">generator</a>, <a href="/arena">arena</a>, and long-form workflow articles closely linked. They each support a different stage of the same work.</p>
+<p>For many teams, the answer will not be a single platform. It will be a sequence: plan the brief, refine the prompt, generate the image, then compare variants. That is one reason it makes sense to keep the <a href="{{localePrefix}}/create">generator</a>, <a href="{{localePrefix}}/arena">arena</a>, and long-form workflow articles closely linked. They each support a different stage of the same work.</p>
 
 <h2>Where this article helps most</h2>
 
@@ -638,7 +638,7 @@ export const blogPosts: BlogPost[] = [
 
 <h2>Final takeaway</h2>
 
-<p>If your job is to <strong>plan</strong>, use a planning tool. If your job is to <strong>compare</strong>, use benchmark content or the <a href="/arena">arena</a>. If your job is to <strong>turn a structured brief into an image</strong>, GPT Image 2 is the relevant part of the workflow. That is the most useful way to frame Pollo AI, Lovart, Kimi K2.6, Claude, and GPT Image 2 in one editorial article without forcing a fake winner narrative.</p>
+<p>If your job is to <strong>plan</strong>, use a planning tool. If your job is to <strong>compare</strong>, use benchmark content or the <a href="{{localePrefix}}/arena">arena</a>. If your job is to <strong>turn a structured brief into an image</strong>, GPT Image 2 is the relevant part of the workflow. That is the most useful way to frame Pollo AI, Lovart, Kimi K2.6, Claude, and GPT Image 2 in one editorial article without forcing a fake winner narrative.</p>
     `
   },
   {
@@ -749,7 +749,7 @@ export const blogPosts: BlogPost[] = [
   <li>one note on what to revise next</li>
 </ol>
 
-<p>This creates a clear bridge between testing and production. If one prompt wins, you can move directly into the <a href="/create">generator</a> and iterate further. If results are split, you can run a second round with tighter prompt language. The point of an arena is not to crown a permanent champion. It is to learn which tool is best for the type of visual job you actually need to do.</p>
+<p>This creates a clear bridge between testing and production. If one prompt wins, you can move directly into the <a href="{{localePrefix}}/create">generator</a> and iterate further. If results are split, you can run a second round with tighter prompt language. The point of an arena is not to crown a permanent champion. It is to learn which tool is best for the type of visual job you actually need to do.</p>
 
 <p>That learning loop is also why arena methodology deserves its own page. Readers who search for <strong>LLM Arena</strong> are often not looking for a generic AI news summary. They want a way to compare outputs fairly. Giving them a repeatable method is more useful than giving them a one-time opinion.</p>
 
@@ -769,7 +769,7 @@ export const blogPosts: BlogPost[] = [
 
 <h2>Final takeaway</h2>
 
-<p>A good image arena is not just a gallery of side-by-side visuals. It is a repeatable evaluation method. If you want to try that yourself, use the <a href="/arena">arena page</a> as a starting point, then bring the strongest prompt into the <a href="/create">generator</a> and see whether GPT Image 2 performs best on the kind of work you actually do.</p>
+<p>A good image arena is not just a gallery of side-by-side visuals. It is a repeatable evaluation method. If you want to try that yourself, use the <a href="{{localePrefix}}/arena">arena page</a> as a starting point, then bring the strongest prompt into the <a href="{{localePrefix}}/create">generator</a> and see whether GPT Image 2 performs best on the kind of work you actually do.</p>
     `
   },
   {
@@ -897,7 +897,7 @@ export const blogPosts: BlogPost[] = [
 
 <p>The most effective workflow usually looks like this:</p>
 <ol>
-  <li>Start in the <a href="/create">GPT Image 2 workspace</a> with one product prompt and two composition variants.</li>
+  <li>Start in the <a href="{{localePrefix}}/create">GPT Image 2 workspace</a> with one product prompt and two composition variants.</li>
   <li>Generate a small batch focused on structure rather than decoration.</li>
   <li>Shortlist one image for premium direction, one for marketplace clarity, and one for social storytelling.</li>
   <li>Review those three with a marketer or product owner, not just with a designer.</li>
@@ -908,11 +908,11 @@ export const blogPosts: BlogPost[] = [
 
 <h2>When to use the gallery, pricing, and blog guides together</h2>
 
-<p>If you are still testing whether the workflow is right for your team, use the <a href="/gallery">gallery</a> to inspect the quality level, the <a href="/pricing">pricing page</a> to estimate cost, and related benchmark articles in the <a href="/blog">blog</a> to compare prompt structure and evaluation criteria. These pages are useful together because they answer different questions: output quality, cost, and method.</p>
+<p>If you are still testing whether the workflow is right for your team, use the <a href="{{localePrefix}}/gallery">gallery</a> to inspect the quality level, the <a href="{{localePrefix}}/pricing">pricing page</a> to estimate cost, and related benchmark articles in the <a href="{{localePrefix}}/blog">blog</a> to compare prompt structure and evaluation criteria. These pages are useful together because they answer different questions: output quality, cost, and method.</p>
 
 <h2>Final takeaway</h2>
 
-<p><strong>GPT Image 2</strong> is not most useful when it tries to replace a perfect final studio shoot. It is most useful when it helps you arrive at a stronger commercial direction faster. If you use it for layout-aware product concepts, structured campaign exploration, and realistic review loops, it can save a meaningful amount of time in commercial product photography. Start with one hero-banner brief and one product-detail brief in the <a href="/create">generator</a>, and compare which prompt structure gives you an image that is actually reusable.</p>
+<p><strong>GPT Image 2</strong> is not most useful when it tries to replace a perfect final studio shoot. It is most useful when it helps you arrive at a stronger commercial direction faster. If you use it for layout-aware product concepts, structured campaign exploration, and realistic review loops, it can save a meaningful amount of time in commercial product photography. Start with one hero-banner brief and one product-detail brief in the <a href="{{localePrefix}}/create">generator</a>, and compare which prompt structure gives you an image that is actually reusable.</p>
     `
   },
   {
@@ -1008,10 +1008,10 @@ export const blogPosts: BlogPost[] = [
 
 <p>Here is a more useful way to think about alternatives in 2026:</p>
 <ul>
-  <li><strong>Best for direct prompt-to-image work</strong>: a focused workspace like <a href="/create">GPT Image 2 create</a>, where you can quickly test structured prompts.</li>
-  <li><strong>Best for research and comparison</strong>: benchmark content such as the <a href="/arena">arena</a> and long-form review posts in the <a href="/blog">blog</a>.</li>
+  <li><strong>Best for direct prompt-to-image work</strong>: a focused workspace like <a href="{{localePrefix}}/create">GPT Image 2 create</a>, where you can quickly test structured prompts.</li>
+  <li><strong>Best for research and comparison</strong>: benchmark content such as the <a href="{{localePrefix}}/arena">arena</a> and long-form review posts in the <a href="{{localePrefix}}/blog">blog</a>.</li>
   <li><strong>Best for planning prompts before generation</strong>: a stronger writing assistant or prompt-refinement flow, then bring the result back into the generator.</li>
-  <li><strong>Best for visual inspiration</strong>: a curated example set such as the <a href="/gallery">gallery</a>, which shows what good outputs actually look like.</li>
+  <li><strong>Best for visual inspiration</strong>: a curated example set such as the <a href="{{localePrefix}}/gallery">gallery</a>, which shows what good outputs actually look like.</li>
 </ul>
 
 <h2>Is “free” the right decision metric?</h2>
@@ -1034,7 +1034,7 @@ export const blogPosts: BlogPost[] = [
   <li>a layout-heavy board or poster composition</li>
 </ol>
 
-<p>Those three prompt families tell you much more than a single fantasy landscape ever will. They show whether the tool handles structure, realism, and controlled visual communication. If you want a method for doing this rigorously, the <a href="/arena">arena guide</a> is the best next step.</p>
+<p>Those three prompt families tell you much more than a single fantasy landscape ever will. They show whether the tool handles structure, realism, and controlled visual communication. If you want a method for doing this rigorously, the <a href="{{localePrefix}}/arena">arena guide</a> is the best next step.</p>
 
 <h2>What to do after you choose a tool</h2>
 
@@ -1042,7 +1042,7 @@ export const blogPosts: BlogPost[] = [
 
 <h2>Final takeaway</h2>
 
-<p>If you are searching for a <strong>ChatGPT Image 2 alternative</strong>, the most important question is not “which site claims to be best?” It is “which workflow reduces friction for the kind of images I need to make?” For users who want a dedicated, prompt-first image workspace with clear controls and low-risk trial access, a focused <strong>GPT Image 2</strong> environment can be a better fit than a broader chat-first surface. The fastest way to know is to open the <a href="/create">generator</a>, run one commercial prompt and one portrait prompt, then compare the results against the alternatives you are considering.</p>
+<p>If you are searching for a <strong>ChatGPT Image 2 alternative</strong>, the most important question is not “which site claims to be best?” It is “which workflow reduces friction for the kind of images I need to make?” For users who want a dedicated, prompt-first image workspace with clear controls and low-risk trial access, a focused <strong>GPT Image 2</strong> environment can be a better fit than a broader chat-first surface. The fastest way to know is to open the <a href="{{localePrefix}}/create">generator</a>, run one commercial prompt and one portrait prompt, then compare the results against the alternatives you are considering.</p>
     `
   },
   {
@@ -1055,7 +1055,7 @@ export const blogPosts: BlogPost[] = [
     content: `
 <p>A good prompt library is more than a list of pretty sentences. The point of a prompt collection is to help you discover which prompt <em>structure</em> reliably produces good work. That matters especially for <strong>GPT Image 2</strong>, where small improvements in subject clarity, scene design, and lens language can make the difference between a generic portrait and an image that feels intentionally art-directed.</p>
 
-<p>This guide covers two of the most searched portrait categories: <strong>anime portraits</strong> and <strong>realistic portraits</strong>. Instead of dumping fifty prompts without context, it gives you a practical framework, explains what each family is good for, and then provides prompt sets you can actually test inside the <a href="/create">generator</a>.</p>
+<p>This guide covers two of the most searched portrait categories: <strong>anime portraits</strong> and <strong>realistic portraits</strong>. Instead of dumping fifty prompts without context, it gives you a practical framework, explains what each family is good for, and then provides prompt sets you can actually test inside the <a href="{{localePrefix}}/create">generator</a>.</p>
 
 <figure class="my-8">
   <img src="/examples/cyberpunk-silver-portrait.webp" alt="Close-up realistic cyberpunk portrait with neon reflections and shallow depth of field generated by GPT Image 2" class="rounded-xl w-full" />
@@ -1182,7 +1182,7 @@ export const blogPosts: BlogPost[] = [
 
 <h2>Where to go next after testing these prompts</h2>
 
-<p>Once you find a few prompts that work, save them by category and compare how they behave across tools. If you want a fair method for that, use the <a href="/arena">arena guide</a>. If you want more examples of high-quality outputs, browse the <a href="/gallery">gallery</a>. If you want to keep generating immediately, go back to the <a href="/create">workspace</a> and test one anime prompt and one realistic portrait prompt side by side.</p>
+<p>Once you find a few prompts that work, save them by category and compare how they behave across tools. If you want a fair method for that, use the <a href="{{localePrefix}}/arena">arena guide</a>. If you want more examples of high-quality outputs, browse the <a href="{{localePrefix}}/gallery">gallery</a>. If you want to keep generating immediately, go back to the <a href="{{localePrefix}}/create">workspace</a> and test one anime prompt and one realistic portrait prompt side by side.</p>
 
 <h2>Final takeaway</h2>
 

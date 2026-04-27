@@ -23,6 +23,7 @@ export async function Footer({ locale: currentLocale }: FooterProps) {
     { label: t('link_privacy'), href: `${localePrefix}/privacy` },
     { label: t('link_terms'), href: `${localePrefix}/terms` },
     { label: t('link_about'), href: `${localePrefix}/about` },
+    { label: currentLocale === 'zh' ? '联系支持' : 'Contact support', href: `${localePrefix}/contact` },
   ];
 
   return (

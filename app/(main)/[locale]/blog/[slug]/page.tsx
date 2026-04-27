@@ -127,8 +127,9 @@ export async function generateMetadata(props: { params: Promise<{ slug: string; 
 }
 
 // 处理内容：添加 id 到 h2 标签
-function processContent(content: string): string {
+function processContent(content: string, locale: string): string {
     const usedHeadingIds = new Map<string, number>();
+    const localePrefix = `/${locale}`;
 
     const contentWithHeadingIds = content.replace(/<h2([^>]*)>(.*?)<\/h2>/gi, (match, attrs, title) => {
         const cleanTitle = title.replace(/<[^>]*>/g, '').trim();
@@ -136,7 +137,26 @@ function processContent(content: string): string {
         return `<h2 id="${id}"${attrs}>${title}</h2>`;
     });
 
-    return contentWithHeadingIds.replace(/<img([^>]*?)>/gi, (match, attrs) => {
+    const contentWithLocalizedPlaceholders = contentWithHeadingIds.replaceAll("{{localePrefix}}", localePrefix);
+
+    const contentWithLocalizedLinks = contentWithLocalizedPlaceholders.replace(/<a([^>]*?)href="(\/[^"]*)"(.*?)>/gi, (match, beforeHref, href, afterHref) => {
+        if (
+            href.startsWith('//') ||
+            href.startsWith('/en') ||
+            href.startsWith('/zh') ||
+            href.startsWith('/api') ||
+            href.startsWith('/_next') ||
+            href.startsWith('/favicon') ||
+            href.startsWith('/site.webmanifest')
+        ) {
+            return match;
+        }
+
+        const localizedHref = href === '/' ? `/${locale}` : `/${locale}${href}`;
+        return `<a${beforeHref}href="${localizedHref}"${afterHref}>`;
+    });
+
+    return contentWithLocalizedLinks.replace(/<img([^>]*?)>/gi, (match, attrs) => {
         const hasLoading = /\sloading=/.test(attrs);
         const hasDecoding = /\sdecoding=/.test(attrs);
         const hasFetchPriority = /\sfetchpriority=/.test(attrs);
@@ -161,7 +181,7 @@ export default async function BlogPostPage(props: { params: Promise<{ slug: stri
     const isZh = params.locale === 'zh';
     const localePrefix = `/${params.locale}`;
     const relatedPosts = getRelatedPosts(params.slug);
-    const processedContent = processContent(post.content);
+    const processedContent = processContent(post.content, params.locale);
 
     return (
         <div className="min-h-screen bg-[linear-gradient(180deg,#fffaf4_0%,#fff7ef_46%,#fffdf9_100%)]">

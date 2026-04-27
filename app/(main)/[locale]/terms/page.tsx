@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Scale, CheckCircle, AlertCircle, CreditCard, RefreshCw } from "lucide-react";
 import { BreadcrumbSchema } from "@/components/breadcrumb-schema";
+import { SupportContactPanel } from "@/components/feature/support-contact";
 import { siteConfig } from "@/config/site";
 
 // Static page - enable CDN caching for better performance
@@ -297,10 +298,12 @@ export default async function TermsPage(props: { params: Promise<{ locale: strin
                                 </ul>
                             </div>
                         </div>
-                    </div>
+                        </div>
 
-                    {/* Contact */}
-                    <div className="rounded-2xl border border-orange-100 bg-white/90 p-8 text-center shadow-[0_20px_60px_rgba(255,107,44,0.06)]">
+                        <SupportContactPanel locale={locale as "en" | "zh"} compact />
+
+                        {/* Contact */}
+                        <div className="rounded-2xl border border-orange-100 bg-white/90 p-8 text-center shadow-[0_20px_60px_rgba(255,107,44,0.06)]">
                         <h3 className="mb-4 text-2xl font-bold text-slate-900">
                             {isZh ? '联系我们' : 'Contact Us'}
                         </h3>
@@ -309,12 +312,14 @@ export default async function TermsPage(props: { params: Promise<{ locale: strin
                                 ? '如果您对这些条款有任何疑问，请随时联系我们。'
                                 : 'If you have any questions about these terms, feel free to contact us.'}
                         </p>
-                        <p className="mb-6 text-slate-700">
-                            Email: support@{siteConfig.domain}
-                        </p>
-                        <Link href={localePrefix} className="inline-flex min-w-[220px] items-center justify-center rounded-full bg-[#ff6b2c] px-8 py-4 text-lg font-semibold text-white shadow-[0_18px_36px_rgba(255,107,44,0.24)] transition-colors hover:bg-[#f86120]">
-                            {isZh ? '返回首页' : 'Back to Home'}
-                        </Link>
+                        <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
+                            <a href={`mailto:${siteConfig.supportEmail}`} className="inline-flex min-w-[220px] items-center justify-center rounded-full border border-orange-200 bg-[#fffaf4] px-8 py-4 text-lg font-semibold text-slate-700 transition-colors hover:bg-orange-50">
+                                {isZh ? '发送邮件' : 'Send email'}
+                            </a>
+                            <Link href={`${localePrefix}/contact`} className="inline-flex min-w-[220px] items-center justify-center rounded-full bg-[#ff6b2c] px-8 py-4 text-lg font-semibold text-white shadow-[0_18px_36px_rgba(255,107,44,0.24)] transition-colors hover:bg-[#f86120]">
+                                {isZh ? '查看联系支持方式' : 'View support contact options'}
+                            </Link>
+                        </div>
                     </div>
                 </div>
             </div>
