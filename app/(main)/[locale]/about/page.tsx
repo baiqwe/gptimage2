@@ -58,8 +58,8 @@ export default async function AboutPage(props: { params: Promise<{ locale: strin
             icon: <Wand2 className="h-6 w-6 text-orange-500" />,
             title: isZh ? '更直接的创作体验' : 'A more direct creative workflow',
             desc: isZh
-                ? '打开页面、输入提示词、选择尺寸和导出格式，然后快速看到结果。我们希望这个流程尽量清晰，而不是被复杂设置打断。'
-                : 'Open the page, write a prompt, choose a size and export format, and get to the result quickly. The goal is a workflow that feels clear instead of overloaded.',
+                ? '打开页面、输入提示词、选择画面比例和输出分辨率，然后快速看到结果。我们希望这个流程尽量清晰，而不是被复杂设置打断。'
+                : 'Open the page, write a prompt, choose an aspect ratio and output resolution, and get to the result quickly. The goal is a workflow that feels clear instead of overloaded.',
         },
         {
             icon: <Globe className="h-6 w-6 text-orange-500" />,
@@ -129,6 +129,34 @@ export default async function AboutPage(props: { params: Promise<{ locale: strin
                     </section>
 
                     <section className="grid gap-6 md:grid-cols-3">
+                        {[
+                            {
+                                title: isZh ? '电商与品牌团队' : 'E-commerce and brand teams',
+                                desc: isZh
+                                    ? '需要更快测试商品主图、活动海报、横幅和详情页视觉方向，不想每次都从零搭素材。'
+                                    : 'Teams that need to test product visuals, campaign posters, banners, and detail-page directions without rebuilding assets from zero each time.',
+                            },
+                            {
+                                title: isZh ? '自媒体与内容创作者' : 'Creators and publishers',
+                                desc: isZh
+                                    ? '需要稳定地产出封面、配图和社交媒体视觉，并且希望不同尺寸和比例可以更快切换。'
+                                    : 'People who need a steady workflow for covers, editorial visuals, and social assets, with faster switching across different formats and ratios.',
+                            },
+                            {
+                                title: isZh ? '产品与设计人员' : 'Product and design people',
+                                desc: isZh
+                                    ? '需要把界面灵感、风格板、角色设定和概念图更快转成可讨论、可展示的视觉草稿。'
+                                    : 'People who want to turn UI ideas, style boards, character concepts, and visual drafts into something concrete enough to review and present.',
+                            },
+                        ].map((item) => (
+                            <div key={item.title} className="soft-panel p-6">
+                                <h2 className="text-xl font-bold text-slate-900">{item.title}</h2>
+                                <p className="mt-3 text-sm leading-7 text-slate-600">{item.desc}</p>
+                            </div>
+                        ))}
+                    </section>
+
+                    <section className="grid gap-6 md:grid-cols-3">
                         {cards.map((card) => (
                             <div key={card.title} className="soft-panel p-6">
                                 <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-[#fff5ec]">
@@ -142,6 +170,24 @@ export default async function AboutPage(props: { params: Promise<{ locale: strin
 
                     <section className="section-shell bg-[#fffaf4] p-8 md:p-10">
                         <h2 className="text-2xl font-bold text-slate-900">
+                            {isZh ? '为什么这里强调工作流而不是单次出图' : 'Why we focus on workflow, not just one-off output'}
+                        </h2>
+                        <div className="mt-5 space-y-4 leading-8 text-slate-600">
+                            <p>
+                                {isZh
+                                    ? '很多人第一次接触 AI 绘图时，会把重点放在“能不能生成一张好看的图”。但真正决定工具价值的，往往不是第一次的惊艳，而是第二十次、第五十次的时候，它还能不能继续适合你的节奏。'
+                                    : 'When people first try AI image generation, the question is usually whether it can make one impressive image. In practice, the more important question is whether the tool still fits your pace after the twentieth or fiftieth image.'}
+                            </p>
+                            <p>
+                                {isZh
+                                    ? '因此这个工作台会把重点放在可重复、可比较、可延伸的流程上：你可以切换文生图与图生图、管理不同比例、在 1K 到更高分辨率之间做真实取舍，并在登录、购买和继续生成之间保持上下文连续。'
+                                    : 'That is why this workspace is built around repeatable, comparable, and extendable flow. You can move between text-to-image and image-to-image, compare ratios, choose between 1K and higher resolutions with clear tradeoffs, and keep context across sign-in, purchase, and continued generation.'}
+                            </p>
+                        </div>
+                    </section>
+
+                    <section className="section-shell bg-[#fffaf4] p-8 md:p-10">
+                        <h2 className="text-2xl font-bold text-slate-900">
                             {isZh ? '如果你是第一次来到这里' : 'If this is your first time here'}
                         </h2>
                         <div className="mt-5 grid gap-5 md:grid-cols-2">
@@ -149,8 +195,8 @@ export default async function AboutPage(props: { params: Promise<{ locale: strin
                                 <h3 className="text-lg font-bold text-slate-900">{isZh ? '想直接开始生成' : 'Want to generate right away?'}</h3>
                                 <p className="mt-3 leading-7 text-slate-600">
                                     {isZh
-                                        ? '前往生成器，输入提示词，选择尺寸、质量和格式，然后直接开始出图。'
-                                        : 'Open the generator, enter your prompt, choose size, quality, and format, and start creating immediately.'}
+                                        ? '前往生成器，输入提示词，选择比例和分辨率，然后直接开始出图。'
+                                        : 'Open the generator, enter your prompt, choose the aspect ratio and resolution that fit your task, and start creating immediately.'}
                                 </p>
                                 <Link href={`${localePrefix}/create`} className="mt-5 inline-flex items-center text-sm font-semibold text-orange-700 hover:underline">
                                     {isZh ? '进入生成器' : 'Open the generator'} <ArrowRight className="ml-2 h-4 w-4" />
@@ -169,6 +215,24 @@ export default async function AboutPage(props: { params: Promise<{ locale: strin
                                     <Link href={`${localePrefix}/blog`} className="text-orange-700 hover:underline">{isZh ? '浏览博客' : 'Browse blog'}</Link>
                                 </div>
                             </div>
+                        </div>
+                    </section>
+
+                    <section className="section-shell p-8 md:p-10">
+                        <h2 className="text-2xl font-bold text-slate-900">
+                            {isZh ? '我们如何看待质量、速度与信任' : 'How we think about quality, speed, and trust'}
+                        </h2>
+                        <div className="mt-5 space-y-4 leading-8 text-slate-600">
+                            <p>
+                                {isZh
+                                    ? '质量不是只靠一句“更强模型”来定义的。对大多数用户来说，真正重要的是画面是否稳定、比例和分辨率是否匹配任务、失败时能不能得到明确反馈、以及购买后是否能获得更高等级的输出能力。'
+                                    : 'Quality is not defined by one claim about a stronger model. What usually matters more is whether the image is stable, whether ratio and resolution match the job, whether failures return useful guidance, and whether upgrading really unlocks more capable output.'}
+                            </p>
+                            <p>
+                                {isZh
+                                    ? '信任也不来自口号，而来自细节：我们尽量让价格、分辨率权限、登录恢复、购买后续流程和支持页面保持一致。这样用户不用猜系统在做什么，也更容易把这里当作真实可用的视觉工作台。'
+                                    : 'Trust is also built through detail rather than slogans. We try to keep pricing, resolution access, sign-in recovery, post-purchase flow, and support pages aligned, so users do not have to guess what the system is doing and can treat it like a real production workspace.'}
+                            </p>
                         </div>
                     </section>
 

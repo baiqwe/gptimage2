@@ -7,7 +7,7 @@ This project already has a working frontend flow for image generation, credits, 
 1. The UI submits generation requests to `POST /api/ai/text-to-image`.
 2. The route verifies the signed-in Supabase user.
 3. The route deducts credits with the `decrease_credits` RPC.
-4. The route calls Zhipu's image generation API.
+4. The route calls the configured GPT Image 2 image provider API.
 5. The generated image URL is stored in `generations`.
 6. If the upstream call fails, credits are refunded.
 
@@ -19,7 +19,7 @@ These are required before the site can talk to real services:
 NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
 SUPABASE_SERVICE_ROLE_KEY=
-ZHIPU_API_KEY=
+KIE_API_KEY=
 NEXT_PUBLIC_SITE_URL=http://localhost:3000
 BASE_URL=localhost:3000
 ```
@@ -52,7 +52,7 @@ The image generation flow depends on:
 The codebase now has a proper integration boundary:
 
 - `lib/env.ts`: central required-env validation
-- `lib/ai/zhipu.ts`: Zhipu model mapping, aspect-ratio mapping, prompt enhancement, and upstream error handling
+- `app/api/ai/text-to-image/route.ts`: GPT Image 2 provider routing, aspect-ratio and resolution validation, and upstream error handling
 - `app/api/ai/text-to-image/route.ts`: simplified orchestration route with clearer failure modes
 
 ## Production Checklist

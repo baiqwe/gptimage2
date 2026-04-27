@@ -1,8 +1,6 @@
-import { getTranslations } from 'next-intl/server';
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowLeft, Shield, Eye, Lock, Database, Globe, CreditCard } from "lucide-react";
+import { Shield, Eye, Lock, Database, Globe, CreditCard } from "lucide-react";
 import { BreadcrumbSchema } from "@/components/breadcrumb-schema";
 import { siteConfig } from "@/config/site";
 
@@ -101,6 +99,24 @@ export default async function PrivacyPage(props: { params: Promise<{ locale: str
                         </p>
                     </div>
 
+                    <div className="rounded-2xl border border-orange-100 bg-[#fffaf4] p-6 shadow-[0_16px_40px_rgba(255,107,44,0.06)]">
+                        <h3 className="text-xl font-bold text-slate-900">
+                            {isZh ? '太长不看版' : 'TL;DR'}
+                        </h3>
+                        <div className="mt-4 space-y-3 text-sm leading-7 text-slate-600">
+                            <p>
+                                {isZh
+                                    ? '我们会保存账号、积分、支付和必要的生成记录，以便让工作台正常运行。我们不会把您上传的私人参考图或生成内容拿去训练我们自己的基础模型。'
+                                    : 'We keep account, credit, payment, and essential generation records so the workspace can function. We do not take your private uploads or generated outputs and use them to train our own foundation model.'}
+                            </p>
+                            <p>
+                                {isZh
+                                    ? '分析工具用于理解站点使用情况，而不是读取您的提示词细节。支付由第三方处理，我们不会保存完整银行卡信息。'
+                                    : 'Analytics are used to understand how the site is used, not to inspect the substance of your prompts. Payments are handled by third parties, and we do not store full card details.'}
+                            </p>
+                        </div>
+                    </div>
+
                     {/* Data Collection Cards */}
                     <div className="grid md:grid-cols-2 gap-6">
                         <Card className="border-orange-100 bg-white/90 shadow-[0_16px_40px_rgba(255,107,44,0.06)]">
@@ -126,26 +142,26 @@ export default async function PrivacyPage(props: { params: Promise<{ locale: str
 
                         <Card className="border-orange-100 bg-white/90 shadow-[0_16px_40px_rgba(255,107,44,0.06)]">
                             <CardHeader>
-                                <CardTitle className="flex items-center gap-2 text-white">
-                                    <Eye className="h-5 w-5 text-purple-400" />
+                                <CardTitle className="flex items-center gap-2 text-slate-900">
+                                    <Eye className="h-5 w-5 text-orange-500" />
                                     {isZh ? 'AI 图像生成' : 'AI Image Generation'}
                                 </CardTitle>
                             </CardHeader>
-                            <CardContent className="space-y-3 text-sm text-slate-400">
+                            <CardContent className="space-y-3 text-sm text-slate-600">
                                 <p>
                                     {isZh
                                         ? '当您使用 AI 生成功能时：'
                                         : 'When you use the AI generation feature:'}
                                 </p>
                                 <ul className="list-disc list-inside space-y-1">
-                                    <li>{isZh ? '您的文字提示词会发送至图像生成 API' : 'Your text prompts are sent to the image generation API'}</li>
-                                    <li>{isZh ? '生成的图像会临时存储供下载' : 'Generated images are temporarily stored for download'}</li>
-                                    <li>{isZh ? '我们不会永久保留您的生成内容' : 'We do not permanently retain your generations'}</li>
+                                    <li>{isZh ? '您的文字提示词和必要参数会发送至图像生成服务提供商' : 'Your prompts and required parameters are sent to the image-generation provider'}</li>
+                                    <li>{isZh ? '参考图会在图生图请求中按需上传，用于完成当前任务' : 'Reference images may be uploaded as part of image-to-image requests for the current task'}</li>
+                                    <li>{isZh ? '生成结果会被短期保存，便于预览、下载和重新访问' : 'Generated outputs may be stored for a limited time so they can be previewed, downloaded, and reopened'}</li>
                                 </ul>
                             </CardContent>
                         </Card>
 
-                        <Card className="bg-slate-800/50 border-slate-700">
+                        <Card className="border-orange-100 bg-white/90 shadow-[0_16px_40px_rgba(255,107,44,0.06)]">
                             <CardHeader>
                                 <CardTitle className="flex items-center gap-2 text-slate-900">
                                     <Globe className="h-5 w-5 text-orange-500" />
@@ -188,6 +204,24 @@ export default async function PrivacyPage(props: { params: Promise<{ locale: str
                         </Card>
                     </div>
 
+                    <div className="rounded-2xl border border-orange-100 bg-white/85 p-8 shadow-[0_20px_60px_rgba(255,107,44,0.06)]">
+                        <h3 className="mb-4 text-2xl font-bold text-slate-900">
+                            {isZh ? 'AI 相关的隐私说明' : 'AI-specific privacy notes'}
+                        </h3>
+                        <div className="space-y-4 text-slate-600 leading-8">
+                            <p>
+                                {isZh
+                                    ? '与传统 SaaS 不同，AI 图像产品会处理提示词、参考图和生成输出，因此最重要的问题通常是：这些内容会被保存多久、是否会被再次训练、以及谁可以访问它们。我们在产品设计上尽量遵循最小化原则，只保留完成当前服务、处理账单和支持用户查询所必需的数据。'
+                                    : 'Unlike a traditional SaaS tool, an AI image product has to process prompts, reference images, and generated outputs. The most important privacy questions are therefore how long these assets are kept, whether they are reused for training, and who can access them. We try to keep data handling narrow and limited to what is required for the service, billing, and support.'}
+                            </p>
+                            <p>
+                                {isZh
+                                    ? '如果您上传的是客户素材、内部产品图或尚未公开的品牌资源，建议您在使用前先确认公司自己的素材政策，并避免在提示词里加入不必要的私人敏感信息。'
+                                    : 'If you upload client materials, internal product assets, or unpublished brand resources, it is a good practice to confirm your own organization’s asset policy first and avoid placing unnecessary sensitive personal information directly in prompts.'}
+                            </p>
+                        </div>
+                    </div>
+
                     {/* Data Protection */}
                     <div className="rounded-2xl border border-orange-100 bg-white/85 p-8 shadow-[0_20px_60px_rgba(255,107,44,0.06)]">
                         <h3 className="mb-6 flex items-center gap-3 text-2xl font-bold text-slate-900">
@@ -228,23 +262,21 @@ export default async function PrivacyPage(props: { params: Promise<{ locale: str
                     </div>
 
                     {/* Contact */}
-                    <div className="text-center bg-gradient-to-r from-indigo-500/10 via-purple-500/10 to-indigo-500/10 rounded-2xl p-8 border border-slate-700">
-                        <h3 className="text-2xl font-bold mb-4 text-white">
+                    <div className="rounded-2xl border border-orange-100 bg-white/90 p-8 text-center shadow-[0_20px_60px_rgba(255,107,44,0.06)]">
+                        <h3 className="mb-4 text-2xl font-bold text-slate-900">
                             {isZh ? '联系我们' : 'Contact Us'}
                         </h3>
-                        <p className="text-slate-400 mb-6">
+                        <p className="mb-6 text-slate-600">
                             {isZh
                                 ? '如果您对隐私政策有任何疑问，请通过以下方式联系我们。'
                                 : 'If you have any questions about this privacy policy, please contact us.'}
                         </p>
-                        <p className="text-slate-300 mb-6">
+                        <p className="mb-6 text-slate-700">
                             Email: privacy@{siteConfig.domain}
                         </p>
-                        <Button asChild className="bg-indigo-600 hover:bg-indigo-700">
-                            <Link href={localePrefix}>
-                                {isZh ? '返回首页' : 'Back to Home'}
-                            </Link>
-                        </Button>
+                        <Link href={localePrefix} className="inline-flex min-w-[220px] items-center justify-center rounded-full bg-[#ff6b2c] px-8 py-4 text-lg font-semibold text-white shadow-[0_18px_36px_rgba(255,107,44,0.24)] transition-colors hover:bg-[#f86120]">
+                            {isZh ? '返回首页' : 'Back to Home'}
+                        </Link>
                     </div>
                 </div>
             </div>

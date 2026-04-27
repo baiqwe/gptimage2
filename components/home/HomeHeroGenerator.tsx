@@ -802,11 +802,6 @@ export default function HomeHeroGenerator({ user }: HomeHeroGeneratorProps) {
                                                                     className="object-cover"
                                                                     unoptimized
                                                                 />
-                                                                {image.isPending && (
-                                                                    <span className="absolute left-1.5 top-1.5 rounded-full bg-white/90 px-2 py-1 text-[10px] font-semibold text-orange-700 shadow-sm">
-                                                                        {locale === 'zh' ? '待上传' : 'Ready'}
-                                                                    </span>
-                                                                )}
                                                                 <button
                                                                     type="button"
                                                                     onClick={() => {

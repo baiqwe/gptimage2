@@ -961,7 +961,7 @@ export const blogPosts: BlogPost[] = [
     <tr>
       <td>Dedicated interface</td>
       <td>Reduces friction when you only want to create images</td>
-      <td>A clear workspace with prompt, size, quality, and format controls</td>
+      <td>A clear workspace with prompt, aspect-ratio, and resolution controls</td>
     </tr>
     <tr>
       <td>Free trial or low-risk entry</td>

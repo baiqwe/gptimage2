@@ -50,7 +50,7 @@ This project leverages the latest web technologies for optimal performance and S
 
 ## 🔌 Real API Integration
 
-The frontend already sends image generation requests to `POST /api/ai/text-to-image`. For a real deployment, configure Supabase, Zhipu, and optionally Creem billing, then follow the setup notes in [docs/api-integration-prep.md](/Users/fanqienigehamigua/Documents/gptimage2/docs/api-integration-prep.md).
+The frontend already sends image generation requests to `POST /api/ai/text-to-image`. For a real deployment, configure Supabase, Kie/OpenAI image access, and optionally Creem billing, then follow the setup notes in [docs/api-integration-prep.md](/Users/fanqienigehamigua/Documents/gptimage2/docs/api-integration-prep.md).
 
 ## 🔗 Links
 

@@ -10,7 +10,6 @@ import {
     resolveResolution,
     validateResolutionForAspectRatio,
 } from "@/config/gpt-image";
-import { enhancePromptWithZhipu } from "@/lib/ai/zhipu";
 
 // Use Node.js runtime for Vercel
 export const runtime = 'nodejs';
@@ -50,25 +49,6 @@ function optimizePrompt(prompt: string, locale: "zh" | "en") {
     }
 
     return `${prompt.trim()}, clear focal subject, cohesive composition, natural layered lighting, refined material detail, clean background separation, premium visual polish.`;
-}
-
-async function getOptimizedPrompt({
-    prompt,
-    locale,
-    style = "default",
-}: {
-    prompt: string;
-    locale: "zh" | "en";
-    style?: string;
-}) {
-    if (process.env.ZHIPU_API_KEY) {
-        const enhanced = await enhancePromptWithZhipu(prompt, style);
-        if (enhanced.success && enhanced.enhanced) {
-            return enhanced.enhanced;
-        }
-    }
-
-    return optimizePrompt(prompt, locale);
 }
 
 function sleep(ms: number) {
@@ -264,7 +244,6 @@ export async function POST(request: NextRequest) {
             resolution = "1K",
             count = 1,
             prompt_optimization = false,
-            style = "default",
             input_urls = [],
         } = await request.json();
         const requestedAspectRatio = resolveAspectRatio(aspect_ratio ?? size_preset ?? "auto");
@@ -387,11 +366,7 @@ export async function POST(request: NextRequest) {
         const trimmedPrompt = prompt.trim();
         const locale = /[\u4e00-\u9fff]/.test(trimmedPrompt) ? "zh" : "en";
         const finalPrompt = prompt_optimization
-            ? await getOptimizedPrompt({
-                prompt: trimmedPrompt,
-                locale,
-                style: typeof style === "string" ? style : "default",
-            })
+            ? optimizePrompt(trimmedPrompt, locale)
             : trimmedPrompt;
 
         try {

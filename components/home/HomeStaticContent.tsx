@@ -495,7 +495,7 @@ function SEOContentSection({ t, locale }: { t: any; locale: string }) {
                     <div className="mt-8 space-y-6">
                         <StepItem number={1} title={isZh ? '从一个明确的 prompt 开始' : 'Start with a concrete prompt'} desc={isZh ? '尽量写清主体、场景、风格和输出目标，这样更容易比较不同工具之间的结果。' : 'Use a subject, scene, style, and output goal so the result is easier to compare across tools.'} />
                         <StepItem number={2} title={isZh ? '选择合适的尺寸预设' : 'Choose a clear size preset'} desc={isZh ? '方图、竖图和横图适合不同场景，缩略图、海报和商品视觉的方向也会更明确。' : 'Square, portrait, and landscape presets make output intent obvious for thumbnails, posters, and product visuals.'} />
-                        <StepItem number={3} title={isZh ? '调整质量和导出格式' : 'Adjust quality and format'} desc={isZh ? '质量和导出格式会影响迭代速度与最终交付，所以我们把它们直接放在可见位置。' : 'Quality and export format affect iteration speed and final delivery, so we expose them directly.'} />
+                        <StepItem number={3} title={isZh ? '选择合适比例与分辨率' : 'Choose the right ratio and resolution'} desc={isZh ? '比例和分辨率会直接影响交付场景，所以我们把这些关键控制项直接放在可见位置。' : 'Aspect ratio and resolution shape where the output can actually be used, so these controls stay visible from the start.'} />
                         <StepItem number={4} title={isZh ? '继续比较并迭代' : 'Compare, iterate, and document'} desc={isZh ? '如果你还想对比其他模型或案例，可以继续看博客和 Arena 页面。' : 'Use the blog and arena pages to compare your results against other models or use cases without leaving the site.'} />
                     </div>
                 </div>
@@ -512,7 +512,7 @@ function SEOContentSection({ t, locale }: { t: any; locale: string }) {
                     <ul className="mt-6 space-y-4">
                         <TechItem title={isZh ? '示例尽量贴近真实使用场景' : 'Prompt examples stay close to real use cases'} desc={isZh ? '你会看到海报、UI 板、商品详情页和社媒视觉等例子，而不只是抽象风格词。' : 'You will see examples for posters, UI boards, product detail layouts, and social visuals rather than abstract style prompts only.'} />
                         <TechItem title={isZh ? '工具页和指南页各有分工' : 'Tool pages and guide pages serve different jobs'} desc={isZh ? '生成器负责出图，API、Arena 和博客负责帮助你比较、学习并决定下一步。' : 'The generator helps you create, while the API, arena, and blog pages help you compare, learn, and plan the next step.'} />
-                        <TechItem title={isZh ? '关键控制项默认可见' : 'Key controls are visible from the start'} desc={isZh ? '尺寸、质量和导出格式都直接展示，方便你快速测试工作流。' : 'Size, quality, and export format are exposed directly so you can test a workflow without hunting through hidden settings.'} />
+                        <TechItem title={isZh ? '关键控制项默认可见' : 'Key controls are visible from the start'} desc={isZh ? '比例、分辨率和图像模式都会直接展示，方便你快速测试工作流。' : 'Aspect ratio, resolution, and generation mode are exposed directly so you can test a workflow without hunting through hidden settings.'} />
                         <TechItem title={isZh ? '每个入口都能继续行动' : 'Guides are meant to lead into action'} desc={isZh ? '页面会继续引导你去生成、研究 API、做模型对比或深入阅读，而不是停在介绍层面。' : 'Every section points you toward generation, API research, comparisons, or deeper reading instead of leaving you at a dead end.'} />
                     </ul>
                 </div>
