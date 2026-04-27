@@ -103,6 +103,13 @@ export async function GET(request: Request) {
             response.cookies.set(cookie.name, cookie.value, cookie.options);
         }
 
+        response.cookies.set("auth_just_signed_in", "1", {
+            path: "/",
+            maxAge: 20,
+            sameSite: "lax",
+            secure: process.env.NODE_ENV === "production",
+        });
+
         return response;
 
     } catch (err: any) {

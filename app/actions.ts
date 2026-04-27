@@ -2,7 +2,7 @@
 
 import { encodedRedirect } from "@/utils/utils";
 import { createClient } from "@/utils/supabase/server";
-import { headers } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 
 function resolveLocalePrefix(referer: string | null) {
@@ -170,6 +170,13 @@ export const signUpAction = async (formData: FormData) => {
   }
 
   if (data.session) {
+    const cookieStore = await cookies();
+    cookieStore.set("auth_just_signed_in", "1", {
+      path: "/",
+      maxAge: 20,
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+    });
     return redirect(nextPath);
   }
 
@@ -205,6 +212,13 @@ export const signInAction = async (formData: FormData) => {
     );
   }
 
+  const cookieStore = await cookies();
+  cookieStore.set("auth_just_signed_in", "1", {
+    path: "/",
+    maxAge: 20,
+    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
+  });
   return redirect(nextPath);
 };
 
