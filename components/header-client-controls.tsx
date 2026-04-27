@@ -2,6 +2,7 @@
 
 import { signOutAction } from "@/app/actions";
 import { useUser } from "@/hooks/use-user";
+import { useEffect } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -29,9 +30,19 @@ interface HeaderClientControlsProps {
 export function HeaderClientControls({ user: initialUser, locale, navItems }: HeaderClientControlsProps) {
   const pathname = usePathname();
   const t = useTranslations('nav');
-  const { user: clientUser, loading } = useUser();
-  const user = loading ? initialUser : clientUser;
+  const { user: clientUser, loading, refreshUser } = useUser();
   const localePrefix = `/${locale}`;
+  const hasJustSignedInCookie =
+    typeof document !== "undefined" &&
+    document.cookie.includes("auth_just_signed_in=1");
+  const showAuthLoading = loading || (hasJustSignedInCookie && !clientUser);
+  const user = showAuthLoading ? initialUser : clientUser;
+
+  useEffect(() => {
+    if (hasJustSignedInCookie && !clientUser && !loading) {
+      refreshUser("fresh");
+    }
+  }, [clientUser, hasJustSignedInCookie, loading, pathname, refreshUser]);
 
   const getPathWithoutLocale = () => {
     if (!pathname) return '/';
@@ -64,7 +75,7 @@ export function HeaderClientControls({ user: initialUser, locale, navItems }: He
         </Link>
       </div>
 
-      {loading ? (
+      {showAuthLoading ? (
         <div className="hidden items-center gap-2 md:flex">
           <div className="h-9 w-[92px] rounded-full border border-orange-100 bg-white/80" />
           <div className="h-9 w-[92px] rounded-full border border-orange-100 bg-white/80" />
