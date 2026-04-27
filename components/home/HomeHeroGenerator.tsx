@@ -160,6 +160,17 @@ export default function HomeHeroGenerator({ user }: HomeHeroGeneratorProps) {
     const [pendingReferenceFiles, setPendingReferenceFiles] = useState<PendingReferenceFile[]>([]);
     const [isUploadingReference, setIsUploadingReference] = useState(false);
     const canUseHighResolution = Boolean(credits?.has_paid_access);
+    const autoResumePendingRef = useRef(false);
+
+    const readResponseJson = async (response: Response) => {
+        const text = await response.text();
+        if (!text) return {};
+        try {
+            return JSON.parse(text);
+        } catch {
+            throw new Error(text || "Unexpected server response");
+        }
+    };
 
     useEffect(() => {
         const checkUser = async () => {
@@ -360,9 +371,7 @@ export default function HomeHeroGenerator({ user }: HomeHeroGeneratorProps) {
                     });
 
                     if (!hasPendingLocalReferences) {
-                        setTimeout(() => {
-                            void handleGenerate();
-                        }, 800);
+                        autoResumePendingRef.current = true;
                     }
                 }
             } catch {
@@ -370,6 +379,15 @@ export default function HomeHeroGenerator({ user }: HomeHeroGeneratorProps) {
             }
         }
     }, [defaultPrompt, locale, refetchCredits, toast, user]);
+
+    useEffect(() => {
+        if (!currentUser || !autoResumePendingRef.current) return;
+        autoResumePendingRef.current = false;
+        const timer = window.setTimeout(() => {
+            void handleGenerate();
+        }, 250);
+        return () => window.clearTimeout(timer);
+    }, [currentUser, prompt, generationMode, aspectRatio, resolution, referenceImages.length]);
 
     useEffect(() => {
         return () => {
@@ -468,7 +486,7 @@ export default function HomeHeroGenerator({ user }: HomeHeroGeneratorProps) {
                         body: formData,
                     });
 
-                    const data = await response.json();
+                    const data = await readResponseJson(response);
                     if (!response.ok) {
                         throw new Error(data?.error || "Upload failed");
                     }
@@ -519,7 +537,7 @@ export default function HomeHeroGenerator({ user }: HomeHeroGeneratorProps) {
             });
 
             if (!response.ok) {
-                const errorData = await response.json();
+                const errorData = await readResponseJson(response);
                 if (response.status === 402) {
                     saveStateForLater();
                     setIsRefillModalOpen(true);
@@ -533,7 +551,7 @@ export default function HomeHeroGenerator({ user }: HomeHeroGeneratorProps) {
                 throw new Error(errorData.error || "Generation failed");
             }
 
-            const data = await response.json();
+            const data = await readResponseJson(response);
             const images = Array.isArray(data.images) ? data.images : (data.url ? [data.url] : []);
 
             if (images.length > 0) {

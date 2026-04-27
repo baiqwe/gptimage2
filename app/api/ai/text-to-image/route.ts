@@ -255,9 +255,8 @@ async function generateWithOpenAI({
 }
 
 export async function POST(request: NextRequest) {
-    const supabase = await createClient();
-
     try {
+        const supabase = await createClient();
         const {
             prompt,
             aspect_ratio,
