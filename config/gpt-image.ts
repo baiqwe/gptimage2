@@ -34,6 +34,38 @@ export function resolveResolution(resolution: string): ResolutionOption {
   return RESOLUTION_OPTIONS.find((option) => option.id === resolution)?.id ?? "1K";
 }
 
+export function isHighResolutionUnlocked(creemCustomerId?: string | null) {
+  return Boolean(creemCustomerId && !creemCustomerId.startsWith("auto_"));
+}
+
+export function validateResolutionForAspectRatio(
+  aspectRatio: AspectRatioOption,
+  resolution: ResolutionOption
+) {
+  if (resolution === "1K") {
+    return { valid: true as const };
+  }
+
+  if (aspectRatio === "auto") {
+    return {
+      valid: false as const,
+      code: "RESOLUTION_ASPECT_RATIO_INVALID",
+      message:
+        "2K and 4K require a fixed aspect ratio. Auto aspect ratio only supports 1K.",
+    };
+  }
+
+  if (aspectRatio === "1:1" && resolution === "4K") {
+    return {
+      valid: false as const,
+      code: "RESOLUTION_ASPECT_RATIO_INVALID",
+      message: "4K is not available for 1:1 images. Please choose 2K or another aspect ratio.",
+    };
+  }
+
+  return { valid: true as const };
+}
+
 export function resolveOpenAISize(aspectRatio: string) {
   const resolved = resolveAspectRatio(aspectRatio);
 

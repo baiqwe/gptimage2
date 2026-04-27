@@ -62,7 +62,7 @@ export default async function DashboardPage(props: { params: Promise<{ locale: s
 
             {/* Stats Grid */}
             <div className="grid gap-4 sm:gap-6 md:grid-cols-2">
-                <SubscriptionStatusCard subscription={subscription} />
+                <SubscriptionStatusCard subscription={subscription} locale={locale} />
                 <CreditsBalanceCard credits={credits} locale={locale} />
             </div>
 

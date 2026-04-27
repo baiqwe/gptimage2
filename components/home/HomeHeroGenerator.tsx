@@ -27,6 +27,7 @@ import {
     type AspectRatioOption,
     RESOLUTION_OPTIONS,
     type ResolutionOption,
+    validateResolutionForAspectRatio,
 } from '@/config/gpt-image';
 import { CREDITS_PER_GENERATION } from '@/config/pricing';
 
@@ -339,6 +340,7 @@ export default function HomeHeroGenerator({ user }: HomeHeroGeneratorProps) {
             try {
                 const parsed = JSON.parse(pendingAfterLogin);
                 if (parsed.timestamp && Date.now() - parsed.timestamp < 30 * 60 * 1000) {
+                    const hasPendingLocalReferences = Array.isArray(parsed.pendingReferenceNames) && parsed.pendingReferenceNames.length > 0;
                     setPrompt(parsed.prompt || defaultPrompt);
                     setGenerationMode(parsed.generationMode || "text-to-image");
                     setAspectRatio(parsed.aspectRatio || "auto");
@@ -349,13 +351,19 @@ export default function HomeHeroGenerator({ user }: HomeHeroGeneratorProps) {
                     toast({
                         title: locale === "zh" ? "欢迎！" : "Welcome!",
                         description: locale === "zh"
-                            ? (parsed.pendingReferenceNames?.length
+                            ? (hasPendingLocalReferences
                                 ? "提示词和设置已恢复；本地参考图需要重新选择后再继续图生图。"
                                 : "您的创作设置已恢复。")
-                            : (parsed.pendingReferenceNames?.length
+                            : (hasPendingLocalReferences
                                 ? "Your prompt and settings are restored. Please reselect local reference images before editing."
                                 : "Your creation settings have been restored."),
                     });
+
+                    if (!hasPendingLocalReferences) {
+                        setTimeout(() => {
+                            void handleGenerate();
+                        }, 800);
+                    }
                 }
             } catch {
                 localStorage.removeItem("pending_gpt_image_2_generation");
@@ -397,6 +405,19 @@ export default function HomeHeroGenerator({ user }: HomeHeroGeneratorProps) {
                 : "2K and 4K unlock after any paid credits package or subscription.",
         });
     };
+
+    useEffect(() => {
+        const validation = validateResolutionForAspectRatio(aspectRatio, resolution);
+        if (!validation.valid) {
+            setResolution(aspectRatio === "1:1" ? "2K" : "1K");
+        }
+    }, [aspectRatio, resolution]);
+
+    useEffect(() => {
+        if (!canUseHighResolution && resolution !== "1K") {
+            setResolution("1K");
+        }
+    }, [canUseHighResolution, resolution]);
 
     const handleGenerate = async (force = false) => {
         let effectiveReferenceImages = referenceImages;
@@ -917,20 +938,37 @@ export default function HomeHeroGenerator({ user }: HomeHeroGeneratorProps) {
                                         <div className="grid grid-cols-3 gap-2">
                                             {RESOLUTION_OPTIONS.map((option) => {
                                                 const isLocked = option.id !== "1K" && !canUseHighResolution;
+                                                const aspectValidation = validateResolutionForAspectRatio(aspectRatio, option.id);
+                                                const isAspectDisabled = !aspectValidation.valid;
                                                 const isActive = resolution === option.id;
 
                                                 return (
                                                     <button
                                                         key={option.id}
                                                         type="button"
-                                                        onClick={() => handleResolutionSelect(option.id)}
+                                                        onClick={() => {
+                                                            if (isAspectDisabled) {
+                                                                toast({
+                                                                    title: locale === 'zh' ? '当前比例不支持该分辨率' : 'This aspect ratio does not support that resolution',
+                                                                    description: locale === 'zh'
+                                                                        ? (aspectRatio === 'auto'
+                                                                            ? '请先选择固定画面比例，再使用 2K 或 4K。'
+                                                                            : '1:1 画面比例目前不支持 4K，请改用 2K 或其他比例。')
+                                                                        : (aspectRatio === 'auto'
+                                                                            ? 'Choose a fixed aspect ratio before using 2K or 4K.'
+                                                                            : '4K is not available for 1:1 images. Please use 2K or another aspect ratio.'),
+                                                                });
+                                                                return;
+                                                            }
+                                                            handleResolutionSelect(option.id);
+                                                        }}
                                                         className={`flex min-h-10 items-center justify-center rounded-2xl border px-2.5 py-2 text-[12px] font-semibold transition-all sm:text-[13px] ${isActive
                                                             ? 'border-orange-200 bg-[#ff6b2c] text-white shadow-[0_12px_28px_rgba(255,107,44,0.22)]'
-                                                            : isLocked
+                                                            : isLocked || isAspectDisabled
                                                                 ? 'border-[#ecd9c7] bg-white text-slate-400 hover:border-orange-200 hover:bg-orange-50'
                                                                 : 'border-[#ecd9c7] bg-white text-slate-700 hover:border-orange-200 hover:bg-orange-50'
                                                             }`}
-                                                        aria-disabled={isLocked}
+                                                        aria-disabled={isLocked || isAspectDisabled}
                                                     >
                                                         <span className="inline-flex items-center gap-1.5">
                                                             {option.id}
@@ -942,8 +980,12 @@ export default function HomeHeroGenerator({ user }: HomeHeroGeneratorProps) {
                                         </div>
                                         <p className="mt-3 text-[12px] leading-5 text-slate-500">
                                             {canUseHighResolution
-                                                ? (locale === 'zh' ? '已解锁 2K / 4K 输出，可在文生图和图生图中使用。' : '2K and 4K are unlocked for both text-to-image and image-to-image.')
-                                                : (locale === 'zh' ? '购买任意积分包或订阅后，即可解锁 2K 和 4K。' : 'Buy any credits pack or subscription to unlock 2K and 4K output.')}
+                                                ? (locale === 'zh'
+                                                    ? '已解锁 2K / 4K。注意：Auto 仅支持 1K，1:1 不支持 4K。'
+                                                    : '2K and 4K are unlocked. Note: Auto only supports 1K, and 1:1 does not support 4K.')
+                                                : (locale === 'zh'
+                                                    ? '购买任意积分包或订阅后，即可解锁 2K 和 4K；Auto 仅支持 1K，1:1 不支持 4K。'
+                                                    : 'Buy any credits pack or subscription to unlock 2K and 4K. Auto only supports 1K, and 1:1 does not support 4K.')}
                                         </p>
                                     </div>
 

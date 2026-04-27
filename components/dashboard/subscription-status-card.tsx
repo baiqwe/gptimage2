@@ -83,10 +83,12 @@ type SubscriptionStatusCardProps = {
         status: string;
         current_period_end: string;
     } | null;
+    locale?: string;
 };
 
 export function SubscriptionStatusCard({
     subscription,
+    locale = "en",
 }: SubscriptionStatusCardProps) {
     return (
         <div className="rounded-[24px] border border-orange-100 bg-white p-6 shadow-[0_20px_50px_rgba(235,145,71,0.08)]">
@@ -121,7 +123,7 @@ export function SubscriptionStatusCard({
                 </div>
             )}
             <div className="mt-4">
-                <SubscriptionPortalDialog />
+                <SubscriptionPortalDialog locale={locale} />
             </div>
         </div>
     );

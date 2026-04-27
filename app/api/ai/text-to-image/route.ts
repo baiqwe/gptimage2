@@ -4,10 +4,13 @@ import { CREDITS_PER_GENERATION } from "@/config/pricing";
 import {
     COUNT_OPTIONS,
     GPT_IMAGE_MODEL,
+    isHighResolutionUnlocked,
     resolveAspectRatio,
     resolveOpenAISize,
     resolveResolution,
+    validateResolutionForAspectRatio,
 } from "@/config/gpt-image";
+import { enhancePromptWithZhipu } from "@/lib/ai/zhipu";
 
 // Use Node.js runtime for Vercel
 export const runtime = 'nodejs';
@@ -47,6 +50,25 @@ function optimizePrompt(prompt: string, locale: "zh" | "en") {
     }
 
     return `${prompt.trim()}, clear focal subject, cohesive composition, natural layered lighting, refined material detail, clean background separation, premium visual polish.`;
+}
+
+async function getOptimizedPrompt({
+    prompt,
+    locale,
+    style = "default",
+}: {
+    prompt: string;
+    locale: "zh" | "en";
+    style?: string;
+}) {
+    if (process.env.ZHIPU_API_KEY) {
+        const enhanced = await enhancePromptWithZhipu(prompt, style);
+        if (enhanced.success && enhanced.enhanced) {
+            return enhanced.enhanced;
+        }
+    }
+
+    return optimizePrompt(prompt, locale);
 }
 
 function sleep(ms: number) {
@@ -243,6 +265,7 @@ export async function POST(request: NextRequest) {
             resolution = "1K",
             count = 1,
             prompt_optimization = false,
+            style = "default",
             input_urls = [],
         } = await request.json();
         const requestedAspectRatio = resolveAspectRatio(aspect_ratio ?? size_preset ?? "auto");
@@ -289,7 +312,7 @@ export async function POST(request: NextRequest) {
             .eq("user_id", user.id)
             .single();
 
-        const hasPaidAccess = Boolean(customer?.creem_customer_id);
+        const hasPaidAccess = isHighResolutionUnlocked(customer?.creem_customer_id);
 
         if (requestedResolution !== "1K" && !hasPaidAccess) {
             return NextResponse.json({
@@ -298,6 +321,20 @@ export async function POST(request: NextRequest) {
                 required_purchase: true,
                 resolution: requestedResolution,
             }, { status: 402 });
+        }
+
+        const resolutionValidation = validateResolutionForAspectRatio(
+            requestedAspectRatio,
+            requestedResolution
+        );
+
+        if (!resolutionValidation.valid) {
+            return NextResponse.json({
+                error: resolutionValidation.message,
+                code: resolutionValidation.code,
+                resolution: requestedResolution,
+                aspect_ratio: requestedAspectRatio,
+            }, { status: 400 });
         }
 
         const provider = process.env.KIE_API_KEY ? "kie" : process.env.OPENAI_API_KEY ? "openai" : null;
@@ -351,7 +388,11 @@ export async function POST(request: NextRequest) {
         const trimmedPrompt = prompt.trim();
         const locale = /[\u4e00-\u9fff]/.test(trimmedPrompt) ? "zh" : "en";
         const finalPrompt = prompt_optimization
-            ? optimizePrompt(trimmedPrompt, locale)
+            ? await getOptimizedPrompt({
+                prompt: trimmedPrompt,
+                locale,
+                style: typeof style === "string" ? style : "default",
+            })
             : trimmedPrompt;
 
         try {

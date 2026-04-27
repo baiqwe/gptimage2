@@ -27,6 +27,13 @@ export async function GET() {
             );
         }
 
+        if (customerData.creem_customer_id.startsWith("auto_")) {
+            return NextResponse.json(
+                { error: "No billing portal available for free accounts" },
+                { status: 404 }
+            );
+        }
+
         // 3. 调用 Creem API 获取 Customer Portal URL
         const response = await fetch(
             `${process.env.CREEM_API_URL}/customers/${customerData.creem_customer_id}/billing-portal`,

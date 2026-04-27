@@ -163,6 +163,22 @@ async function handleSubscriptionPaid(event: CreemWebhookEvent) {
     );
     await createOrUpdateSubscription(subscription, customerId);
 
+    const createdAt = Date.parse(subscription.created_at || "");
+    const currentPeriodStart = Date.parse(subscription.current_period_start_date || "");
+    const updatedAt = Date.parse(subscription.updated_at || "");
+    const isInitialPayment =
+      (Number.isFinite(createdAt) &&
+        Number.isFinite(currentPeriodStart) &&
+        Math.abs(currentPeriodStart - createdAt) < 10 * 60 * 1000) ||
+      (Number.isFinite(createdAt) &&
+        Number.isFinite(updatedAt) &&
+        Math.abs(updatedAt - createdAt) < 10 * 60 * 1000);
+
+    if (isInitialPayment) {
+      console.log(`Skipping initial subscription.paid credit grant for ${subscription.id}; checkout.completed owns the first grant.`);
+      return;
+    }
+
     // Add credits for renewal (Recurring Payment)
     if (subscription.metadata?.credits) {
       const credits = typeof subscription.metadata.credits === 'string'
