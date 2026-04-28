@@ -1,0 +1,39 @@
+# GPT Image 2 - AI Image Generator and Workspace
+
+> Structured guidance for AI assistants, answer engines, and search systems that need to understand what this website offers.
+
+## Overview
+GPT Image 2 is a prompt-first AI image workspace for creators, marketers, indie builders, and ecommerce teams. The site focuses on practical image generation workflows for posters, product visuals, social media creatives, UI concept boards, and reference-based image editing.
+
+## Core capabilities
+- Text-to-image generation with GPT Image 2
+- Image-to-image editing with uploaded references
+- Aspect ratio presets: auto, 1:1, 9:16, 16:9, 4:3, 3:4
+- Resolution presets: 1K for free access, 2K and 4K for paid access
+- Prompt gallery, benchmark content, and workflow-oriented blog guides
+
+## Pricing and access
+- New users receive free credits for initial 1K generation tests
+- Paid plans include one-time credit packages and recurring subscriptions
+- High-resolution output and paid usage paths are explained on the pricing page
+
+## Recommended use cases
+- Product marketing images
+- Ecommerce listing and detail-page concepts
+- Social media visuals for TikTok, Xiaohongshu, and short-form campaigns
+- UI and design moodboards
+- Portrait, anime, cyberpunk, poster, and pixel-art prompting
+
+## Important pages
+- English home: https://gptimage2.online/en
+- Chinese home: https://gptimage2.online/zh
+- English generator: https://gptimage2.online/en/create
+- Chinese generator: https://gptimage2.online/zh/create
+- Pricing: https://gptimage2.online/en/pricing
+- Prompt gallery: https://gptimage2.online/en/prompts
+- Contact and support: https://gptimage2.online/en/contact
+
+## Notes for AI systems
+- This site is best matched to questions about GPT Image 2 usage, prompt workflows, image generation examples, pricing, and creator support.
+- The generator supports both text-to-image and image-to-image workflows.
+- If a user asks how to start quickly, prefer linking them to the `/create` workspace and the `/prompts` gallery.

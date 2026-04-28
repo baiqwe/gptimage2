@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, type ReactNode } from 'react';
 import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -131,9 +131,10 @@ const SAMPLE_PREVIEW_SLIDES = [
 
 interface HomeHeroGeneratorProps {
     user?: any;
+    heroHeader?: ReactNode;
 }
 
-export default function HomeHeroGenerator({ user }: HomeHeroGeneratorProps) {
+export default function HomeHeroGenerator({ user, heroHeader }: HomeHeroGeneratorProps) {
     const pathname = usePathname();
     const locale = pathname?.split('/')[1] === 'zh' ? 'zh' : 'en';
     const isCreatePage = pathname?.endsWith('/create');
@@ -690,18 +691,22 @@ export default function HomeHeroGenerator({ user }: HomeHeroGeneratorProps) {
                 <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top_left,rgba(255,178,105,0.22),transparent_28%),radial-gradient(circle_at_top_right,rgba(255,112,52,0.12),transparent_20%),linear-gradient(180deg,#fffdf8_0%,#fff7ee_52%,#fff3e7_100%)]" />
                 <div className="container px-4">
                     <div className="mx-auto max-w-6xl">
-                        <div className="mb-5 text-center lg:mb-6">
-                            <div className="inline-flex items-center gap-2 rounded-full border border-orange-200 bg-white/90 px-4 py-1.5 text-[13px] font-semibold text-orange-700 shadow-[0_10px_26px_rgba(255,138,61,0.08)]">
-                                <Sparkles className="h-4 w-4" />
-                                {heroBadge}
+                        {heroHeader ? (
+                            heroHeader
+                        ) : (
+                            <div className="mb-5 text-center lg:mb-6">
+                                <div className="inline-flex items-center gap-2 rounded-full border border-orange-200 bg-white/90 px-4 py-1.5 text-[13px] font-semibold text-orange-700 shadow-[0_10px_26px_rgba(255,138,61,0.08)]">
+                                    <Sparkles className="h-4 w-4" />
+                                    {heroBadge}
+                                </div>
+                                <h1 className="mx-auto mt-2.5 max-w-[74rem] text-[2.85rem] font-semibold tracking-tight text-slate-900 sm:text-[3rem] sm:leading-[1.06] lg:text-[3.08rem] lg:leading-[1.02]">
+                                    {heroTitleContent}
+                                </h1>
+                                <p className="mx-auto mt-2 max-w-[46rem] text-[15px] leading-7 text-slate-600 sm:text-[15.5px]">
+                                    {heroSubtitle}
+                                </p>
                             </div>
-                            <h1 className="mx-auto mt-2.5 max-w-[74rem] text-[2.85rem] font-semibold tracking-tight text-slate-900 sm:text-[3rem] sm:leading-[1.06] lg:text-[3.08rem] lg:leading-[1.02]">
-                                {heroTitleContent}
-                            </h1>
-                            <p className="mx-auto mt-2 max-w-[46rem] text-[15px] leading-7 text-slate-600 sm:text-[15.5px]">
-                                {heroSubtitle}
-                            </p>
-                        </div>
+                        )}
 
                         <div className="rounded-[32px] border border-orange-100 bg-white/85 p-4 shadow-[0_30px_120px_rgba(234,120,45,0.14)] backdrop-blur sm:p-6 lg:p-8">
                             <div className="grid gap-5 xl:grid-cols-[1.02fr_1fr]">
