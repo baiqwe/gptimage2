@@ -2,6 +2,7 @@ import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
 import { SubscriptionStatusCard } from "@/components/dashboard/subscription-status-card";
 import { CreditsBalanceCard } from "@/components/dashboard/credits-balance-card";
+import { GenerationHistorySection } from "@/components/dashboard/generation-history-section";
 
 
 
@@ -41,6 +42,14 @@ export default async function DashboardPage(props: { params: Promise<{ locale: s
 
     const subscription = customerData?.subscriptions?.[0];
     const credits = customerData?.credits || 0;
+
+    const { data: generationHistory } = await supabase
+        .from("generations")
+        .select("id, prompt, image_url, status, credits_cost, created_at, metadata")
+        .eq("user_id", user.id)
+        .eq("status", "succeeded")
+        .order("created_at", { ascending: false })
+        .limit(24);
 
     const welcomeText = locale === 'zh' ? '欢迎回来' : 'Welcome back';
     const manageText = locale === 'zh' ? '在这里管理您的订阅和积分。' : 'Manage your subscription and credits here.';
@@ -82,6 +91,11 @@ export default async function DashboardPage(props: { params: Promise<{ locale: s
                     </div>
                 </div>
             </div>
+
+            <GenerationHistorySection
+                items={generationHistory || []}
+                locale={locale}
+            />
         </div>
     );
 }
