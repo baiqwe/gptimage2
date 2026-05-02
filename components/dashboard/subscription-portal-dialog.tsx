@@ -12,7 +12,7 @@ export function SubscriptionPortalDialog({ locale = "en" }: { locale?: string })
     const handleManageSubscription = async () => {
         try {
             setIsLoading(true);
-            const response = await fetch("/api/creem/customer-portal");
+            const response = await fetch("/api/billing/customer-portal");
 
             if (response.status === 404) {
                 toast({

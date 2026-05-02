@@ -18,7 +18,7 @@ export interface PricingPlan {
     credits: number;
     type: 'one_time' | 'subscription';
     interval?: 'month' | 'year';
-    productId: string;       // Creem Product ID
+    productId: string;       // Legacy Creem Product ID
     badge?: string;
     badgeZh?: string;
     isPopular?: boolean;
@@ -28,6 +28,9 @@ export interface PricingPlan {
     features: string[];
     featuresZh: string[];
 }
+
+export type BillingProvider = "stripe" | "creem";
+export type PricingPlanId = PricingPlan["id"];
 
 // 单次包 - Starter
 export const PLAN_STARTER: PricingPlan = {
@@ -121,6 +124,31 @@ export const PLAN_PRO_YEARLY: PricingPlan = {
 
 // 所有套餐
 export const ALL_PLANS = [PLAN_STARTER, PLAN_PRO_MONTHLY, PLAN_PRO_YEARLY];
+
+export function getPlanById(planId: string): PricingPlan | undefined {
+    return ALL_PLANS.find((plan) => plan.id === planId);
+}
+
+export function getCreemProductId(planId: string): string | null {
+    return getPlanById(planId)?.productId ?? null;
+}
+
+export function getStripePriceId(planId: string): string | null {
+    switch (planId) {
+        case PLAN_STARTER.id:
+            return process.env.STRIPE_PRICE_STARTER_ID || null;
+        case PLAN_PRO_MONTHLY.id:
+            return process.env.STRIPE_PRICE_PRO_MONTHLY_ID || null;
+        case PLAN_PRO_YEARLY.id:
+            return process.env.STRIPE_PRICE_PRO_YEARLY_ID || null;
+        default:
+            return null;
+    }
+}
+
+export function getPlanByStripePriceId(priceId: string): PricingPlan | undefined {
+    return ALL_PLANS.find((plan) => getStripePriceId(plan.id) === priceId);
+}
 
 // 兼容旧代码的别名
 export const PLAN_MINI = PLAN_STARTER;

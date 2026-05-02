@@ -8,6 +8,7 @@ import {
   createOrUpdateSubscription,
   addCreditsToCustomer,
 } from "@/utils/supabase/subscriptions";
+import { markCustomerPaidAccess } from "@/utils/supabase/billing";
 
 const CREEM_WEBHOOK_SECRET = process.env.CREEM_WEBHOOK_SECRET!;
 
@@ -119,6 +120,8 @@ async function handleCheckoutCompleted(event: CreemWebhookEvent) {
       }
       console.log(`Added ${credits} credits to customer ${customerId}`);
     }
+
+    await markCustomerPaidAccess(customerId, "creem");
   } catch (error) {
     console.error("Error handling checkout completed:", error);
     throw error;
@@ -162,6 +165,7 @@ async function handleSubscriptionPaid(event: CreemWebhookEvent) {
       subscription.metadata?.user_id
     );
     await createOrUpdateSubscription(subscription, customerId);
+    await markCustomerPaidAccess(customerId, "creem");
 
     const createdAt = Date.parse(subscription.created_at || "");
     const currentPeriodStart = Date.parse(subscription.current_period_start_date || "");
@@ -229,6 +233,7 @@ async function handleSubscriptionCanceled(event: CreemWebhookEvent) {
       subscription.metadata?.user_id
     );
     await createOrUpdateSubscription(subscription, customerId);
+    await markCustomerPaidAccess(customerId, "creem");
   } catch (error) {
     console.error("Error handling subscription canceled:", error);
     throw error;

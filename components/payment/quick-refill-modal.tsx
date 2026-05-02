@@ -3,11 +3,11 @@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { useTranslations } from "next-intl";
-import { Loader2, Zap } from "lucide-react";
+import { Zap } from "lucide-react";
 import { useState } from "react";
 import { usePathname } from "next/navigation";
-import { PLAN_MINI, PLAN_PRO_MONTHLY, PricingPlan } from "@/config/pricing";
-import { toast } from "@/hooks/use-toast";
+import { ALL_PLANS, PLAN_MINI, PLAN_PRO_MONTHLY, PricingPlan } from "@/config/pricing";
+import { PaymentProviderPanel } from "@/components/payment/payment-provider-panel";
 
 interface QuickRefillModalProps {
     isOpen: boolean;
@@ -17,76 +17,10 @@ interface QuickRefillModalProps {
 
 export function QuickRefillModal({ isOpen, onClose, currentPath }: QuickRefillModalProps) {
     const t = useTranslations('Pricing');
-    const [loadingPlanId, setLoadingPlanId] = useState<string | null>(null);
     const pathname = usePathname();
     const locale = pathname?.split("/")[1] === "zh" ? "zh" : "en";
-
-    const handlePurchase = async (plan: PricingPlan) => {
-        try {
-            setLoadingPlanId(plan.id);
-
-            // Construct local redirect URL to return to current work
-            const returnUrl = new URL(window.location.href);
-            returnUrl.searchParams.set('checkout', 'success');
-            // Add a timestamp to force refresh if needed
-            returnUrl.searchParams.set('ts', Date.now().toString());
-
-            const formData = new FormData();
-            formData.append('priceId', plan.productId);
-            formData.append('productType', plan.type === 'subscription' ? 'subscription' : 'credits');
-
-            if (plan.credits) {
-                formData.append('credits', plan.credits.toString());
-            }
-
-            formData.append('redirectUrl', returnUrl.toString());
-
-            const response = await fetch('/api/creem/checkout', {
-                method: 'POST',
-                body: formData,
-            });
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                if (response.status === 401) {
-                    toast({
-                        title: locale === 'zh' ? '请先登录' : 'Sign in first',
-                        description: locale === 'zh'
-                            ? '登录后即可继续购买并解锁更高分辨率。'
-                            : 'Please sign in before purchasing and unlocking higher resolutions.',
-                    });
-                    window.location.href = `/${locale}/sign-in?next=${encodeURIComponent(window.location.pathname)}`;
-                    return;
-                }
-                throw new Error(data.error || 'Checkout failed');
-            }
-
-            if (data.checkout_url) {
-                // Before redirecting, we could emit an event or rely on parent to save state
-                // But typically parent captures input state. 
-                // We just redirect.
-                window.location.href = data.checkout_url;
-            } else {
-                console.error('No checkout URL', data);
-                toast({
-                    title: t('error'),
-                    description: "Failed to initialize checkout.",
-                    variant: "destructive"
-                });
-            }
-
-        } catch (error) {
-            console.error('Payment error:', error);
-            toast({
-                title: t('error'),
-                description: "Failed to start payment process.",
-                variant: "destructive"
-            });
-        } finally {
-            setLoadingPlanId(null);
-        }
-    };
+    const [selectedPlan, setSelectedPlan] = useState<PricingPlan>(PLAN_PRO_MONTHLY);
+    const returnPath = currentPath || pathname || `/${locale}/create`;
 
     return (
         <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
@@ -102,54 +36,49 @@ export function QuickRefillModal({ isOpen, onClose, currentPath }: QuickRefillMo
                 </DialogHeader>
 
                 <div className="grid gap-4 py-4">
-                    {/* Option A: Pro (Hero) */}
-                    <div className="relative">
-                        <div className="absolute -top-3 right-0 bg-primary text-primary-foreground text-xs px-2 py-0.5 rounded-full font-bold shadow-sm animate-pulse">
-                            RECOMMENDED
-                        </div>
-                        <Button
-                            className="w-full h-auto py-4 flex flex-col items-center gap-1 bg-gradient-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-600/90 border-0"
-                            onClick={() => handlePurchase(PLAN_PRO_MONTHLY)}
-                            disabled={!!loadingPlanId}
-                        >
-                            {loadingPlanId === PLAN_PRO_MONTHLY.id ? (
-                                <Loader2 className="h-6 w-6 animate-spin" />
-                            ) : (
-                                <>
-                                    <span className="text-lg font-bold flex items-center gap-2">
-                                        <Zap className="fill-yellow-400 text-yellow-400 h-5 w-5" />
-                                        {t('refill_upgrade')}
-                                    </span>
-                                    <span className="text-primary-foreground/80 text-sm font-normal">
-                                        $19.99 / mo • 1,000 Credits
-                                    </span>
-                                </>
-                            )}
-                        </Button>
+                    <div className="grid gap-3">
+                        {ALL_PLANS.map((plan) => (
+                            <button
+                                key={plan.id}
+                                type="button"
+                                onClick={() => setSelectedPlan(plan)}
+                                className={`rounded-2xl border p-4 text-left transition ${selectedPlan.id === plan.id
+                                        ? "border-orange-300 bg-[#fff7ef] shadow-[0_12px_28px_rgba(255,107,44,0.12)]"
+                                        : "border-slate-200 bg-white hover:border-orange-200 hover:bg-[#fffaf4]"
+                                    }`}
+                            >
+                                <div className="flex items-center justify-between gap-3">
+                                    <div>
+                                        <div className="flex items-center gap-2">
+                                            <span className="text-base font-semibold text-slate-900">
+                                                {locale === "zh" ? plan.nameZh : plan.name}
+                                            </span>
+                                            {plan.id === PLAN_PRO_MONTHLY.id ? (
+                                                <span className="rounded-full bg-orange-100 px-2 py-0.5 text-[10px] font-semibold uppercase text-orange-700">
+                                                    Recommended
+                                                </span>
+                                            ) : null}
+                                        </div>
+                                        <p className="mt-1 text-sm text-slate-500">
+                                            {plan.type === "subscription"
+                                                ? `${plan.credits.toLocaleString()} credits · $${plan.price.toFixed(2)}/${plan.interval === "year" ? "yr" : "mo"}`
+                                                : `${plan.credits.toLocaleString()} credits · $${plan.price.toFixed(2)}`}
+                                        </p>
+                                    </div>
+                                    {plan.id === PLAN_PRO_MONTHLY.id ? (
+                                        <Zap className="h-5 w-5 text-orange-500" />
+                                    ) : null}
+                                </div>
+                            </button>
+                        ))}
                     </div>
 
-                    <div className="relative">
-                        <div className="absolute inset-0 flex items-center">
-                            <span className="w-full border-t" />
-                        </div>
-                        <div className="relative flex justify-center text-xs uppercase">
-                            <span className="bg-background px-2 text-muted-foreground">Or</span>
-                        </div>
-                    </div>
-
-                    {/* Option B: Mini */}
-                    <Button
-                        variant="outline"
-                        className="w-full h-auto py-3 text-muted-foreground hover:text-foreground"
-                        onClick={() => handlePurchase(PLAN_MINI)}
-                        disabled={!!loadingPlanId}
-                    >
-                        {loadingPlanId === PLAN_MINI.id ? (
-                            <Loader2 className="h-4 w-4 animate-spin" />
-                        ) : (
-                            <span>{t('refill_mini')} (400 credits)</span>
-                        )}
-                    </Button>
+                    <PaymentProviderPanel
+                        plan={selectedPlan}
+                        locale={locale}
+                        returnPath={returnPath}
+                        source="quick_refill"
+                    />
                 </div>
             </DialogContent>
         </Dialog>

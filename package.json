@@ -24,6 +24,8 @@
     "@radix-ui/react-slot": "^1.2.3",
     "@radix-ui/react-tabs": "^1.1.12",
     "@radix-ui/react-toast": "^1.2.6",
+    "@stripe/react-stripe-js": "^6.3.0",
+    "@stripe/stripe-js": "^9.4.0",
     "@supabase/ssr": "latest",
     "@supabase/supabase-js": "latest",
     "@types/canvas-confetti": "^1.9.0",
@@ -46,6 +48,7 @@
     "react-dropzone": "^14.3.8",
     "react-hook-form": "^7.61.1",
     "replicate": "^1.4.0",
+    "stripe": "^22.1.0",
     "zod": "^3.25.76"
   },
   "devDependencies": {

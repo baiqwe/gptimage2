@@ -13,10 +13,13 @@ CREATE TABLE IF NOT EXISTS public.customers (
     id uuid primary key default uuid_generate_v4(),
     user_id uuid references auth.users(id) on delete cascade not null,
     creem_customer_id text not null,
+    stripe_customer_id text,
     email text not null,
     name text,
     country text,
     credits integer default 0 not null,
+    has_paid_access boolean default false not null,
+    billing_provider text,
     created_at timestamp with time zone default timezone('utc'::text, now()) not null,
     updated_at timestamp with time zone default timezone('utc'::text, now()) not null,
     metadata jsonb default '{}'::jsonb,
@@ -53,7 +56,11 @@ CREATE TABLE IF NOT EXISTS public.subscriptions (
     customer_id uuid references public.customers(id) on delete cascade not null,
     creem_subscription_id text not null unique,
     creem_product_id text not null,
-    status text not null check (status in ('incomplete', 'expired', 'active', 'past_due', 'canceled', 'unpaid', 'paused', 'trialing')),
+    provider text not null default 'creem',
+    stripe_subscription_id text unique,
+    stripe_price_id text,
+    stripe_product_id text,
+    status text not null check (status in ('incomplete', 'incomplete_expired', 'expired', 'active', 'past_due', 'canceled', 'unpaid', 'paused', 'trialing')),
     current_period_start timestamp with time zone not null,
     current_period_end timestamp with time zone not null,
     canceled_at timestamp with time zone,
@@ -95,9 +102,12 @@ CREATE TABLE IF NOT EXISTS public.processed_webhooks (
 -- 6. 创建索引
 -- ============================================
 CREATE INDEX IF NOT EXISTS customers_user_id_idx ON public.customers(user_id);
+CREATE UNIQUE INDEX IF NOT EXISTS customers_stripe_customer_id_idx ON public.customers(stripe_customer_id) WHERE stripe_customer_id IS NOT NULL;
 CREATE INDEX IF NOT EXISTS credits_history_customer_id_idx ON public.credits_history(customer_id);
 CREATE INDEX IF NOT EXISTS generations_user_id_idx ON public.generations(user_id);
 CREATE UNIQUE INDEX IF NOT EXISTS processed_webhooks_action_key_idx ON public.processed_webhooks(action_key);
+CREATE UNIQUE INDEX IF NOT EXISTS subscriptions_stripe_subscription_id_idx ON public.subscriptions(stripe_subscription_id) WHERE stripe_subscription_id IS NOT NULL;
+CREATE INDEX IF NOT EXISTS subscriptions_provider_idx ON public.subscriptions(provider);
 
 -- ============================================
 -- 7. 启用 RLS

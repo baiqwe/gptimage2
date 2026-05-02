@@ -286,11 +286,11 @@ export async function POST(request: NextRequest) {
 
         const { data: customer } = await supabase
             .from("customers")
-            .select("creem_customer_id")
+            .select("*")
             .eq("user_id", user.id)
             .single();
 
-        const hasPaidAccess = isHighResolutionUnlocked(customer?.creem_customer_id);
+        const hasPaidAccess = isHighResolutionUnlocked(customer);
 
         if (requestedResolution !== "1K" && !hasPaidAccess) {
             return NextResponse.json({

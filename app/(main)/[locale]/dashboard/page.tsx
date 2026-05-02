@@ -31,6 +31,7 @@ export default async function DashboardPage(props: { params: Promise<{ locale: s
             `
       *,
       subscriptions (
+        provider,
         status,
         current_period_end,
         creem_product_id

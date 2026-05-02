@@ -108,6 +108,7 @@ export async function createOrUpdateSubscription(
 
   const subscriptionData = {
     customer_id: customerId,
+    provider: "creem",
     creem_product_id:
       typeof creemSubscription?.product === "string"
         ? creemSubscription?.product

@@ -34,8 +34,32 @@ export function resolveResolution(resolution: string): ResolutionOption {
   return RESOLUTION_OPTIONS.find((option) => option.id === resolution)?.id ?? "1K";
 }
 
-export function isHighResolutionUnlocked(creemCustomerId?: string | null) {
-  return Boolean(creemCustomerId && !creemCustomerId.startsWith("auto_"));
+type HighResolutionAccessSource =
+  | string
+  | null
+  | undefined
+  | {
+      has_paid_access?: boolean | null;
+      creem_customer_id?: string | null;
+      stripe_customer_id?: string | null;
+    };
+
+export function isHighResolutionUnlocked(source?: HighResolutionAccessSource) {
+  if (!source) return false;
+
+  if (typeof source === "string") {
+    return Boolean(source && !source.startsWith("auto_"));
+  }
+
+  if (source.has_paid_access) {
+    return true;
+  }
+
+  if (source.stripe_customer_id) {
+    return true;
+  }
+
+  return Boolean(source.creem_customer_id && !source.creem_customer_id.startsWith("auto_"));
 }
 
 export function validateResolutionForAspectRatio(

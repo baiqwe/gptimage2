@@ -2,10 +2,9 @@
 
 import { useTranslations } from 'next-intl';
 import { useState, useEffect } from 'react';
-import { Check, Loader2, Sparkles, Zap, Crown, Clock } from 'lucide-react';
+import { Check, Sparkles, Zap, Crown, Clock } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { toast } from "@/hooks/use-toast";
 import {
     ALL_PLANS,
     CREDITS_PER_GENERATION,
@@ -14,6 +13,7 @@ import {
     getLocalizedPlan,
     PricingPlan
 } from "@/config/pricing";
+import { PaymentDialog } from "@/components/payment/payment-dialog";
 
 interface PricingSectionProps {
     locale: string;
@@ -57,65 +57,12 @@ function DiscountTimer({ locale }: { locale: string }) {
 
 export function PricingSection({ locale }: PricingSectionProps) {
     const t = useTranslations('Pricing');
-    const [loadingPlanId, setLoadingPlanId] = useState<string | null>(null);
+    const [selectedPlan, setSelectedPlan] = useState<PricingPlan | null>(null);
+    const [isPaymentDialogOpen, setIsPaymentDialogOpen] = useState(false);
 
-    const handlePurchase = async (plan: PricingPlan) => {
-        try {
-            setLoadingPlanId(plan.id);
-
-            const formData = new FormData();
-            formData.append('priceId', plan.productId);
-            formData.append('productType', plan.type === 'subscription' ? 'subscription' : 'credits');
-
-            if (plan.credits) {
-                formData.append('credits', plan.credits.toString());
-            }
-
-            const successUrl = new URL(window.location.href);
-            successUrl.pathname = `/${locale}/create`;
-            successUrl.searchParams.set('checkout', 'success');
-            formData.append('redirectUrl', successUrl.toString());
-
-            const response = await fetch('/api/creem/checkout', {
-                method: 'POST',
-                body: formData,
-            });
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                if (response.status === 401) {
-                    toast({
-                        title: locale === 'zh' ? '请先登录' : 'Sign in first',
-                        description: locale === 'zh'
-                            ? '登录后即可继续购买并解锁更高分辨率。'
-                            : 'Please sign in before purchasing and unlocking higher resolutions.',
-                    });
-                    window.location.href = `/${locale}/sign-in?next=${encodeURIComponent(window.location.pathname)}`;
-                    return;
-                }
-                throw new Error(data.error || 'Checkout failed');
-            }
-
-            if (data.checkout_url) {
-                window.location.href = data.checkout_url;
-            } else {
-                toast({
-                    title: locale === 'zh' ? '错误' : 'Error',
-                    description: "Failed to initialize checkout.",
-                    variant: "destructive"
-                });
-            }
-        } catch (error) {
-            console.error('Payment error:', error);
-            toast({
-                title: locale === 'zh' ? '错误' : 'Error',
-                description: "Failed to start payment process.",
-                variant: "destructive"
-            });
-        } finally {
-            setLoadingPlanId(null);
-        }
+    const handlePurchase = (plan: PricingPlan) => {
+        setSelectedPlan(plan);
+        setIsPaymentDialogOpen(true);
     };
 
     const formatPrice = (price: number) => {
@@ -241,22 +188,19 @@ export function PricingSection({ locale }: PricingSectionProps) {
                         buttonClass
                     )}
                     onClick={() => handlePurchase(plan)}
-                    disabled={!!loadingPlanId}
                 >
-                    {loadingPlanId === plan.id ? (
-                        <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                    ) : plan.type === 'subscription' ? (
+                    {plan.type === 'subscription' ? (
                         plan.interval === 'year'
-                            ? (locale === 'zh' ? '锁定年付优惠' : 'Lock Annual Savings')
-                            : (locale === 'zh' ? '立即订阅' : 'Subscribe Now')
+                            ? (locale === 'zh' ? '继续购买年付方案' : 'Continue to yearly checkout')
+                            : (locale === 'zh' ? '继续购买月付方案' : 'Continue to monthly checkout')
                     ) : (
-                        locale === 'zh' ? '立即买断' : 'Buy Once'
+                        locale === 'zh' ? '继续购买积分包' : 'Continue to credits checkout'
                     )}
                 </Button>
 
                 <div className="mt-3 flex items-center justify-center gap-1.5 text-[10px] text-slate-400">
                     <Check className="w-3 h-3" />
-                    <span>Secure Payment via Creem</span>
+                    <span>{locale === 'zh' ? '默认 Stripe，支持切换 Creem 备用支付' : 'Secure checkout via Stripe with Creem fallback'}</span>
                 </div>
             </div>
         );
@@ -291,9 +235,18 @@ export function PricingSection({ locale }: PricingSectionProps) {
                     {locale === 'zh' ? '💰 所有套餐积分永久有效，无过期限制' : '💰 All credits never expire'}
                 </p>
                 <p className="text-xs text-slate-400">
-                    {locale === 'zh' ? '支持 Visa、Mastercard、PayPal' : 'Visa, Mastercard, PayPal accepted'}
+                    {locale === 'zh' ? 'Stripe 将按地区自动展示卡支付与可用钱包方式，Creem 可作为备用结账' : 'Stripe shows eligible card and wallet methods by region, with Creem available as a fallback'}
                 </p>
             </div>
+
+            <PaymentDialog
+                open={isPaymentDialogOpen}
+                onOpenChange={setIsPaymentDialogOpen}
+                plan={selectedPlan}
+                locale={locale}
+                returnPath={`/${locale}/create`}
+                source="pricing"
+            />
         </div>
     );
 }
