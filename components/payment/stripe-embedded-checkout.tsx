@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { loadStripe } from "@stripe/stripe-js";
 import { EmbeddedCheckout, EmbeddedCheckoutProvider } from "@stripe/react-stripe-js";
-import { Loader2, CreditCard, Wallet } from "lucide-react";
+import { Loader2, CreditCard, Wallet, Smartphone, MoreHorizontal } from "lucide-react";
 import type { PricingPlan } from "@/config/pricing";
 import { toast } from "@/hooks/use-toast";
 
@@ -18,6 +18,50 @@ type StripeEmbeddedCheckoutProps = {
   source: "pricing" | "quick_refill";
 };
 
+type StripeMethodKey = "card" | "apple_google" | "mobile_wallets" | "more";
+
+const STRIPE_METHODS: Record<
+  StripeMethodKey,
+  {
+    icon: typeof CreditCard;
+    label: { en: string; zh: string };
+    description: { en: string; zh: string };
+  }
+> = {
+  card: {
+    icon: CreditCard,
+    label: { en: "Card", zh: "银行卡" },
+    description: {
+      en: "Best for most international payments and recurring subscriptions.",
+      zh: "最适合大多数国际卡支付和自动续费订阅。",
+    },
+  },
+  apple_google: {
+    icon: Wallet,
+    label: { en: "Apple / Google Pay", zh: "Apple / Google Pay" },
+    description: {
+      en: "Shown automatically on supported devices and browsers.",
+      zh: "会在支持的设备和浏览器中自动显示。",
+    },
+  },
+  mobile_wallets: {
+    icon: Smartphone,
+    label: { en: "Local wallets", zh: "本地钱包" },
+    description: {
+      en: "Availability depends on your region, browser, and Stripe account settings.",
+      zh: "是否可用取决于地区、浏览器和 Stripe 账户配置。",
+    },
+  },
+  more: {
+    icon: MoreHorizontal,
+    label: { en: "More", zh: "更多方式" },
+    description: {
+      en: "Stripe may surface other eligible payment methods when available.",
+      zh: "当条件满足时，Stripe 还会自动展示其他可用方式。",
+    },
+  },
+};
+
 export function StripeEmbeddedCheckoutSection({
   plan,
   locale,
@@ -27,6 +71,9 @@ export function StripeEmbeddedCheckoutSection({
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [activeMethod, setActiveMethod] = useState<StripeMethodKey>("card");
+
+  const localizedText = locale === "zh" ? "zh" : "en";
 
   useEffect(() => {
     let active = true;
@@ -104,15 +151,19 @@ export function StripeEmbeddedCheckoutSection({
   if (isLoading) {
     return (
       <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-        <div className="mb-4 flex flex-wrap items-center gap-2 text-xs text-slate-500">
-          <span className="inline-flex items-center gap-1 rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1">
-            <CreditCard className="h-3.5 w-3.5" />
-            Card
-          </span>
-          <span className="inline-flex items-center gap-1 rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1">
-            <Wallet className="h-3.5 w-3.5" />
-            Apple Pay / Google Pay
-          </span>
+        <div className="mb-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
+          {Object.entries(STRIPE_METHODS).map(([key, method]) => {
+            const Icon = method.icon;
+            return (
+              <div
+                key={key}
+                className="flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 text-sm font-medium text-slate-500"
+              >
+                <Icon className="h-4 w-4" />
+                <span>{method.label[localizedText]}</span>
+              </div>
+            );
+          })}
         </div>
         <div className="flex min-h-[280px] items-center justify-center rounded-2xl border border-dashed border-slate-200 bg-slate-50">
           <div className="flex items-center gap-3 text-sm text-slate-500">
@@ -134,18 +185,43 @@ export function StripeEmbeddedCheckoutSection({
 
   return (
     <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
-      <div className="mb-4 flex flex-wrap items-center gap-2 text-xs text-slate-500">
-        <span className="inline-flex items-center gap-1 rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1">
-          <CreditCard className="h-3.5 w-3.5" />
-          Card
-        </span>
-        <span className="inline-flex items-center gap-1 rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1">
-          <Wallet className="h-3.5 w-3.5" />
-          Apple Pay / Google Pay
-        </span>
-        <span className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1">
-          {locale === "zh" ? "其他可用方式按地区自动显示" : "Other eligible methods appear automatically"}
-        </span>
+      <div className="mb-4 space-y-3">
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+          {Object.entries(STRIPE_METHODS).map(([key, method]) => {
+            const Icon = method.icon;
+            const isActive = activeMethod === key;
+
+            return (
+              <button
+                key={key}
+                type="button"
+                onClick={() => setActiveMethod(key as StripeMethodKey)}
+                className={`flex items-center justify-center gap-2 rounded-xl border px-3 py-3 text-sm font-medium transition ${
+                  isActive
+                    ? "border-orange-200 bg-[#fff7ef] text-orange-700 shadow-sm"
+                    : "border-slate-200 bg-slate-50 text-slate-500 hover:border-slate-300 hover:bg-white"
+                }`}
+              >
+                <Icon className="h-4 w-4" />
+                <span>{method.label[localizedText]}</span>
+              </button>
+            );
+          })}
+        </div>
+
+        <div className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 text-sm text-slate-600">
+          <p className="font-medium text-slate-800">
+            {locale === "zh" ? "方式说明" : "Payment method note"}
+          </p>
+          <p className="mt-1 leading-6">
+            {STRIPE_METHODS[activeMethod].description[localizedText]}
+          </p>
+          <p className="mt-2 text-xs text-slate-500">
+            {locale === "zh"
+              ? "Stripe 会根据你的地区、设备、浏览器和账户配置自动决定最终可展示的支付方式。"
+              : "Stripe automatically decides which payment methods can be shown based on your region, device, browser, and account configuration."}
+          </p>
+        </div>
       </div>
 
       <EmbeddedCheckoutProvider stripe={stripePromise} options={{ clientSecret }}>
