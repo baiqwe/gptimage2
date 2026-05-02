@@ -2,8 +2,34 @@
 
 import { encodedRedirect } from "@/utils/utils";
 import { createClient } from "@/utils/supabase/server";
+import { createServiceRoleClient } from "@/utils/supabase/service-role";
 import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { createHash } from "crypto";
+
+const SIGNUP_LIMIT_WINDOW_MS = 24 * 60 * 60 * 1000;
+const MAX_SIGNUPS_PER_IP = 3;
+const MAX_SIGNUPS_PER_DEVICE = 3;
+const BLOCKED_SIGNUP_DOMAINS = new Set([
+  "drafterplus.nl",
+  ...(process.env.BLOCKED_SIGNUP_EMAIL_DOMAINS || "")
+    .split(",")
+    .map((item) => item.trim().toLowerCase())
+    .filter(Boolean),
+]);
+
+function getServiceRoleClientSafe() {
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    return null;
+  }
+
+  try {
+    return createServiceRoleClient();
+  } catch (error) {
+    console.error("Failed to create service-role client:", error);
+    return null;
+  }
+}
 
 function resolveLocalePrefix(referer: string | null) {
   if (!referer) return "/en";
@@ -59,6 +85,175 @@ function humanizeAuthError(message: string, locale: "en" | "zh") {
   }
 
   return message;
+}
+
+function getEmailDomain(email: string) {
+  const parts = email.toLowerCase().split("@");
+  return parts.length === 2 ? parts[1] : "";
+}
+
+function hashUserAgent(value: string | null) {
+  if (!value) return null;
+  return createHash("sha256").update(value).digest("hex");
+}
+
+async function recordSignupAttempt(params: {
+  clientIp: string | null;
+  deviceId: string | null;
+  userAgentHash: string | null;
+  emailDomain: string;
+  outcome: "blocked_ip" | "blocked_device" | "blocked_domain" | "blocked_config" | "signup_error" | "signup_success";
+  metadata?: Record<string, unknown>;
+}) {
+  try {
+    const serviceRole = getServiceRoleClientSafe();
+    if (!serviceRole) return;
+
+    await serviceRole.from("signup_attempt_logs").insert({
+      client_ip: params.clientIp,
+      device_id: params.deviceId,
+      user_agent_hash: params.userAgentHash,
+      email_domain: params.emailDomain || null,
+      outcome: params.outcome,
+      metadata: params.metadata || {},
+    });
+  } catch (error) {
+    console.error("Failed to record signup attempt:", error);
+  }
+}
+
+async function enforceSignupGuards(params: {
+  email: string;
+  clientIp: string | null;
+  deviceId: string | null;
+  userAgent: string | null;
+  locale: "en" | "zh";
+}) {
+  const emailDomain = getEmailDomain(params.email);
+  const userAgentHash = hashUserAgent(params.userAgent);
+
+  if (!emailDomain) {
+    return {
+      allowed: false,
+      emailDomain,
+      userAgentHash,
+      message:
+        params.locale === "zh"
+          ? "请输入有效的邮箱地址。"
+          : "Please enter a valid email address.",
+      outcome: "blocked_config" as const,
+    };
+  }
+
+  if (BLOCKED_SIGNUP_DOMAINS.has(emailDomain)) {
+    await recordSignupAttempt({
+      clientIp: params.clientIp,
+      deviceId: params.deviceId,
+      userAgentHash,
+      emailDomain,
+      outcome: "blocked_domain",
+      metadata: { reason: "blocked_domain" },
+    });
+
+    return {
+      allowed: false,
+      emailDomain,
+      userAgentHash,
+      message:
+        params.locale === "zh"
+          ? "当前邮箱域名暂不支持注册，请更换常用邮箱后重试。"
+          : "This email domain is not eligible for signup. Please use a different email address.",
+      outcome: "blocked_domain" as const,
+    };
+  }
+
+  const serviceRole = getServiceRoleClientSafe();
+  if (!serviceRole) {
+    return {
+      allowed: true,
+      emailDomain,
+      userAgentHash,
+      message: null,
+      outcome: null,
+    };
+  }
+
+  const since = new Date(Date.now() - SIGNUP_LIMIT_WINDOW_MS).toISOString();
+  try {
+    if (params.clientIp) {
+      const { count, error } = await serviceRole
+        .from("signup_attempt_logs")
+        .select("*", { count: "exact", head: true })
+        .eq("client_ip", params.clientIp)
+        .gte("attempted_at", since);
+
+      if (error) {
+        console.error("Signup IP guard query failed:", error);
+      } else if ((count || 0) >= MAX_SIGNUPS_PER_IP) {
+        await recordSignupAttempt({
+          clientIp: params.clientIp,
+          deviceId: params.deviceId,
+          userAgentHash,
+          emailDomain,
+          outcome: "blocked_ip",
+          metadata: { reason: "ip_limit", count, window_hours: 24 },
+        });
+
+        return {
+          allowed: false,
+          emailDomain,
+          userAgentHash,
+          message:
+            params.locale === "zh"
+              ? "当前网络环境的注册次数已达上限，请 24 小时后再试。"
+              : "This network has reached the signup limit. Please try again in 24 hours.",
+          outcome: "blocked_ip" as const,
+        };
+      }
+    }
+
+    if (params.deviceId) {
+      const { count, error } = await serviceRole
+        .from("signup_attempt_logs")
+        .select("*", { count: "exact", head: true })
+        .eq("device_id", params.deviceId)
+        .gte("attempted_at", since);
+
+      if (error) {
+        console.error("Signup device guard query failed:", error);
+      } else if ((count || 0) >= MAX_SIGNUPS_PER_DEVICE) {
+        await recordSignupAttempt({
+          clientIp: params.clientIp,
+          deviceId: params.deviceId,
+          userAgentHash,
+          emailDomain,
+          outcome: "blocked_device",
+          metadata: { reason: "device_limit", count, window_hours: 24 },
+        });
+
+        return {
+          allowed: false,
+          emailDomain,
+          userAgentHash,
+          message:
+            params.locale === "zh"
+              ? "当前设备的注册次数已达上限，请 24 小时后再试。"
+              : "This device has reached the signup limit. Please try again in 24 hours.",
+          outcome: "blocked_device" as const,
+        };
+      }
+    }
+  } catch (error) {
+    console.error("Signup guard enforcement failed:", error);
+  }
+
+  return {
+    allowed: true,
+    emailDomain,
+    userAgentHash,
+    message: null,
+    outcome: null,
+  };
 }
 
 async function verifyTurnstileToken({
@@ -119,6 +314,7 @@ export const signUpAction = async (formData: FormData) => {
   const email = formData.get("email")?.toString();
   const password = formData.get("password")?.toString();
   const turnstileToken = formData.get("turnstile_token")?.toString();
+  const signupDeviceId = formData.get("signup_device_id")?.toString() || null;
   const requestedNextPath = formData.get("next")?.toString();
   const supabase = await createClient();
   const headersList = await headers();
@@ -126,12 +322,32 @@ export const signUpAction = async (formData: FormData) => {
   const localePrefix = resolveLocalePrefix(headersList.get("referer"));
   const locale = localePrefix === "/zh" ? "zh" : "en";
   const nextPath = resolveSafeNextPath(requestedNextPath, localePrefix);
+  const clientIp = headersList.get("x-forwarded-for")?.split(",")[0]?.trim()
+    || headersList.get("x-real-ip")
+    || null;
+  const userAgent = headersList.get("user-agent");
 
   if (!email || !password) {
     return encodedRedirect(
       "error",
       `${localePrefix}/sign-up`,
       locale === "zh" ? "请输入邮箱和密码。" : "Email and password are required."
+    );
+  }
+
+  const guardResult = await enforceSignupGuards({
+    email,
+    clientIp,
+    deviceId: signupDeviceId,
+    userAgent,
+    locale,
+  });
+
+  if (!guardResult.allowed) {
+    return encodedRedirect(
+      "error",
+      `${localePrefix}/sign-up`,
+      guardResult.message || (locale === "zh" ? "暂时无法完成注册，请稍后再试。" : "Signup is temporarily unavailable. Please try again.")
     );
   }
 
@@ -161,6 +377,14 @@ export const signUpAction = async (formData: FormData) => {
   });
 
   if (error) {
+    await recordSignupAttempt({
+      clientIp,
+      deviceId: signupDeviceId,
+      userAgentHash: guardResult.userAgentHash,
+      emailDomain: guardResult.emailDomain,
+      outcome: "signup_error",
+      metadata: { error: error.message },
+    });
     console.error(error.code + " " + error.message);
     return encodedRedirect(
       "error",
@@ -168,6 +392,18 @@ export const signUpAction = async (formData: FormData) => {
       humanizeAuthError(error.message, locale)
     );
   }
+
+  await recordSignupAttempt({
+    clientIp,
+    deviceId: signupDeviceId,
+    userAgentHash: guardResult.userAgentHash,
+    emailDomain: guardResult.emailDomain,
+    outcome: "signup_success",
+    metadata: {
+      has_session: Boolean(data.session),
+      user_id: data.user?.id || null,
+    },
+  });
 
   if (data.session) {
     const cookieStore = await cookies();

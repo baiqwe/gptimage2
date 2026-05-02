@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { TurnstileWidget } from "@/components/auth/turnstile-widget";
+import { SignupDeviceField } from "@/components/auth/signup-device-field";
 import Link from "next/link";
 import { createClient } from "@/utils/supabase/server";
 import { encodedRedirect } from "@/utils/utils";
@@ -94,6 +95,7 @@ export default async function SignUp(props: {
       <div className="grid gap-6">
         <form className="grid gap-4">
           <input type="hidden" name="next" value={nextPath} />
+          <SignupDeviceField />
           <div className="grid gap-2">
             <Label htmlFor="email">{copy.email}</Label>
             <Input
