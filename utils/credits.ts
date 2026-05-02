@@ -28,9 +28,14 @@ export async function getUserCredits(userId: string) {
                     .insert({
                         user_id: userId,
                         email: user.email,
-                        credits: 30, // Default signup bonus
+                        credits: 0,
                         creem_customer_id: `auto_${userId}`,
-                        metadata: { source: 'auto_recovery' }
+                        metadata: {
+                            source: 'auto_recovery',
+                            initial_credits: 0,
+                            recovered_at: new Date().toISOString(),
+                            note: 'Recovered missing customer without reissuing signup bonus'
+                        }
                     })
                     .select()
                     .single();
