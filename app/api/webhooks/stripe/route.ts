@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import { getStripeServerClient } from "@/utils/stripe/server";
 import {
+  ensureLocalCustomerForUser,
   createOrUpdateStripeSubscription,
   markCustomerPaidAccess,
   upsertStripeCustomerForUser,
@@ -84,12 +85,21 @@ async function handleCheckoutSessionCompleted(session: StripeCheckoutSession) {
     throw new Error("Stripe checkout session is missing metadata.user_id");
   }
 
-  if (!session.customer || typeof session.customer !== "string") {
-    throw new Error("Stripe checkout session is missing customer id");
-  }
+  const stripeCustomerId =
+    typeof session.customer === "string" ? session.customer : null;
+  const fallbackEmail =
+    session.customer_email ||
+    session.customer_details?.email ||
+    session.metadata?.user_email ||
+    undefined;
 
-  const stripeCustomer = await getStripeCustomer(session.customer);
-  const customerId = await upsertStripeCustomerForUser(stripeCustomer, userId);
+  const customerId = stripeCustomerId
+    ? await upsertStripeCustomerForUser(
+        await getStripeCustomer(stripeCustomerId),
+        userId
+      )
+    : await ensureLocalCustomerForUser(userId, fallbackEmail);
+
   await markCustomerPaidAccess(customerId, "stripe");
 
   if (session.mode === "subscription" && session.subscription && typeof session.subscription === "string") {

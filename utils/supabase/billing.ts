@@ -69,6 +69,42 @@ export async function upsertStripeCustomerForUser(
   return insertedCustomer.id as string;
 }
 
+export async function ensureLocalCustomerForUser(userId: string, email?: string) {
+  const supabase = createServiceRoleClient();
+
+  const { data: existingCustomer, error: lookupError } = await supabase
+    .from("customers")
+    .select("id,email")
+    .eq("user_id", userId)
+    .single();
+
+  if (lookupError && lookupError.code !== "PGRST116") {
+    throw lookupError;
+  }
+
+  if (existingCustomer) {
+    return existingCustomer.id as string;
+  }
+
+  const { data: insertedCustomer, error: insertError } = await supabase
+    .from("customers")
+    .insert({
+      user_id: userId,
+      creem_customer_id: `auto_${userId}`,
+      credits: 0,
+      email: email || "no-email@placeholder.com",
+      metadata: {
+        source: "stripe_webhook_autocreate",
+      },
+      updated_at: new Date().toISOString(),
+    })
+    .select("id")
+    .single();
+
+  if (insertError) throw insertError;
+  return insertedCustomer.id as string;
+}
+
 export async function markCustomerPaidAccess(
   customerId: string,
   provider: "stripe" | "creem"

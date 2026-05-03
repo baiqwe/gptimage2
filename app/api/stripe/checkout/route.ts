@@ -100,7 +100,13 @@ export async function POST(request: Request) {
               metadata,
             },
           }
-        : {}),
+        : {
+            ...(customer?.stripe_customer_id
+              ? {}
+              : {
+                  customer_creation: "always" as const,
+                }),
+          }),
     });
 
     if (!session.client_secret) {
