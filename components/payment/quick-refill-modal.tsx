@@ -24,7 +24,8 @@ export function QuickRefillModal({ isOpen, onClose, currentPath }: QuickRefillMo
 
     return (
         <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-            <DialogContent className="sm:max-w-md">
+            <DialogContent className="w-[min(96vw,1100px)] max-h-[92vh] overflow-y-auto p-0 sm:max-w-[1100px]">
+                <div className="p-6 sm:p-7">
                 <DialogHeader>
                     <DialogTitle className="flex items-center gap-2 text-xl">
                         <span className="text-2xl">⚡️</span>
@@ -35,8 +36,21 @@ export function QuickRefillModal({ isOpen, onClose, currentPath }: QuickRefillMo
                     </DialogDescription>
                 </DialogHeader>
 
-                <div className="grid gap-4 py-4">
-                    <div className="grid gap-3">
+                <div className="grid gap-5 py-4 lg:grid-cols-[320px_minmax(0,1fr)] lg:items-start">
+                    <div className="grid gap-3 rounded-2xl border border-orange-100 bg-[linear-gradient(135deg,#fffaf4_0%,#ffffff_100%)] p-4 shadow-sm">
+                        <div>
+                            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">
+                                {locale === "zh" ? "推荐套餐" : "Recommended plans"}
+                            </p>
+                            <h3 className="mt-2 text-lg font-bold text-slate-900">
+                                {locale === "zh" ? "积分不足，继续创作" : "Top up and keep creating"}
+                            </h3>
+                            <p className="mt-1 text-sm text-slate-600">
+                                {locale === "zh"
+                                    ? "选择适合你的积分包或订阅方案，右侧会展示统一的支付面板。"
+                                    : "Choose a credits pack or subscription on the left and complete payment in the unified checkout panel."}
+                            </p>
+                        </div>
                         {ALL_PLANS.map((plan) => (
                             <button
                                 key={plan.id}
@@ -73,12 +87,15 @@ export function QuickRefillModal({ isOpen, onClose, currentPath }: QuickRefillMo
                         ))}
                     </div>
 
-                    <PaymentProviderPanel
-                        plan={selectedPlan}
-                        locale={locale}
-                        returnPath={returnPath}
-                        source="quick_refill"
-                    />
+                    <div className="min-w-0">
+                        <PaymentProviderPanel
+                            plan={selectedPlan}
+                            locale={locale}
+                            returnPath={returnPath}
+                            source="quick_refill"
+                        />
+                    </div>
+                </div>
                 </div>
             </DialogContent>
         </Dialog>

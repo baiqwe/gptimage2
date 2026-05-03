@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { loadStripe } from "@stripe/stripe-js";
 import { EmbeddedCheckout, EmbeddedCheckoutProvider } from "@stripe/react-stripe-js";
-import { Loader2, CreditCard, Wallet, Smartphone, MoreHorizontal } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import type { PricingPlan } from "@/config/pricing";
 import { toast } from "@/hooks/use-toast";
 
@@ -104,31 +104,11 @@ export function StripeEmbeddedCheckoutSection({
   if (isLoading) {
     return (
       <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-        <div className="mb-4 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">
-          <div className="flex flex-wrap items-center gap-3 text-slate-700">
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-2.5 py-1 font-medium">
-              <CreditCard className="h-4 w-4" />
-              {locale === "zh" ? "银行卡" : "Card"}
-            </span>
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-2.5 py-1 font-medium">
-              <Wallet className="h-4 w-4" />
-              Apple Pay / Google Pay
-            </span>
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-2.5 py-1 font-medium">
-              <Smartphone className="h-4 w-4" />
-              {locale === "zh" ? "本地钱包" : "Local wallets"}
-            </span>
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-2.5 py-1 font-medium">
-              <MoreHorizontal className="h-4 w-4" />
-              {locale === "zh" ? "更多方式" : "More"}
-            </span>
-          </div>
-          <p className="mt-2 text-xs leading-6 text-slate-500">
-            {locale === "zh"
-              ? "Stripe 会根据你的地区、设备、浏览器和账户配置自动展示可用的支付方式。"
-              : "Stripe automatically shows the payment methods available for your region, device, browser, and account configuration."}
-          </p>
-        </div>
+        <p className="mb-4 text-sm leading-6 text-slate-600">
+          {locale === "zh"
+            ? "Stripe 会根据你的地区、设备、浏览器和账户配置自动展示本次可用的支付方式，例如银行卡、Apple Pay、Google Pay 以及其他本地钱包。"
+            : "Stripe automatically shows the payment methods available for this checkout based on your region, device, browser, and account setup, including cards, Apple Pay, Google Pay, and local wallets when eligible."}
+        </p>
         <div className="flex min-h-[280px] items-center justify-center rounded-2xl border border-dashed border-slate-200 bg-slate-50">
           <div className="flex items-center gap-3 text-sm text-slate-500">
             <Loader2 className="h-4 w-4 animate-spin" />
@@ -149,31 +129,11 @@ export function StripeEmbeddedCheckoutSection({
 
   return (
     <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
-      <div className="mb-4 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">
-        <div className="flex flex-wrap items-center gap-3 text-slate-700">
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-2.5 py-1 font-medium">
-            <CreditCard className="h-4 w-4" />
-            {locale === "zh" ? "银行卡" : "Card"}
-          </span>
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-2.5 py-1 font-medium">
-            <Wallet className="h-4 w-4" />
-            Apple Pay / Google Pay
-          </span>
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-2.5 py-1 font-medium">
-            <Smartphone className="h-4 w-4" />
-            {locale === "zh" ? "本地钱包" : "Local wallets"}
-          </span>
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-2.5 py-1 font-medium">
-            <MoreHorizontal className="h-4 w-4" />
-            {locale === "zh" ? "更多方式" : "More"}
-          </span>
-        </div>
-        <p className="mt-2 text-xs leading-6 text-slate-500">
-          {locale === "zh"
-            ? "Stripe 会根据你的地区、设备、浏览器和账户配置自动展示可用的支付方式。页面下方真正出现的方式，才是当前这次支付可用的渠道。"
-            : "Stripe automatically shows the payment methods available for your region, device, browser, and account configuration. The methods shown below are the ones actually available for this checkout."}
-        </p>
-      </div>
+      <p className="mb-4 text-sm leading-6 text-slate-600">
+        {locale === "zh"
+          ? "Stripe 会根据你的地区、设备、浏览器和账户配置自动展示本次可用的支付方式。下方实际显示的方式，就是当前这次结账可以使用的渠道。"
+          : "Stripe automatically shows the payment methods available for this checkout based on your region, device, browser, and account setup. The methods shown below are the ones actually available right now."}
+      </p>
 
       <EmbeddedCheckoutProvider stripe={stripePromise} options={{ clientSecret }}>
         <EmbeddedCheckout />

@@ -23,7 +23,7 @@ export function PaymentDialog({
 }: PaymentDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[92vh] overflow-y-auto sm:max-w-[920px]">
+      <DialogContent className="w-[min(96vw,1100px)] max-h-[92vh] overflow-y-auto sm:max-w-[1100px]">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold text-slate-900">
             {locale === "zh" ? "选择支付方式" : "Choose a payment method"}
