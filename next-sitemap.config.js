@@ -6,9 +6,9 @@ const { PROMPT_CATEGORY_SLUGS } = require('./config/prompts-data.ts');
 function getAlternateRefs(siteUrl, loc) {
     const pathWithoutLocale = loc.replace(/^\/(en|zh)/, '') || '';
     return [
-        { href: `${siteUrl}/en${pathWithoutLocale}`, hreflang: 'en' },
-        { href: `${siteUrl}/zh${pathWithoutLocale}`, hreflang: 'zh' },
-        { href: `${siteUrl}/en${pathWithoutLocale}`, hreflang: 'x-default' },
+        { href: `${siteUrl}/en${pathWithoutLocale}`, hreflang: 'en', hrefIsAbsolute: true },
+        { href: `${siteUrl}/zh${pathWithoutLocale}`, hreflang: 'zh', hrefIsAbsolute: true },
+        { href: `${siteUrl}/en${pathWithoutLocale}`, hreflang: 'x-default', hrefIsAbsolute: true },
     ];
 }
 
