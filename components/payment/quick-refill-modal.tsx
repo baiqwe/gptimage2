@@ -4,9 +4,9 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Button } from "@/components/ui/button";
 import { useTranslations } from "next-intl";
 import { Zap } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
-import { ALL_PLANS, PLAN_MINI, PLAN_PRO_MONTHLY, PricingPlan } from "@/config/pricing";
+import { ALL_PLANS, PLAN_PRO_MONTHLY, PLAN_STARTER, PricingPlan } from "@/config/pricing";
 import { PaymentProviderPanel } from "@/components/payment/payment-provider-panel";
 
 interface QuickRefillModalProps {
@@ -19,8 +19,14 @@ export function QuickRefillModal({ isOpen, onClose, currentPath }: QuickRefillMo
     const t = useTranslations('Pricing');
     const pathname = usePathname();
     const locale = pathname?.split("/")[1] === "zh" ? "zh" : "en";
-    const [selectedPlan, setSelectedPlan] = useState<PricingPlan>(PLAN_PRO_MONTHLY);
+    const [selectedPlan, setSelectedPlan] = useState<PricingPlan>(PLAN_STARTER);
     const returnPath = currentPath || pathname || `/${locale}/create`;
+
+    useEffect(() => {
+        if (isOpen) {
+            setSelectedPlan(PLAN_STARTER);
+        }
+    }, [isOpen]);
 
     return (
         <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
