@@ -130,11 +130,9 @@ const SAMPLE_PREVIEW_SLIDES = [
 ] as const;
 
 const MAX_REFERENCE_FILE_SIZE = 20 * 1024 * 1024;
-const REFERENCE_BUCKET_NAME = "generation-references";
 
 interface SignedReferenceUploadPayload {
-    bucket: string;
-    token: string;
+    signedUrl: string;
     path: string;
     url: string;
 }
@@ -201,11 +199,6 @@ export default function HomeHeroGenerator({ user, heroHeader }: HomeHeroGenerato
     };
 
     const uploadReferenceDirectly = async (file: File) => {
-        const supabase = createClient();
-        if (!supabase) {
-            throw new Error("Storage upload is not configured");
-        }
-
         const signedUploadResponse = await fetch("/api/ai/upload-reference", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -221,28 +214,33 @@ export default function HomeHeroGenerator({ user, heroHeader }: HomeHeroGenerato
             throw new Error(signedUploadData.error || "Failed to prepare upload");
         }
 
-        if (!signedUploadData.path || !signedUploadData.token) {
-            throw new Error("Upload token is missing");
+        if (!signedUploadData.path || !signedUploadData.signedUrl) {
+            throw new Error("Upload URL is missing");
         }
 
-        const { error: uploadError } = await supabase.storage
-            .from(signedUploadData.bucket || REFERENCE_BUCKET_NAME)
-            .uploadToSignedUrl(
-                signedUploadData.path,
-                signedUploadData.token,
-                file,
-                {
-                    cacheControl: "31536000",
-                    contentType: file.type,
-                }
-            );
+        const uploadBody = new FormData();
+        uploadBody.append("cacheControl", "31536000");
+        uploadBody.append("", file);
 
-        if (uploadError) {
-            throw uploadError;
+        const uploadResponse = await fetch(signedUploadData.signedUrl, {
+            method: "PUT",
+            body: uploadBody,
+            headers: {
+                "x-upsert": "false",
+            },
+        });
+
+        if (!uploadResponse.ok) {
+            const uploadText = await uploadResponse.text();
+            throw new Error(uploadText || "Direct upload failed");
+        }
+
+        if (!signedUploadData.url) {
+            throw new Error("Public URL is missing");
         }
 
         return {
-            url: signedUploadData.url || supabase.storage.from(REFERENCE_BUCKET_NAME).getPublicUrl(signedUploadData.path).data.publicUrl,
+            url: signedUploadData.url,
             path: signedUploadData.path,
         };
     };

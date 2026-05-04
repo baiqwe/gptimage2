@@ -105,6 +105,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: true,
       bucket: BUCKET_NAME,
+      signedUrl: signedUpload.signedUrl,
       token: signedUpload.token,
       url: data.publicUrl,
       path: objectPath,
