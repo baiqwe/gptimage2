@@ -22,6 +22,13 @@ const KIE_POLL_INTERVAL_MS = 2500;
 const KIE_TEXT_TO_IMAGE_TIMEOUT_MS = 90000;
 const KIE_IMAGE_TO_IMAGE_TIMEOUT_MS = 165000;
 const KIE_HIGH_RES_TEXT_TIMEOUT_MS = 170000;
+const KIE_MAX_RETRY_ATTEMPTS = 3;
+const KIE_RETRYABLE_ERROR_PATTERNS = [
+    "Internal Error, Please try again later.",
+    "internal error",
+    "server error",
+    "please try again later",
+] as const;
 
 interface KieCreateTaskResponse {
     code: number;
@@ -179,6 +186,41 @@ async function generateWithKie({
     throw new Error(
         `Kie generation timed out while waiting for task completion (taskId: ${taskId}, resolution: ${resolution}, timeoutMs: ${pollTimeoutMs})`
     );
+}
+
+function isRetryableKieError(error: unknown) {
+    const message = error instanceof Error ? error.message : String(error || "");
+    const normalized = message.toLowerCase();
+    return KIE_RETRYABLE_ERROR_PATTERNS.some((pattern) =>
+        normalized.includes(pattern.toLowerCase())
+    );
+}
+
+async function generateWithKieRetry(
+    params: Parameters<typeof generateWithKie>[0]
+) {
+    let lastError: unknown;
+
+    for (let attempt = 1; attempt <= KIE_MAX_RETRY_ATTEMPTS; attempt += 1) {
+        try {
+            return await generateWithKie(params);
+        } catch (error) {
+            lastError = error;
+
+            if (!isRetryableKieError(error) || attempt === KIE_MAX_RETRY_ATTEMPTS) {
+                throw error;
+            }
+
+            const retryDelayMs = 1500 * attempt;
+            console.warn(
+                `Retrying Kie generation after transient provider error (attempt ${attempt}/${KIE_MAX_RETRY_ATTEMPTS}):`,
+                error
+            );
+            await sleep(retryDelayMs);
+        }
+    }
+
+    throw lastError instanceof Error ? lastError : new Error("Kie generation failed after retries");
 }
 
 async function generateWithOpenAI({
@@ -389,7 +431,7 @@ export async function POST(request: NextRequest) {
             console.log("Count:", count);
 
             const generationResult = provider === "kie"
-                ? await generateWithKie({
+                ? await generateWithKieRetry({
                     prompt: finalPrompt,
                     aspectRatio: requestedAspectRatio,
                     resolution: requestedResolution,

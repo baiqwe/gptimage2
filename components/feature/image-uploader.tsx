@@ -13,6 +13,7 @@ interface ImageUploaderProps {
 export default function ImageUploader({ onImageSelect, onHeicConvert }: ImageUploaderProps) {
     const t = useTranslations('uploader');
     const [error, setError] = useState<string>('');
+    const maxSize = 20 * 1024 * 1024;
 
     const onDrop = useCallback(async (acceptedFiles: File[]) => {
         setError('');
@@ -20,8 +21,6 @@ export default function ImageUploader({ onImageSelect, onHeicConvert }: ImageUpl
         if (acceptedFiles.length === 0) return;
 
         const file = acceptedFiles[0];
-        const maxSize = 10 * 1024 * 1024; // 10MB
-
         if (file.size > maxSize) {
             setError(t('error_size'));
             return;
@@ -63,7 +62,7 @@ export default function ImageUploader({ onImageSelect, onHeicConvert }: ImageUpl
             'image/*': ['.png', '.jpg', '.jpeg', '.webp', '.heic']
         },
         multiple: false,
-        maxSize: 10 * 1024 * 1024
+        maxSize
     });
 
     return (

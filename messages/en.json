@@ -36,7 +36,7 @@
         "browse": "Browse Files",
         "processing": "Generating...",
         "error_invalid": "Invalid file type. Please upload an image.",
-        "error_size": "File too large. Maximum size is 10MB."
+        "error_size": "File too large. Maximum size is 20MB."
     },
     "editor": {
         "mode_label": "Generation Mode:",

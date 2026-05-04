@@ -6,7 +6,7 @@ export const runtime = "nodejs";
 export const maxDuration = 30;
 
 const BUCKET_NAME = "generation-references";
-const MAX_FILE_SIZE = 10 * 1024 * 1024;
+const MAX_FILE_SIZE = 20 * 1024 * 1024;
 const ALLOWED_TYPES = new Set(["image/jpeg", "image/png", "image/webp"]);
 
 async function ensureBucketExists() {
@@ -23,6 +23,12 @@ async function ensureBucketExists() {
     if (error) {
       throw error;
     }
+  } else {
+    await admin.storage.updateBucket(BUCKET_NAME, {
+      public: true,
+      fileSizeLimit: MAX_FILE_SIZE,
+      allowedMimeTypes: Array.from(ALLOWED_TYPES),
+    });
   }
 
   return admin;
@@ -50,50 +56,56 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const formData = await request.formData();
-    const file = formData.get("file");
+    const body = await request.json();
+    const fileName = typeof body?.fileName === "string" ? body.fileName : "";
+    const contentType = typeof body?.contentType === "string" ? body.contentType : "";
+    const fileSize = typeof body?.fileSize === "number" ? body.fileSize : NaN;
+    const extension = fileName.split(".").pop()?.toLowerCase() || "png";
 
-    if (!(file instanceof File)) {
+    if (!fileName) {
       return NextResponse.json(
-        { error: "Please upload an image file", code: "MISSING_FILE" },
+        { error: "Please choose an image file", code: "MISSING_FILE" },
         { status: 400 }
       );
     }
 
-    if (!ALLOWED_TYPES.has(file.type)) {
+    if (!ALLOWED_TYPES.has(contentType)) {
       return NextResponse.json(
         { error: "Unsupported image type. Use JPG, PNG, or WebP.", code: "INVALID_FILE_TYPE" },
         { status: 400 }
       );
     }
 
-    if (file.size > MAX_FILE_SIZE) {
+    if (!Number.isFinite(fileSize) || fileSize <= 0) {
       return NextResponse.json(
-        { error: "Image too large. Maximum size is 10MB.", code: "FILE_TOO_LARGE" },
+        { error: "Invalid file size", code: "INVALID_FILE_SIZE" },
+        { status: 400 }
+      );
+    }
+
+    if (fileSize > MAX_FILE_SIZE) {
+      return NextResponse.json(
+        { error: "Image too large. Maximum size is 20MB.", code: "FILE_TOO_LARGE" },
         { status: 400 }
       );
     }
 
     const admin = await ensureBucketExists();
-    const extension = file.name.split(".").pop()?.toLowerCase() || "png";
     const objectPath = `${user.id}/${Date.now()}-${crypto.randomUUID()}.${extension}`;
-
-    const { error: uploadError } = await admin.storage
+    const { data: signedUpload, error: signedUploadError } = await admin.storage
       .from(BUCKET_NAME)
-      .upload(objectPath, file, {
-        contentType: file.type,
-        cacheControl: "31536000",
-        upsert: false,
-      });
+      .createSignedUploadUrl(objectPath);
 
-    if (uploadError) {
-      throw uploadError;
+    if (signedUploadError || !signedUpload?.token) {
+      throw signedUploadError || new Error("Failed to create signed upload URL");
     }
 
     const { data } = admin.storage.from(BUCKET_NAME).getPublicUrl(objectPath);
 
     return NextResponse.json({
       success: true,
+      bucket: BUCKET_NAME,
+      token: signedUpload.token,
       url: data.publicUrl,
       path: objectPath,
     });

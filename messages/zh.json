@@ -36,7 +36,7 @@
         "browse": "浏览文件",
         "processing": "生成中...",
         "error_invalid": "无效的文件类型。请上传图片。",
-        "error_size": "文件过大。最大 10MB。"
+        "error_size": "文件过大。最大 20MB。"
     },
     "editor": {
         "mode_label": "生成模式：",

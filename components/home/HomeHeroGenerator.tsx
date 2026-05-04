@@ -129,6 +129,16 @@ const SAMPLE_PREVIEW_SLIDES = [
     },
 ] as const;
 
+const MAX_REFERENCE_FILE_SIZE = 20 * 1024 * 1024;
+const REFERENCE_BUCKET_NAME = "generation-references";
+
+interface SignedReferenceUploadPayload {
+    bucket: string;
+    token: string;
+    path: string;
+    url: string;
+}
+
 interface HomeHeroGeneratorProps {
     user?: any;
     heroHeader?: ReactNode;
@@ -163,6 +173,23 @@ export default function HomeHeroGenerator({ user, heroHeader }: HomeHeroGenerato
     const canUseHighResolution = Boolean(credits?.has_paid_access);
     const autoResumePendingRef = useRef(false);
 
+    const waitForPaidAccessSync = async (requiresPaidAccess: boolean) => {
+        const latestCredits = await refetchCredits();
+        if (!requiresPaidAccess || latestCredits?.has_paid_access) {
+            return latestCredits;
+        }
+
+        for (let attempt = 0; attempt < 5; attempt += 1) {
+            await new Promise((resolve) => window.setTimeout(resolve, 1500));
+            const nextCredits = await refetchCredits();
+            if (nextCredits?.has_paid_access) {
+                return nextCredits;
+            }
+        }
+
+        return latestCredits;
+    };
+
     const readResponseJson = async (response: Response) => {
         const text = await response.text();
         if (!text) return {};
@@ -171,6 +198,53 @@ export default function HomeHeroGenerator({ user, heroHeader }: HomeHeroGenerato
         } catch {
             throw new Error(text || "Unexpected server response");
         }
+    };
+
+    const uploadReferenceDirectly = async (file: File) => {
+        const supabase = createClient();
+        if (!supabase) {
+            throw new Error("Storage upload is not configured");
+        }
+
+        const signedUploadResponse = await fetch("/api/ai/upload-reference", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                fileName: file.name,
+                contentType: file.type,
+                fileSize: file.size,
+            }),
+        });
+
+        const signedUploadData = await readResponseJson(signedUploadResponse) as Partial<SignedReferenceUploadPayload> & { error?: string };
+        if (!signedUploadResponse.ok) {
+            throw new Error(signedUploadData.error || "Failed to prepare upload");
+        }
+
+        if (!signedUploadData.path || !signedUploadData.token) {
+            throw new Error("Upload token is missing");
+        }
+
+        const { error: uploadError } = await supabase.storage
+            .from(signedUploadData.bucket || REFERENCE_BUCKET_NAME)
+            .uploadToSignedUrl(
+                signedUploadData.path,
+                signedUploadData.token,
+                file,
+                {
+                    cacheControl: "31536000",
+                    contentType: file.type,
+                }
+            );
+
+        if (uploadError) {
+            throw uploadError;
+        }
+
+        return {
+            url: signedUploadData.url || supabase.storage.from(REFERENCE_BUCKET_NAME).getPublicUrl(signedUploadData.path).data.publicUrl,
+            path: signedUploadData.path,
+        };
     };
 
     useEffect(() => {
@@ -316,34 +390,56 @@ export default function HomeHeroGenerator({ user, heroHeader }: HomeHeroGenerato
 
         const query = new URLSearchParams(window.location.search);
         if (query.get("checkout") === "success") {
-            const savedState = localStorage.getItem("pending_gpt_image_2_generation");
-            if (savedState) {
-                try {
-                    const parsed = JSON.parse(savedState);
-                    setPrompt(parsed.prompt || defaultPrompt);
-                    setGenerationMode(parsed.generationMode || "text-to-image");
-                    setAspectRatio(parsed.aspectRatio || "auto");
-                    setResolution(parsed.resolution || "1K");
-                    setReferenceImages(Array.isArray(parsed.referenceImages) ? parsed.referenceImages : []);
-                    localStorage.removeItem("pending_gpt_image_2_generation");
+            const resumeAfterCheckout = async () => {
+                const savedState = localStorage.getItem("pending_gpt_image_2_generation");
+                let restoredResolution: ResolutionOption = "1K";
 
-                    toast({
-                        title: locale === "zh" ? "支付成功！" : "Payment Successful!",
-                        description: locale === "zh"
-                            ? "积分已添加，继续您的创作..."
-                            : "Credits added. Resuming your creation...",
-                        className: "bg-green-500 text-white border-none"
-                    });
-
-                    setTimeout(() => {
-                        handleGenerate(true);
-                    }, 1000);
-                } catch (restoreError) {
-                    console.error("Failed to restore generation state", restoreError);
+                if (savedState) {
+                    try {
+                        const parsed = JSON.parse(savedState);
+                        restoredResolution = parsed.resolution || "1K";
+                        setPrompt(parsed.prompt || defaultPrompt);
+                        setGenerationMode(parsed.generationMode || "text-to-image");
+                        setAspectRatio(parsed.aspectRatio || "auto");
+                        setResolution(restoredResolution);
+                        setReferenceImages(Array.isArray(parsed.referenceImages) ? parsed.referenceImages : []);
+                        localStorage.removeItem("pending_gpt_image_2_generation");
+                    } catch (restoreError) {
+                        console.error("Failed to restore generation state", restoreError);
+                    }
                 }
-            }
 
-            refetchCredits();
+                toast({
+                    title: locale === "zh" ? "支付成功！" : "Payment Successful!",
+                    description: locale === "zh"
+                        ? "正在同步积分和高清权限..."
+                        : "Syncing credits and high-resolution access...",
+                    className: "bg-green-500 text-white border-none"
+                });
+
+                const latestCredits = await waitForPaidAccessSync(restoredResolution !== "1K");
+
+                if (restoredResolution !== "1K" && !latestCredits?.has_paid_access) {
+                    setResolution("1K");
+                    toast({
+                        title: locale === "zh" ? "权益同步稍慢" : "Access sync is still in progress",
+                        description: locale === "zh"
+                            ? "付款已成功，但高清权限还没同步完成。请稍等几秒再试一次。"
+                            : "Payment succeeded, but high-resolution access has not synced yet. Please try again in a few seconds.",
+                    });
+                    return;
+                }
+
+                if (restoredResolution !== "1K") {
+                    setResolution(restoredResolution);
+                }
+
+                setTimeout(() => {
+                    handleGenerate(true);
+                }, 300);
+            };
+
+            void resumeAfterCheckout();
             window.history.replaceState({}, document.title, window.location.pathname);
         }
 
@@ -479,19 +575,7 @@ export default function HomeHeroGenerator({ user, heroHeader }: HomeHeroGenerato
                 const uploadedImages: ReferenceImage[] = [];
 
                 for (const pendingImage of pendingReferenceFiles) {
-                    const formData = new FormData();
-                    formData.append("file", pendingImage.file);
-
-                    const response = await fetch("/api/ai/upload-reference", {
-                        method: "POST",
-                        body: formData,
-                    });
-
-                    const data = await readResponseJson(response);
-                    if (!response.ok) {
-                        throw new Error(data?.error || "Upload failed");
-                    }
-
+                    const data = await uploadReferenceDirectly(pendingImage.file);
                     uploadedImages.push({
                         url: data.url,
                         name: pendingImage.name,
@@ -578,6 +662,16 @@ export default function HomeHeroGenerator({ user, heroHeader }: HomeHeroGenerato
     const handleReferenceUpload = async (files?: FileList | File[]) => {
         const selectedFiles = Array.from(files || []).slice(0, 10 - referenceImages.length);
         if (selectedFiles.length === 0) return;
+
+        const oversizedFile = selectedFiles.find((file) => file.size > MAX_REFERENCE_FILE_SIZE);
+        if (oversizedFile) {
+            setError(
+                locale === "zh"
+                    ? `图片 ${oversizedFile.name} 超过 20MB，请压缩后再上传`
+                    : `Image ${oversizedFile.name} exceeds the 20MB limit. Please compress it before uploading.`
+            );
+            return;
+        }
 
         setIsUploadingReference(true);
         setError(null);

@@ -18,7 +18,7 @@ interface UseCreditsResult {
   credits: Credits | null;
   loading: boolean;
   error: string | null;
-  refetchCredits: () => Promise<void>;
+  refetchCredits: () => Promise<Credits | null>;
   spendCredits: (amount: number, operation?: string) => Promise<boolean>;
 }
 
@@ -33,12 +33,12 @@ export function useCredits(): UseCreditsResult {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchCredits = async () => {
+  const fetchCredits = async (): Promise<Credits | null> => {
     if (!user) {
       setCredits(null);
       setLoading(false);
       setError(null);
-      return;
+      return null;
     }
 
     try {
@@ -53,13 +53,14 @@ export function useCredits(): UseCreditsResult {
         if (response.status === 401) {
           setCredits(null);
           setError(null); // Don't show error for unauthenticated users
-          return;
+          return null;
         }
         throw new Error(data.error || 'Failed to fetch credits');
       }
 
       setCredits(data.credits);
       broadcastCreditsUpdate(data.credits);
+      return data.credits;
     } catch (err) {
       // Only log errors that aren't auth-related
       if (err instanceof Error && !err.message.includes('Unauthorized') && !err.message.includes('Failed to fetch')) {
@@ -68,6 +69,7 @@ export function useCredits(): UseCreditsResult {
       } else {
         setError(null);
       }
+      return null;
     } finally {
       setLoading(false);
     }
@@ -111,9 +113,7 @@ export function useCredits(): UseCreditsResult {
     }
   };
 
-  const refetchCredits = async () => {
-    await fetchCredits();
-  };
+  const refetchCredits = async () => fetchCredits();
 
   useEffect(() => {
     fetchCredits();
