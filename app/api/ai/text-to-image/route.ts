@@ -21,6 +21,7 @@ const KIE_IMAGE_TO_IMAGE_MODEL = "gpt-image-2-image-to-image";
 const KIE_POLL_INTERVAL_MS = 2500;
 const KIE_TEXT_TO_IMAGE_TIMEOUT_MS = 90000;
 const KIE_IMAGE_TO_IMAGE_TIMEOUT_MS = 165000;
+const KIE_HIGH_RES_TEXT_TIMEOUT_MS = 170000;
 
 interface KieCreateTaskResponse {
     code: number;
@@ -121,7 +122,12 @@ async function generateWithKie({
 
     const taskId = createData.data.taskId;
     const startedAt = Date.now();
-    const pollTimeoutMs = hasInputImage ? KIE_IMAGE_TO_IMAGE_TIMEOUT_MS : KIE_TEXT_TO_IMAGE_TIMEOUT_MS;
+    const isHighResolution = resolution === "2K" || resolution === "4K";
+    const pollTimeoutMs = hasInputImage
+        ? KIE_IMAGE_TO_IMAGE_TIMEOUT_MS
+        : isHighResolution
+            ? KIE_HIGH_RES_TEXT_TIMEOUT_MS
+            : KIE_TEXT_TO_IMAGE_TIMEOUT_MS;
 
     while (Date.now() - startedAt < pollTimeoutMs) {
         await sleep(KIE_POLL_INTERVAL_MS);
@@ -170,7 +176,9 @@ async function generateWithKie({
         }
     }
 
-    throw new Error(`Kie generation timed out while waiting for task completion (taskId: ${taskId})`);
+    throw new Error(
+        `Kie generation timed out while waiting for task completion (taskId: ${taskId}, resolution: ${resolution}, timeoutMs: ${pollTimeoutMs})`
+    );
 }
 
 async function generateWithOpenAI({
