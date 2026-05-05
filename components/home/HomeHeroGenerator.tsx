@@ -46,6 +46,7 @@ type GenerationMode = 'text-to-image' | 'image-to-image';
 interface ReferenceImage {
     url: string;
     name: string;
+    previewUrl?: string;
 }
 
 interface PendingReferenceFile {
@@ -130,6 +131,7 @@ const SAMPLE_PREVIEW_SLIDES = [
 ] as const;
 
 const MAX_REFERENCE_FILE_SIZE = 20 * 1024 * 1024;
+const REFERENCE_UPLOAD_RETRY_ATTEMPTS = 3;
 
 interface SignedReferenceUploadPayload {
     signedUrl: string;
@@ -170,6 +172,8 @@ export default function HomeHeroGenerator({ user, heroHeader }: HomeHeroGenerato
     const [isUploadingReference, setIsUploadingReference] = useState(false);
     const canUseHighResolution = Boolean(credits?.has_paid_access);
     const autoResumePendingRef = useRef(false);
+    const pendingReferenceFilesRef = useRef<PendingReferenceFile[]>([]);
+    const referenceImagesRef = useRef<ReferenceImage[]>([]);
 
     const waitForPaidAccessSync = async (requiresPaidAccess: boolean) => {
         const latestCredits = await refetchCredits();
@@ -198,51 +202,77 @@ export default function HomeHeroGenerator({ user, heroHeader }: HomeHeroGenerato
         }
     };
 
+    const sleep = (ms: number) => new Promise((resolve) => window.setTimeout(resolve, ms));
+
+    const isRetryableUploadError = (message: string) => {
+        const normalized = message.toLowerCase();
+        return normalized.includes("failed to fetch")
+            || normalized.includes("networkerror")
+            || normalized.includes("network request failed")
+            || normalized.includes("error code 520")
+            || normalized.includes("web server is returning an unknown error")
+            || normalized.includes("timeout")
+            || normalized.includes("temporarily unavailable")
+            || normalized.includes("internal server error");
+    };
+
     const uploadReferenceDirectly = async (file: File) => {
-        const signedUploadResponse = await fetch("/api/ai/upload-reference", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                fileName: file.name,
-                contentType: file.type,
-                fileSize: file.size,
-            }),
-        });
+        let lastError: Error | null = null;
 
-        const signedUploadData = await readResponseJson(signedUploadResponse) as Partial<SignedReferenceUploadPayload> & { error?: string };
-        if (!signedUploadResponse.ok) {
-            throw new Error(signedUploadData.error || "Failed to prepare upload");
+        for (let attempt = 1; attempt <= REFERENCE_UPLOAD_RETRY_ATTEMPTS; attempt += 1) {
+            try {
+                const signedUploadResponse = await fetch("/api/ai/upload-reference", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        fileName: file.name,
+                        contentType: file.type,
+                        fileSize: file.size,
+                    }),
+                });
+
+                const signedUploadData = await readResponseJson(signedUploadResponse) as Partial<SignedReferenceUploadPayload> & { error?: string };
+                if (!signedUploadResponse.ok) {
+                    throw new Error(signedUploadData.error || "Failed to prepare upload");
+                }
+
+                if (!signedUploadData.path || !signedUploadData.signedUrl) {
+                    throw new Error("Upload URL is missing");
+                }
+
+                const uploadResponse = await fetch(signedUploadData.signedUrl, {
+                    method: "PUT",
+                    body: file,
+                    headers: {
+                        "content-type": file.type || "application/octet-stream",
+                        "cache-control": "31536000",
+                        "x-upsert": "false",
+                    },
+                });
+
+                if (!uploadResponse.ok) {
+                    const uploadText = await uploadResponse.text();
+                    throw new Error(uploadText || "Direct upload failed");
+                }
+
+                if (!signedUploadData.url) {
+                    throw new Error("Public URL is missing");
+                }
+
+                return {
+                    url: signedUploadData.url,
+                    path: signedUploadData.path,
+                };
+            } catch (error: any) {
+                lastError = error instanceof Error ? error : new Error(error?.message || "Upload failed");
+                if (attempt === REFERENCE_UPLOAD_RETRY_ATTEMPTS || !isRetryableUploadError(lastError.message)) {
+                    break;
+                }
+                await sleep(800 * attempt);
+            }
         }
 
-        if (!signedUploadData.path || !signedUploadData.signedUrl) {
-            throw new Error("Upload URL is missing");
-        }
-
-        const uploadBody = new FormData();
-        uploadBody.append("cacheControl", "31536000");
-        uploadBody.append("", file);
-
-        const uploadResponse = await fetch(signedUploadData.signedUrl, {
-            method: "PUT",
-            body: uploadBody,
-            headers: {
-                "x-upsert": "false",
-            },
-        });
-
-        if (!uploadResponse.ok) {
-            const uploadText = await uploadResponse.text();
-            throw new Error(uploadText || "Direct upload failed");
-        }
-
-        if (!signedUploadData.url) {
-            throw new Error("Public URL is missing");
-        }
-
-        return {
-            url: signedUploadData.url,
-            path: signedUploadData.path,
-        };
+        throw lastError || new Error("Upload failed");
     };
 
     useEffect(() => {
@@ -485,12 +515,29 @@ export default function HomeHeroGenerator({ user, heroHeader }: HomeHeroGenerato
     }, [currentUser, prompt, generationMode, aspectRatio, resolution, referenceImages.length]);
 
     useEffect(() => {
+        pendingReferenceFilesRef.current = pendingReferenceFiles;
+    }, [pendingReferenceFiles]);
+
+    useEffect(() => {
+        referenceImagesRef.current = referenceImages;
+    }, [referenceImages]);
+
+    useEffect(() => {
         return () => {
-            pendingReferenceFiles.forEach((image) => {
-                URL.revokeObjectURL(image.previewUrl);
+            const previewUrls = new Set<string>();
+            pendingReferenceFilesRef.current.forEach((image) => {
+                previewUrls.add(image.previewUrl);
+            });
+            referenceImagesRef.current.forEach((image) => {
+                if (image.previewUrl) {
+                    previewUrls.add(image.previewUrl);
+                }
+            });
+            previewUrls.forEach((previewUrl) => {
+                URL.revokeObjectURL(previewUrl);
             });
         };
-    }, [pendingReferenceFiles]);
+    }, []);
 
     const handleResolutionSelect = (nextResolution: ResolutionOption) => {
         if (nextResolution === "1K") {
@@ -577,15 +624,13 @@ export default function HomeHeroGenerator({ user, heroHeader }: HomeHeroGenerato
                     uploadedImages.push({
                         url: data.url,
                         name: pendingImage.name,
+                        previewUrl: pendingImage.previewUrl,
                     });
                 }
 
                 setReferenceImages(uploadedImages);
                 effectiveReferenceImages = uploadedImages;
-                setPendingReferenceFiles((current) => {
-                    current.forEach((image) => URL.revokeObjectURL(image.previewUrl));
-                    return [];
-                });
+                setPendingReferenceFiles([]);
             } catch (uploadError: any) {
                 setError(uploadError.message || "Upload failed");
                 return;
@@ -884,7 +929,7 @@ export default function HomeHeroGenerator({ user, heroHeader }: HomeHeroGenerato
                                                             isPending: true,
                                                         })), ...referenceImages.map((image, index) => ({
                                                             key: `${image.url}-${index}`,
-                                                            src: image.url,
+                                                            src: image.previewUrl || image.url,
                                                             name: image.name,
                                                             isPending: false,
                                                         }))].map((image, index) => (
@@ -912,7 +957,13 @@ export default function HomeHeroGenerator({ user, heroHeader }: HomeHeroGenerato
                                                                             });
                                                                         } else {
                                                                             const referenceIndex = index - pendingReferenceFiles.length;
-                                                                            setReferenceImages((current) => current.filter((_, itemIndex) => itemIndex !== referenceIndex));
+                                                                            setReferenceImages((current) => {
+                                                                                const target = current[referenceIndex];
+                                                                                if (target?.previewUrl) {
+                                                                                    URL.revokeObjectURL(target.previewUrl);
+                                                                                }
+                                                                                return current.filter((_, itemIndex) => itemIndex !== referenceIndex);
+                                                                            });
                                                                         }
                                                                     }}
                                                                     className="absolute right-1.5 top-1.5 inline-flex h-7 w-7 items-center justify-center rounded-full bg-white/90 text-slate-600 opacity-0 shadow transition hover:bg-white hover:text-orange-700 group-hover:opacity-100"
@@ -1245,6 +1296,26 @@ export default function HomeHeroGenerator({ user, heroHeader }: HomeHeroGenerato
                                             >
                                                 {locale === 'zh' ? '重新开始' : 'Start Over'}
                                             </Button>
+                                        </div>
+                                    ) : (isGenerating || isUploadingReference) ? (
+                                        <div className="flex min-h-[500px] flex-col justify-center rounded-[24px] border border-dashed border-orange-200 bg-[linear-gradient(180deg,#fff7ef_0%,#fffdfb_100%)] p-6 text-center">
+                                            <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-white shadow-[0_20px_50px_rgba(235,145,71,0.18)]">
+                                                <Loader2 className="h-10 w-10 animate-spin text-orange-500" />
+                                            </div>
+                                            <h4 className="mt-6 text-[1.7rem] font-semibold leading-tight text-slate-900">
+                                                {isUploadingReference
+                                                    ? (locale === 'zh' ? '正在上传参考图...' : 'Uploading reference images...')
+                                                    : (locale === 'zh' ? '正在生成图片...' : 'Generating your image...')}
+                                            </h4>
+                                            <p className="mx-auto mt-3 max-w-md text-[13px] leading-6 text-slate-500">
+                                                {isUploadingReference
+                                                    ? (locale === 'zh'
+                                                        ? '上传完成后会自动继续图生图，无需重复点击。'
+                                                        : 'The editor will continue automatically once the references finish uploading.')
+                                                    : (locale === 'zh'
+                                                        ? '结果出来后会直接显示在这里，你可以继续预览和下载。'
+                                                        : 'Your result will appear here as soon as it is ready for preview and download.')}
+                                            </p>
                                         </div>
                                     ) : (
                                         <div className="flex min-h-[500px] flex-col justify-center rounded-[24px] border border-dashed border-orange-200 bg-[linear-gradient(180deg,#fff7ef_0%,#fffdfb_100%)] p-4 text-center">
