@@ -204,6 +204,20 @@ export default function HomeHeroGenerator({ user, heroHeader }: HomeHeroGenerato
 
     const sleep = (ms: number) => new Promise((resolve) => window.setTimeout(resolve, ms));
 
+    const sanitizeReferenceImages = (images: unknown): ReferenceImage[] => {
+        if (!Array.isArray(images)) {
+            return [];
+        }
+
+        return images
+            .filter((image): image is { url?: string; name?: string } => Boolean(image && typeof image === "object"))
+            .map((image) => ({
+                url: typeof image.url === "string" ? image.url : "",
+                name: typeof image.name === "string" ? image.name : "",
+            }))
+            .filter((image) => image.url);
+    };
+
     const isRetryableUploadError = (message: string) => {
         const normalized = message.toLowerCase();
         return normalized.includes("failed to fetch")
@@ -368,7 +382,10 @@ export default function HomeHeroGenerator({ user, heroHeader }: HomeHeroGenerato
             generationMode,
             aspectRatio,
             resolution,
-            referenceImages,
+            referenceImages: referenceImages.map((image) => ({
+                url: image.url,
+                name: image.name,
+            })),
             pendingReferenceNames: pendingReferenceFiles.map((image) => image.name),
             timestamp: Date.now()
         }));
@@ -430,7 +447,7 @@ export default function HomeHeroGenerator({ user, heroHeader }: HomeHeroGenerato
                         setGenerationMode(parsed.generationMode || "text-to-image");
                         setAspectRatio(parsed.aspectRatio || "auto");
                         setResolution(restoredResolution);
-                        setReferenceImages(Array.isArray(parsed.referenceImages) ? parsed.referenceImages : []);
+                        setReferenceImages(sanitizeReferenceImages(parsed.referenceImages));
                         localStorage.removeItem("pending_gpt_image_2_generation");
                     } catch (restoreError) {
                         console.error("Failed to restore generation state", restoreError);
@@ -481,7 +498,7 @@ export default function HomeHeroGenerator({ user, heroHeader }: HomeHeroGenerato
                     setGenerationMode(parsed.generationMode || "text-to-image");
                     setAspectRatio(parsed.aspectRatio || "auto");
                     setResolution(parsed.resolution || "1K");
-                    setReferenceImages(Array.isArray(parsed.referenceImages) ? parsed.referenceImages : []);
+                    setReferenceImages(sanitizeReferenceImages(parsed.referenceImages));
                     localStorage.removeItem("pending_gpt_image_2_generation");
 
                     toast({
@@ -907,14 +924,10 @@ export default function HomeHeroGenerator({ user, heroHeader }: HomeHeroGenerato
                                                 <button
                                                     type="button"
                                                     onClick={() => fileInputRef.current?.click()}
-                                                    disabled={isUploadingReference || referenceImages.length >= 10}
+                                                    disabled={isUploadingReference || isGenerating || referenceImages.length >= 10}
                                                     className="flex min-h-[132px] flex-col items-center justify-center rounded-[22px] border border-dashed border-orange-200 bg-white text-slate-500 transition hover:border-orange-300 hover:bg-orange-50 disabled:cursor-not-allowed disabled:opacity-60"
                                                 >
-                                                    {isUploadingReference ? (
-                                                        <Loader2 className="mb-3 h-8 w-8 animate-spin text-orange-500" />
-                                                    ) : (
-                                                        <ImagePlus className="mb-3 h-8 w-8 text-orange-500" />
-                                                    )}
+                                                    <ImagePlus className="mb-3 h-8 w-8 text-orange-500" />
                                                     <span className="text-sm font-semibold">
                                                         {locale === 'zh' ? '添加图片' : 'Add Images'}
                                                     </span>
@@ -928,7 +941,7 @@ export default function HomeHeroGenerator({ user, heroHeader }: HomeHeroGenerato
                                                             name: image.name,
                                                             isPending: true,
                                                         })), ...referenceImages.map((image, index) => ({
-                                                            key: `${image.url}-${index}`,
+                                                            key: image.previewUrl || `${image.url}-${index}`,
                                                             src: image.previewUrl || image.url,
                                                             name: image.name,
                                                             isPending: false,
@@ -1034,10 +1047,12 @@ export default function HomeHeroGenerator({ user, heroHeader }: HomeHeroGenerato
                                             onClick={handlePrimaryAction}
                                             disabled={isGenerating || isUploadingReference}
                                         >
-                                            {isGenerating ? (
+                                            {(isGenerating || isUploadingReference) ? (
                                                 <>
                                                     <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                                                    {locale === 'zh' ? '正在生成图片...' : 'Generating image...'}
+                                                    {isUploadingReference
+                                                        ? (locale === 'zh' ? '正在上传参考图...' : 'Uploading references...')
+                                                        : (locale === 'zh' ? '正在生成图片...' : 'Generating image...')}
                                                 </>
                                             ) : needsReferenceBeforeEdit ? (
                                                 <span className="inline-flex items-center gap-2">
@@ -1367,10 +1382,12 @@ export default function HomeHeroGenerator({ user, heroHeader }: HomeHeroGenerato
                     onClick={handlePrimaryAction}
                     disabled={isGenerating || isUploadingReference}
                 >
-                    {isGenerating ? (
+                    {(isGenerating || isUploadingReference) ? (
                         <>
                             <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                            {locale === 'zh' ? '正在生成图片...' : 'Generating image...'}
+                            {isUploadingReference
+                                ? (locale === 'zh' ? '正在上传参考图...' : 'Uploading references...')
+                                : (locale === 'zh' ? '正在生成图片...' : 'Generating image...')}
                         </>
                     ) : needsReferenceBeforeEdit ? (
                         <span className="inline-flex items-center gap-2">
