@@ -236,7 +236,14 @@ export default async function BlogPostPage(props: { params: Promise<{ slug: stri
 
                             {post.heroImage && (
                                 <div className="relative mt-8 aspect-[16/9] overflow-hidden rounded-[28px] border border-orange-100 bg-[#fff7ef]">
-                                    <Image src={post.heroImage} alt={`${post.title}. ${post.description}`} fill className="object-cover" />
+                                    <Image
+                                        src={post.heroImage}
+                                        alt={`${post.title}. ${post.description}`}
+                                        fill
+                                        className="object-cover"
+                                        priority
+                                        sizes="(max-width: 1024px) 100vw, 896px"
+                                    />
                                 </div>
                             )}
                         </header>
@@ -347,7 +354,11 @@ export default async function BlogPostPage(props: { params: Promise<{ slug: stri
                             '@context': 'https://schema.org',
                             '@type': 'BlogPosting',
                             headline: post.title,
+                            image: `${siteConfig.url}${post.heroImage}`,
                             datePublished: post.publishDate,
+                            dateModified: post.publishDate,
+                            url: `${siteConfig.url}/${params.locale}/blog/${params.slug}`,
+                            mainEntityOfPage: `${siteConfig.url}/${params.locale}/blog/${params.slug}`,
                             author: {
                                 '@type': 'Person',
                                 name: post.author,

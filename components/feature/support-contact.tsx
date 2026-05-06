@@ -41,6 +41,7 @@ export function SupportContactDock({ locale }: { locale: "en" | "zh" }) {
               width={720}
               height={1200}
               className="h-auto w-full"
+              sizes="280px"
             />
           </div>
           <p className="mt-3 text-xs leading-6 text-slate-500">
@@ -117,6 +118,7 @@ export function SupportContactPanel({
               width={720}
               height={1200}
               className="h-auto w-full"
+              sizes="(max-width: 1024px) 100vw, 420px"
             />
           </div>
         </a>

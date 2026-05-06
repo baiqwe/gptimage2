@@ -48,9 +48,9 @@ export async function generateMetadata(props: { params: Promise<{ locale: string
     const { locale } = params;
     const isZh = locale === 'zh';
 
-    const title = isZh ? 'GPT Image 2 示例画廊' : 'GPT Image 2 Gallery';
+    const title = isZh ? 'GPT Image 2 Gallery：示例画廊与提示词参考' : 'GPT Image 2 Gallery';
     const description = isZh
-        ? '浏览 GPT Image 2 生成的海报、人像、设计系统和像素艺术示例，查看提示词与成品效果。'
+        ? '浏览 GPT Image 2 Gallery 页面，查看海报、人像、设计系统和像素艺术示例，对照提示词与成品效果，快速找到值得继续改写和测试的方向。'
         : 'Browse GPT Image 2 examples for portraits, posters, design systems, and pixel art, with prompt references and finished visuals.';
 
     return {
@@ -94,11 +94,11 @@ export default async function GalleryPage(props: { params: Promise<{ locale: str
                             {isZh ? '示例画廊' : 'Gallery'}
                         </p>
                         <h1 className="mt-4 text-4xl font-bold tracking-tight text-slate-900 sm:text-5xl">
-                            {isZh ? '看看 GPT Image 2 可以生成的不同画面方向' : 'See the kinds of visuals GPT Image 2 can create'}
+                            {isZh ? 'GPT Image 2 Gallery：看看不同画面方向的示例' : 'See the kinds of visuals GPT Image 2 can create'}
                         </h1>
                         <p className="mx-auto mt-4 max-w-3xl text-lg leading-8 text-slate-600">
                             {isZh
-                                ? '这里集中展示了人物、人像、设计系统、像素艺术等不同风格的示例图，并附上提示词，方便你直接参考或继续改写。'
+                                ? '这里集中展示了人物、人像、设计系统、像素艺术等不同风格的示例图，并附上提示词，方便你直接参考、继续改写，或者先挑一个方向再带进生成器测试。'
                                 : 'This gallery collects portraits, UI boards, pixel art, and other example outputs, each paired with a prompt you can study or adapt.'}
                         </p>
                     </div>
@@ -113,6 +113,7 @@ export default async function GalleryPage(props: { params: Promise<{ locale: str
                                         fill
                                         className="object-cover"
                                         priority={item.src === '/examples/tiktok-live-stream.webp'}
+                                        sizes="(max-width: 768px) 100vw, 50vw"
                                     />
                                 </div>
                                 <div className="p-6 md:p-7">

@@ -20,11 +20,11 @@ export async function generateMetadata(props: {
   const isZh = locale === "zh";
 
   const title = isZh
-    ? "Awesome GPT Image 2 Prompts | GPT Image 2 提示词大全与灵感库"
-    : "Awesome GPT Image 2 Prompts | Gallery, Examples, and Prompt Guide";
+    ? "Awesome GPT Image 2 Prompts：灵感与示例"
+    : "Awesome GPT Image 2 Prompts: Examples and Ideas";
   const description = isZh
-    ? "浏览 Awesome GPT Image 2 Prompts 页面，挑选真正可用的提示词灵感，学习怎么改写 prompt，并一键带入 GPT Image 2 生成器继续出图。"
-    : "Explore awesome GPT Image 2 prompts with examples, prompt-writing guidance, category hubs, and one-click paths into the GPT Image 2 generator.";
+    ? "浏览 Awesome GPT Image 2 Prompts 页面，查看成图示例、挑选可直接改写的 prompt、学习优化方法，并一键带入 GPT Image 2 生成器继续出图，适合先找灵感再开始动手的人。"
+    : "Explore awesome GPT Image 2 prompts with finished examples, rewrite guidance, and one-click paths into the GPT Image 2 generator.";
 
   return {
     title,

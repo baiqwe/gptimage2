@@ -39,10 +39,10 @@ export async function generateMetadata(props: {
   const meta = PROMPT_CATEGORY_META[promptCategory];
 
   const title = isZh
-    ? `${meta.labelZh} GPT Image 2 Prompts | Awesome GPT Image 2 Prompts`
-    : `${meta.label} GPT Image 2 Prompts | Awesome GPT Image 2 Prompts`;
+    ? `${meta.label} GPT Image 2 Prompts：${meta.labelZh}灵感与示例`
+    : `${meta.label} GPT Image 2 Prompts`;
   const description = isZh
-    ? `浏览 ${meta.labelZh} 方向的 Awesome GPT Image 2 Prompts，查看示例图、推荐比例、改写方法和进入生成器的路径。`
+    ? `浏览 ${meta.label} GPT Image 2 Prompts 页面，查看${meta.labelZh}方向的示例图、推荐比例、改写方法和进入生成器继续出图的路径，快速找到更贴近自己任务的起点。`
     : `Browse awesome GPT Image 2 prompts for ${meta.label.toLowerCase()} work, with examples, suggested aspect ratios, rewrite advice, and direct links into the generator.`;
 
   return {
@@ -175,12 +175,12 @@ export default async function PromptCategoryPage(props: {
             </div>
             <h1 className="mx-auto mt-6 max-w-4xl text-4xl font-bold tracking-tight text-slate-900 sm:text-5xl">
               {isZh
-                ? `${meta.labelZh}方向的 Awesome GPT Image 2 Prompts`
+                ? `${meta.label} GPT Image 2 Prompts：${meta.labelZh}方向示例`
                 : `Awesome GPT Image 2 Prompts for ${meta.label}`}
             </h1>
             <p className="mx-auto mt-5 max-w-3xl text-lg leading-8 text-slate-600">
               {isZh
-                ? `这是 Awesome GPT Image 2 Prompts 的 ${meta.labelZh}分类页。你会看到更聚焦的示例图、对应 prompt、推荐比例，以及这类视觉任务适合怎样的写法。`
+                ? `这是 Awesome GPT Image 2 Prompts 的 ${meta.labelZh}分类页。你会看到更聚焦的示例图、对应 prompt、推荐比例，以及这类视觉任务适合怎样的写法，也能更快判断这个方向是不是你要找的起点。`
                 : `This is the ${meta.label.toLowerCase()} category inside our awesome GPT Image 2 prompts hub. It focuses on examples, prompt structure, recommended aspect ratios, and the kind of writing that works best for this visual task.`}
             </p>
           </section>

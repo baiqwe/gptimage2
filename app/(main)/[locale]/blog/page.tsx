@@ -14,10 +14,10 @@ export async function generateMetadata(props: { params: Promise<{ locale: string
     const params = await props.params;
     const { locale } = params;
     const isZh = locale === 'zh';
-    const title = isZh ? 'GPT Image 2 指南与评测' : 'GPT Image 2 Guides and Reviews';
+    const title = isZh ? 'GPT Image 2 指南与评测博客 | 提示词、对比与工作流' : 'GPT Image 2 Guides and Reviews | Prompts, Comparisons, and Workflows';
     const description = isZh
-        ? `${siteConfig.name} 博客，包含 GPT Image 2 评测、竞品对比、提示词指南、发布时间解读与开发者资源。`
-        : `${siteConfig.name} blog with GPT Image 2 reviews, comparisons, prompt guides, release-date explainers, and developer resources.`;
+        ? `${siteConfig.name} 博客，提供 GPT Image 2 指南、评测、竞品对比、提示词案例与工作流建议，帮助你更快判断该怎么用、看什么案例，以及下一步去哪里继续测试。`
+        : `${siteConfig.name} blog with GPT Image 2 reviews, comparisons, prompt ideas, and workflow guidance so you can quickly find useful examples and next steps.`;
 
     return {
         title,
@@ -76,7 +76,7 @@ export default async function BlogPage(props: { params: Promise<{ locale: string
                         {isZh ? '精选内容' : 'Featured Reads'}
                     </div>
                     <h1 className="text-4xl md:text-5xl font-bold text-slate-900 mb-4">
-                        {isZh ? 'GPT Image 2 评测、教程与实战指南' : 'GPT Image 2 Reviews, Tutorials, and Practical Guides'}
+                        {isZh ? 'GPT Image 2 指南、评测与实战教程' : 'GPT Image 2 Reviews, Tutorials, and Practical Guides'}
                     </h1>
                     <p className="text-xl text-slate-600 max-w-3xl mx-auto">
                         {isZh
@@ -112,7 +112,7 @@ export default async function BlogPage(props: { params: Promise<{ locale: string
 
                 {/* Posts Grid */}
                 <div className="mb-16 grid gap-8 md:grid-cols-2">
-                    {posts.map(post => (
+                    {posts.map((post, index) => (
                         <Link key={post.slug} href={`${localePrefix}/blog/${post.slug}`} className="group">
                             <Card className="h-full overflow-hidden border-orange-100 bg-white transition-all hover:-translate-y-1 hover:shadow-[0_24px_54px_rgba(235,145,71,0.12)]">
                                 {post.heroImage && (
@@ -122,6 +122,8 @@ export default async function BlogPage(props: { params: Promise<{ locale: string
                                             alt={`${post.title}. ${post.excerpt}`}
                                             fill
                                             className="object-cover transition-transform duration-500 group-hover:scale-[1.02]"
+                                            priority={index === 0}
+                                            sizes="(max-width: 768px) 100vw, 50vw"
                                         />
                                     </div>
                                 )}

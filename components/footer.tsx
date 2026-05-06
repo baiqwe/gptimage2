@@ -42,6 +42,7 @@ export async function Footer({ locale: currentLocale }: FooterProps) {
                 width={40}
                 height={40}
                 className="h-10 w-10 rounded-xl shadow-lg shadow-orange-500/10"
+                sizes="40px"
               />
               <span className="flex flex-col leading-none">
                 <span className="bg-gradient-to-r from-orange-500 via-amber-500 to-rose-500 bg-clip-text text-base font-bold text-transparent sm:text-lg">
@@ -92,108 +93,6 @@ export async function Footer({ locale: currentLocale }: FooterProps) {
                 </Link>
               ))}
             </nav>
-          </div>
-        </div>
-
-        {/* Friends / 友链 */}
-        <div className="soft-panel mt-8 border border-orange-100 px-6 py-6">
-          <h3 className="text-sm font-semibold text-slate-900 mb-4">
-            {currentLocale === 'zh' ? '友情链接' : 'Friends'}
-          </h3>
-          <div className="flex flex-wrap items-center gap-6">
-            <a
-              href="https://findly.tools/gpt-image-2-generator?utm_source=gpt-image-2-generator"
-              target="_blank"
-              rel="noopener noreferrer nofollow"
-            >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src="https://findly.tools/badges/findly-tools-badge-light.svg"
-                alt="Featured on Findly.tools"
-                width={175}
-                height={55}
-                className="h-auto w-[175px] opacity-90 transition-opacity hover:opacity-100"
-              />
-            </a>
-            <a
-              href="https://z-image.net/"
-              target="_blank"
-              rel="noopener noreferrer nofollow"
-              className="text-sm font-medium text-slate-600 transition-colors hover:text-orange-600"
-            >
-              Z-Image
-            </a>
-            <a
-              href="https://goodaitools.com/ai/gpt-image-2-generator"
-              target="_blank"
-              rel="noopener noreferrer nofollow"
-              className="text-sm text-slate-600 transition-colors hover:text-orange-600"
-            >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src="https://goodaitools.com/assets/images/badge.png"
-                alt="Badge"
-                width={175}
-                height={54}
-                className="h-[54px] w-auto opacity-90 transition-opacity hover:opacity-100"
-              />
-            </a>
-            <a
-              href="https://apphublist.com"
-              target="_blank"
-              rel="noopener noreferrer nofollow"
-            >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src="https://apphublist.com/assets/images/badge.png"
-                alt="App Hub List"
-                width={175}
-                height={54}
-                className="h-[54px] w-auto opacity-90 transition-opacity hover:opacity-100"
-              />
-            </a>
-            <a
-              href="https://tooldynamo.com"
-              target="_blank"
-              rel="noopener noreferrer nofollow"
-            >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src="https://tooldynamo.com/assets/images/badge.png"
-                alt="Tool Dynamo"
-                width={175}
-                height={54}
-                className="h-[54px] w-auto opacity-90 transition-opacity hover:opacity-100"
-              />
-            </a>
-            <a
-              href="https://aixcollection.com"
-              target="_blank"
-              rel="noopener noreferrer nofollow"
-            >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src="https://aixcollection.com/assets/images/badge.png"
-                alt="AI X Collection"
-                width={175}
-                height={54}
-                className="h-[54px] w-auto opacity-90 transition-opacity hover:opacity-100"
-              />
-            </a>
-            <a
-              href="https://weliketools.com"
-              target="_blank"
-              rel="noopener noreferrer nofollow"
-            >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src="https://weliketools.com/assets/images/badge.png"
-                alt="We Like Tools"
-                width={175}
-                height={54}
-                className="h-[54px] w-auto opacity-90 transition-opacity hover:opacity-100"
-              />
-            </a>
           </div>
         </div>
 

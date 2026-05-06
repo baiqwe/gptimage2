@@ -85,6 +85,7 @@ function SocialProofSection({ locale }: { locale: string }) {
                                         fill
                                         className="object-cover"
                                         priority={index === 0}
+                                        sizes="(max-width: 1024px) 100vw, 33vw"
                                     />
                                 </div>
                                 <div className="p-6">

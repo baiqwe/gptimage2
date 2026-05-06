@@ -109,12 +109,29 @@ export default async function LocaleLayout(props: {
     }
 
     const messages = await getMessages({ locale });
+    let supabaseOrigin: string | null = null;
+    if (process.env.NEXT_PUBLIC_SUPABASE_URL) {
+        try {
+            supabaseOrigin = new URL(process.env.NEXT_PUBLIC_SUPABASE_URL).origin;
+        } catch {
+            supabaseOrigin = null;
+        }
+    }
 
     // 用户状态在 Header 客户端组件中通过 useUser hook 获取
     // 不在服务端获取，以便页面可以被缓存
 
     return (
         <html lang={locale} className={geistSans.className} suppressHydrationWarning>
+            <head>
+                {siteConfig.gaId && siteConfig.gaId !== 'G-PLACEHOLDER' ? (
+                    <link rel="preconnect" href="https://www.googletagmanager.com" crossOrigin="anonymous" />
+                ) : null}
+                <link rel="preconnect" href="https://www.clarity.ms" crossOrigin="anonymous" />
+                {supabaseOrigin ? (
+                    <link rel="preconnect" href={supabaseOrigin} crossOrigin="anonymous" />
+                ) : null}
+            </head>
             <body className="bg-background text-foreground antialiased" suppressHydrationWarning>
                 <GoogleAnalytics />
                 <Clarity />
