@@ -1,6 +1,7 @@
 require('tsx/cjs');
 
 const { BLOG_POST_SLUGS } = require('./config/blog-posts.ts');
+const { blogPosts } = require('./config/blog-posts.ts');
 const { PROMPT_CATEGORY_SLUGS } = require('./config/prompts-data.ts');
 
 function getAlternateRefs(siteUrl, loc) {
@@ -67,6 +68,11 @@ module.exports = {
 
         const blogSlugs = BLOG_POST_SLUGS;
         const promptCategorySlugs = PROMPT_CATEGORY_SLUGS;
+        const latestBlogDate = blogPosts
+            .map((post) => post.publishDate)
+            .sort()
+            .at(-1);
+        const blogPublishDates = new Map(blogPosts.map((post) => [post.slug, post.publishDate]));
 
         const result = [];
 
@@ -76,7 +82,6 @@ module.exports = {
                 loc: `/${locale}`,
                 changefreq: 'daily',
                 priority: 1.0,
-                lastmod: new Date().toISOString(),
                 alternateRefs: getAlternateRefs(config.siteUrl, `/${locale}`),
             });
 
@@ -98,7 +103,6 @@ module.exports = {
                     loc: `/${locale}/${page}`,
                     changefreq,
                     priority,
-                    lastmod: new Date().toISOString(),
                     alternateRefs: getAlternateRefs(config.siteUrl, `/${locale}/${page}`),
                 });
             }
@@ -108,7 +112,6 @@ module.exports = {
                     loc: `/${locale}/prompts/${category}`,
                     changefreq: 'weekly',
                     priority: 0.82,
-                    lastmod: new Date().toISOString(),
                     alternateRefs: getAlternateRefs(config.siteUrl, `/${locale}/prompts/${category}`),
                 });
             }
@@ -118,7 +121,7 @@ module.exports = {
                 loc: `/${locale}/blog`,
                 changefreq: 'daily',
                 priority: 0.9,
-                lastmod: new Date().toISOString(),
+                ...(latestBlogDate ? { lastmod: latestBlogDate } : {}),
                 alternateRefs: getAlternateRefs(config.siteUrl, `/${locale}/blog`),
             });
 
@@ -128,7 +131,7 @@ module.exports = {
                     loc: `/${locale}/blog/${slug}`,
                     changefreq: 'weekly',
                     priority: 0.85,
-                    lastmod: new Date().toISOString(),
+                    ...(blogPublishDates.get(slug) ? { lastmod: blogPublishDates.get(slug) } : {}),
                     alternateRefs: getAlternateRefs(config.siteUrl, `/${locale}/blog/${slug}`),
                 });
             }
@@ -160,7 +163,6 @@ module.exports = {
             loc: path,
             changefreq,
             priority,
-            lastmod: new Date().toISOString(),
             alternateRefs: getAlternateRefs(config.siteUrl, path),
         };
     },
