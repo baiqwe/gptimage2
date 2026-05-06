@@ -23,7 +23,7 @@ export async function generateMetadata(props: {
     ? "Awesome GPT Image 2 Prompts | GPT Image 2 提示词大全与灵感库"
     : "Awesome GPT Image 2 Prompts | Gallery, Examples, and Prompt Guide";
   const description = isZh
-    ? "浏览 Awesome GPT Image 2 Prompts 页面，了解什么是高质量提示词、如何改写 prompt、为什么这些案例值得参考，并一键带入 GPT Image 2 生成器。"
+    ? "浏览 Awesome GPT Image 2 Prompts 页面，挑选真正可用的提示词灵感，学习怎么改写 prompt，并一键带入 GPT Image 2 生成器继续出图。"
     : "Explore awesome GPT Image 2 prompts with examples, prompt-writing guidance, category hubs, and one-click paths into the GPT Image 2 generator.";
 
   return {
@@ -148,12 +148,12 @@ export default async function PromptsPage(props: {
             </div>
             <h1 className="mx-auto mt-6 max-w-4xl text-4xl font-bold tracking-tight text-slate-900 sm:text-5xl">
               {isZh
-                ? "Awesome GPT Image 2 Prompts：看成图、学结构、再带去生成器继续做"
+                ? "Awesome GPT Image 2 Prompts：先挑顺眼的案例，再改成你自己的版本"
                 : "Awesome GPT Image 2 Prompts: examples, workflow, and prompt ideas you can actually use"}
             </h1>
             <p className="mx-auto mt-5 max-w-3xl text-lg leading-8 text-slate-600">
               {isZh
-                ? "这个页面围绕 awesome gpt image 2 prompts 的真实搜索意图来设计。很多用户并不是缺少模型，而是缺少一个足够好的起点：什么样的 prompt 才容易得到稳定结果、不同视觉方向要怎么写、为什么某些案例更适合作为商业参考。这里会先给你看结果，再给你 prompt，最后把你带到生成器里继续完成。"
+                ? "如果你打开生成器时经常不知道第一句该怎么写，这个页面就是给你准备的。这里的 awesome gpt image 2 prompts 不只是给你一串词，而是先让你看成图效果，再判断风格适不适合自己，最后再把 prompt 带进生成器继续改。这样上手会比从空白输入框开始轻松很多。"
                 : "This page is built around the real search intent behind awesome gpt image 2 prompts. Most people do not need another vague list of keywords. They need examples that explain what a strong prompt looks like, how different visual directions should be written, and why some prompt structures produce more useful results for commercial or creative work. Here, you start with the output, learn the prompt logic, and then move into the generator with something worth testing."}
             </p>
             <div className="mt-7 flex flex-wrap items-center justify-center gap-3">
@@ -179,7 +179,7 @@ export default async function PromptsPage(props: {
               </h2>
               <p className="mt-3 text-sm leading-7 text-slate-600">
                 {isZh
-                  ? "在这个 awesome gpt image 2 prompts 页面里，每条内容都从成图开始，再回到 prompt 本身，让你先看到结果，再拆解它为什么成立。"
+                  ? "这里每条 awesome gpt image 2 prompts 都配了具体画面方向。你可以先看它更像海报、人像、社媒图还是概念图，再决定要不要继续参考这条 prompt。"
                   : "On this awesome gpt image 2 prompts page, every example starts from the finished result and then works backward into the prompt, so you can judge quality before you study wording."}
               </p>
             </div>
@@ -192,7 +192,7 @@ export default async function PromptsPage(props: {
               </h2>
               <p className="mt-3 text-sm leading-7 text-slate-600">
                 {isZh
-                  ? "我们不会只给你一串词，而是告诉你主体、镜头、光线、材质、版式和用途分别在 prompt 里扮演什么角色。"
+                  ? "你不需要整段照抄。通常先改主体、场景、颜色和用途就够了，比如把人物换成你的产品、把背景换成你的行业场景，结果就会更贴近需求。"
                   : "You do not just get a sentence to copy. You also get a clearer sense of what the subject, lens, lighting, material, composition, and output context are doing inside the prompt."}
               </p>
             </div>
@@ -205,7 +205,7 @@ export default async function PromptsPage(props: {
               </h2>
               <p className="mt-3 text-sm leading-7 text-slate-600">
                 {isZh
-                  ? "点击按钮后，当前 prompt 与比例会直接带到 GPT Image 2 工作台。这个 awesome gpt image 2 prompts 页不是终点，而是进入生成器前的高质量起点。"
+                  ? "看到喜欢的案例后，你可以直接把 prompt 和推荐比例带进生成器继续生成，不用来回复制整理。这会比先找灵感、再自己重写一遍快很多。"
                   : "When you click through, the prompt and ratio move directly into the GPT Image 2 workspace. The awesome gpt image 2 prompts page is not the end of the journey; it is the best starting point before generating."}
               </p>
             </div>
@@ -218,17 +218,17 @@ export default async function PromptsPage(props: {
               </h2>
               <p className="leading-8">
                 {isZh
-                  ? "很多提示词页的问题在于：它们只是在追关键词，却没有真正解释“好 prompt”背后的结构。真正有用的 awesome gpt image 2 prompts，不应该只是几十条碎片化句子，也不应该只靠形容词堆出看起来很厉害的效果。它更像一个经过结果验证的素材库：每条 prompt 都应该告诉你这类图为什么能成立，适合什么比例，适合什么用途，以及如果你要把它改成自己的品牌、产品或内容，该先改哪里。"
+                  ? "很多人搜 awesome gpt image 2 prompts，其实不是想研究理论，而是想尽快找到一条能用的起点。真正好用的 prompt，应该让你一眼看懂这类图适不适合自己，也能让你知道下一步该改哪里，而不是只看到一串形容词。"
                   : "The problem with many prompt galleries is that they target the keyword but never explain the structure behind a good prompt. Truly useful awesome gpt image 2 prompts are not just a stack of pretty adjectives or disconnected one-liners. They work more like a validated library: each prompt should show why the image direction works, which aspect ratio suits it, what kind of job it is best for, and where to edit if you want to turn the idea into your own campaign, product shot, creator visual, or concept board."}
               </p>
               <p className="leading-8">
                 {isZh
-                  ? "这也是为什么我们把这个页面做成“成图 + prompt + 比例 + 分类入口 + 生成器预填”的组合，而不是只做一个漂亮的瀑布流。用户搜 awesome gpt image 2 prompts，通常是在找一个立刻能用的方向。他们可能想要人像、社媒视觉、设计系统、像素风场景、3D 形态，或者电商详情图。页面如果只给图不给方法，用户会停留几秒就走；如果只给方法不给成图，他们又很难快速判断是不是自己想要的风格。把结果、结构和下一步操作放在同一页，才更接近真实需求。"
+                  ? "所以这个页面会把成图示例、prompt 内容、推荐比例和分类入口放在一起。你可以先按风格挑，再按用途挑，看到合适的就直接复制或带进生成器。无论你要做人像、产品图、社媒封面、像素风场景还是 UI 概念图，都能更快找到离目标最近的那条 prompt。"
                   : "That is why this page is designed as more than a pretty masonry grid. People who search for awesome gpt image 2 prompts usually want an immediately usable direction. They may be looking for portraits, social visuals, design-system boards, pixel scenes, abstract 3D forms, or e-commerce layouts. If a page shows images without explaining the prompt logic, the visit ends quickly. If it explains the logic without showing the output, people cannot judge whether the style is right for them. Bringing results, structure, and the next action into one page makes the experience much closer to the real search need."}
               </p>
               <p className="leading-8">
                 {isZh
-                  ? "从 E-E-A-T 的角度看，提示词页也不能只是“看上去很懂”。真正可信的提示词页需要展示可验证的结果、明确的用途和真实的工作流。这里的示例都来自站内实际展示过的案例，而且每条都带有推荐比例和用途说明，方便你在进入生成器前就先做筛选。这样的结构不仅更符合用户预期，也更能帮助搜索引擎理解这个页面为什么不是薄内容。"
+                  ? "这里的每条 awesome gpt image 2 prompts 都更适合当成“可改写的模板”，而不是标准答案。你可以保留喜欢的画面感觉，再把主体、配色、品牌信息、版式要求换成你自己的内容，这样会比完全从零开始稳定得多。"
                   : "From an E-E-A-T perspective, a prompts page should not pretend to be authoritative just because it uses expert-sounding words. A trustworthy prompt page needs visible outputs, clear use cases, and a real workflow connection. That is why the examples here are tied to actual visual references already used on the site, and each one comes with a recommended aspect ratio and practical framing. This makes the page easier to trust for users and easier to interpret for search engines as something more substantial than a thin keyword collection."}
               </p>
             </div>
@@ -245,7 +245,7 @@ export default async function PromptsPage(props: {
                 </h2>
                 <p className="mt-3 leading-8 text-slate-600">
                   {isZh
-                    ? "如果 awesome gpt image 2 prompts 是总入口，下面这些分类页就是更细的工作台入口。每个分类页都会围绕具体场景解释什么样的 prompt 更有效、怎么改、为什么适合这类视觉任务。"
+                    ? "如果你已经知道自己要做人像、产品图、社媒视觉、像素风或 3D 场景，可以直接进下面对应的分类页。这样不用从总列表里慢慢翻，找方向会更快。"
                     : "If awesome gpt image 2 prompts is the main doorway, the category pages below are more focused entry points. Each one explains what works for that visual task, how to iterate the prompt, and why that category matters in a real creative workflow."}
                 </p>
               </div>
@@ -309,17 +309,17 @@ export default async function PromptsPage(props: {
               <div className="mt-5 space-y-4 leading-8 text-slate-600">
                 <p>
                   {isZh
-                    ? "最好的改法不是删掉全部重写，而是先识别 prompt 的骨架。通常一条更稳定的 prompt 至少有四层：主体、风格/材质、镜头/光线、用途/构图。比如一条赛博朋克人像 prompt，如果你喜欢的是镜头感和雨夜霓虹，不一定要保留银发女性这个主体；你完全可以把它换成品牌代言人、游戏角色、运动员或者自己的 IP 形象。"
+                    ? "最省力的改法不是整段推翻重写，而是先保留你喜欢的画面感觉，再替换最关键的几个元素。通常先改主体、场景、色调和用途，就足够让一条 awesome gpt image 2 prompts 更像你自己的版本。比如你喜欢的是雨夜霓虹和电影镜头感，那就保留这层氛围，再把人物换成品牌主角、产品代言人、游戏角色或自己的原创形象。"
                     : "The best way to adapt awesome gpt image 2 prompts is not to delete everything and start from zero. First identify the prompt skeleton. In most strong examples, that means at least four layers: subject, style or material, lens and lighting language, and output or composition intent. If you like a cyberpunk portrait because of the rain reflections and lens treatment, you do not have to keep the silver-haired model. You can swap in a spokesperson, game character, athlete, or brand mascot while preserving the image logic that made the example work."}
                 </p>
                 <p>
                   {isZh
-                    ? "第二步是增加项目语言。提示词要从“好看”走向“可用”，就必须加入品牌关键词、渠道要求和排版边界。做海报时，要告诉模型是否预留标题空间；做社媒图时，要说明竖屏和移动端视觉中心；做详情页时，要补价格模块、卖点区和多图组合逻辑。真正高效的 awesome gpt image 2 prompts，通常都能同时服务风格和用途。"
+                    ? "第二步是补上你的使用场景。做海报时，可以加上标题预留区域；做社媒封面时，可以强调竖屏和视觉中心；做产品图时，可以说明卖点、材质和展示方式。这样 prompt 不只是好看，也会更贴近你真正要交付的内容。"
                     : "The second step is to add project language. A prompt stops being merely attractive and starts becoming useful when you add brand cues, channel constraints, and layout boundaries. For posters, mention headline-safe space. For social visuals, describe the vertical frame and mobile focal point. For product pages, mention price blocks, feature modules, and multi-panel composition. The most effective awesome gpt image 2 prompts usually serve both style and function at the same time."}
                 </p>
                 <p>
                   {isZh
-                    ? "第三步是控制变量。一次只改一个关键层面，比如只改主体、不改镜头；或者只改色调、不改构图。这样你才能看清楚到底是哪一层影响了最终结果。对团队来说，这种改法也更容易复盘，因为大家讨论的是明确变量，而不是一句“这个感觉不对”。"
+                    ? "第三步是一次只改一个重点。比如这一轮只换主体，不动构图；下一轮只改颜色，不动镜头。这样你会更容易看懂到底是哪一步让结果变好了，也更容易快速挑出最接近目标的版本。"
                     : "The third step is variable control. Change one major layer at a time: the subject but not the lens, or the color environment but not the composition. That makes it far easier to see which layer changed the result. It also creates a better review workflow for teams, because people can discuss concrete variables instead of saying that a version just feels wrong."}
                 </p>
               </div>
@@ -327,22 +327,22 @@ export default async function PromptsPage(props: {
 
             <div className="section-shell bg-[#fffaf4] p-8 md:p-10">
               <h2 className="text-2xl font-bold text-slate-900">
-                {isZh ? "Why：为什么 prompts 页面能真正提升使用转化" : "Why an awesome GPT Image 2 prompts hub improves real product conversion"}
+                {isZh ? "Why：为什么先看 prompts，会比直接乱试更省时间" : "Why an awesome GPT Image 2 prompts hub improves real product conversion"}
               </h2>
               <div className="mt-5 space-y-4 leading-8 text-slate-600">
                 <p>
                   {isZh
-                    ? "从产品角度看，灵感不足常常比模型能力更早把用户拦住。很多用户打开生成器时并不是真的没有需求，而是不知道第一句该怎么写。awesome gpt image 2 prompts 页面可以把“不会写 prompt”的阻力变成“挑一个最接近的例子，然后开始改”。这一步会显著缩短用户从访问页面到真正点击生成之间的距离。"
+                    ? "很多时候，不是你没有想法，而是脑子里有方向，却不知道怎么把第一句写出来。先看 awesome gpt image 2 prompts 的例子，相当于先选一个最接近的草稿，再往自己的方向继续改，会比从零开始盲猜快得多。"
                     : "From a product perspective, lack of prompt confidence blocks people earlier than model quality. Many visitors do not arrive without intent; they arrive without a starting sentence. An awesome gpt image 2 prompts hub turns that friction into a much simpler job: pick the closest example, copy it, and begin iterating. That shortens the distance between landing on the site and actually generating something."}
                 </p>
                 <p>
                   {isZh
-                    ? "从 SEO 角度看，这种页面也比单一生成器页更适合承接长尾搜索。用户搜索 awesome gpt image 2 prompts，本质上不是在找“工具首页”，而是在找“可以直接拿来用的灵感案例”。如果这个页面既能展示真实成图，又能讲清楚 prompt 结构，再把用户导向生成器，就会形成比单页工具更完整的搜索闭环。"
+                    ? "而且你会更容易判断风格对不对。只看一句 prompt，很多人其实很难想象最后会生成什么；但先看成图，再决定要不要复制、改写、继续生成，整个过程会更有把握。"
                     : "From an SEO angle, this type of page is also a better fit for long-tail prompt intent than a generator landing page alone. People searching for awesome gpt image 2 prompts are not only looking for the tool home page; they are looking for usable ideas. A page that shows finished examples, explains the prompt structure, and then routes users into the generator creates a much stronger search-to-product loop than a single tool page on its own."}
                 </p>
                 <p>
                   {isZh
-                    ? "对站内架构来说，分类 prompts 子页还能帮助你覆盖更细的需求层：portrait、product、ui、social、pixel art、3d render。只要每个子页都围绕清晰任务来写，而不是机械复读同一段内容，就能在不制造 doorway pages 的前提下，扩展更多稳定流量入口。"
+                    ? "如果你已经知道自己要做哪一类图，也可以直接跳去对应分类页。这样你看到的 prompts 会更集中，改起来也更顺手，不需要在完全不相关的案例之间来回切换。"
                     : "At the site-architecture level, category prompt pages help you cover narrower intent around portrait, product, UI, social, pixel art, and 3D render work. As long as each category page solves a distinct task instead of repeating the same copy, you can expand coverage without turning the site into a doorway-page network."}
                 </p>
               </div>
