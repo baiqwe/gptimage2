@@ -132,11 +132,40 @@ const SAMPLE_PREVIEW_SLIDES = [
 
 const MAX_REFERENCE_FILE_SIZE = 20 * 1024 * 1024;
 const REFERENCE_UPLOAD_RETRY_ATTEMPTS = 3;
+const ACTIVE_GENERATION_STORAGE_KEY = "pending_gpt_image_2_generation_job";
+const CLIENT_GENERATION_POLL_TIMEOUT_MS = 12 * 60 * 1000;
+const PENDING_GENERATION_RESUME_WINDOW_MS = 6 * 60 * 60 * 1000;
 
 interface SignedReferenceUploadPayload {
     signedUrl: string;
     path: string;
     url: string;
+}
+
+interface SubmittedGenerationResponse {
+    success?: boolean;
+    queued?: boolean;
+    generationId?: string;
+    status?: string;
+    pollAfterMs?: number;
+    url?: string;
+    images?: string[];
+    revisedPrompt?: string | null;
+}
+
+interface GenerationStatusPayload {
+    id: string;
+    status: string;
+    imageUrl?: string | null;
+    images?: string[];
+    error?: string | null;
+    refunded?: boolean;
+    metadata?: {
+        mode?: string;
+        resolution?: string;
+        aspect_ratio?: string;
+        provider?: string | null;
+    } | null;
 }
 
 interface HomeHeroGeneratorProps {
@@ -170,10 +199,12 @@ export default function HomeHeroGenerator({ user, heroHeader }: HomeHeroGenerato
     const [referenceImages, setReferenceImages] = useState<ReferenceImage[]>([]);
     const [pendingReferenceFiles, setPendingReferenceFiles] = useState<PendingReferenceFile[]>([]);
     const [isUploadingReference, setIsUploadingReference] = useState(false);
+    const [activeGenerationId, setActiveGenerationId] = useState<string | null>(null);
     const canUseHighResolution = Boolean(credits?.has_paid_access);
     const autoResumePendingRef = useRef(false);
     const pendingReferenceFilesRef = useRef<PendingReferenceFile[]>([]);
     const referenceImagesRef = useRef<ReferenceImage[]>([]);
+    const generationPollTokenRef = useRef(0);
 
     const waitForPaidAccessSync = async (requiresPaidAccess: boolean) => {
         const latestCredits = await refetchCredits();
@@ -228,6 +259,140 @@ export default function HomeHeroGenerator({ user, heroHeader }: HomeHeroGenerato
             || normalized.includes("timeout")
             || normalized.includes("temporarily unavailable")
             || normalized.includes("internal server error");
+    };
+
+    const savePendingGenerationJob = (generationId: string) => {
+        localStorage.setItem(ACTIVE_GENERATION_STORAGE_KEY, JSON.stringify({
+            generationId,
+            timestamp: Date.now(),
+        }));
+    };
+
+    const clearPendingGenerationJob = () => {
+        localStorage.removeItem(ACTIVE_GENERATION_STORAGE_KEY);
+    };
+
+    const launchSuccessConfetti = async () => {
+        const confetti = (await import('canvas-confetti')).default;
+        confetti({
+            particleCount: 100,
+            spread: 64,
+            origin: { y: 0.72 },
+            colors: ['#ff6b2c', '#ffb347', '#ffe1bf'],
+        });
+    };
+
+    const finalizeGenerationSuccess = async (generation: GenerationStatusPayload) => {
+        const images = Array.isArray(generation.images)
+            ? generation.images
+            : (generation.imageUrl ? [generation.imageUrl] : []);
+
+        if (images.length === 0) {
+            throw new Error("No image returned from server");
+        }
+
+        setResultImages(images);
+        setActivePreviewIndex(0);
+        setActiveGenerationId(null);
+        clearPendingGenerationJob();
+        setIsGenerating(false);
+        await refetchCredits();
+        await launchSuccessConfetti();
+    };
+
+    const finalizeGenerationFailure = async (generation: GenerationStatusPayload) => {
+        setActiveGenerationId(null);
+        clearPendingGenerationJob();
+        setIsGenerating(false);
+        setError(
+            generation.error ||
+            (locale === "zh"
+                ? "生成失败，请稍后重试。"
+                : "Generation failed. Please try again later.")
+        );
+
+        if (generation.refunded) {
+            await refetchCredits();
+        }
+    };
+
+    const pollGenerationUntilFinished = async (
+        generationId: string,
+        options?: { initialDelayMs?: number; resume?: boolean }
+    ) => {
+        const pollToken = ++generationPollTokenRef.current;
+        const startedAt = Date.now();
+        const initialDelayMs = options?.initialDelayMs ?? 2000;
+
+        setActiveGenerationId(generationId);
+        savePendingGenerationJob(generationId);
+        setIsGenerating(true);
+
+        if (!options?.resume) {
+            setResultImages([]);
+        }
+
+        let attempt = 0;
+
+        while (generationPollTokenRef.current === pollToken) {
+            if (Date.now() - startedAt > CLIENT_GENERATION_POLL_TIMEOUT_MS) {
+                setIsGenerating(false);
+                setError(
+                    locale === "zh"
+                        ? "生成时间超过预期，任务仍可能在后台处理中。请稍后刷新页面或到控制台查看结果。"
+                        : "This generation is taking longer than expected. It may still be processing in the background. Please refresh later or check your dashboard."
+                );
+                return;
+            }
+
+            await sleep(attempt === 0 ? initialDelayMs : Math.min(2500 + attempt * 300, 6000));
+            attempt += 1;
+
+            try {
+                const response = await fetch(`/api/generations/${encodeURIComponent(generationId)}`, {
+                    method: "GET",
+                    cache: "no-store",
+                });
+                const data = await readResponseJson(response) as { generation?: GenerationStatusPayload; error?: string };
+
+                if (!response.ok) {
+                    if (response.status === 401) {
+                        setIsGenerating(false);
+                        setShowLoginPrompt(true);
+                        return;
+                    }
+
+                    throw new Error(data.error || "Failed to fetch generation status");
+                }
+
+                const generation = data.generation;
+                if (!generation) {
+                    throw new Error("Generation status is missing");
+                }
+
+                if (generation.status === "succeeded") {
+                    await finalizeGenerationSuccess(generation);
+                    return;
+                }
+
+                if (generation.status === "failed") {
+                    await finalizeGenerationFailure(generation);
+                    return;
+                }
+            } catch (pollError: any) {
+                console.error("Failed to poll generation status:", pollError);
+                if (Date.now() - startedAt > 30000) {
+                    setIsGenerating(false);
+                    setError(
+                        pollError?.message ||
+                        (locale === "zh"
+                            ? "获取生成状态失败，请稍后重试。"
+                            : "Failed to fetch generation status. Please try again later.")
+                    );
+                    return;
+                }
+            }
+        }
     };
 
     const uploadReferenceDirectly = async (file: File) => {
@@ -532,6 +697,50 @@ export default function HomeHeroGenerator({ user, heroHeader }: HomeHeroGenerato
     }, [currentUser, prompt, generationMode, aspectRatio, resolution, referenceImages.length]);
 
     useEffect(() => {
+        if (!currentUser || isGenerating) return;
+
+        const savedGenerationJob = localStorage.getItem(ACTIVE_GENERATION_STORAGE_KEY);
+        if (!savedGenerationJob) return;
+
+        try {
+            const parsed = JSON.parse(savedGenerationJob);
+            const generationId = typeof parsed?.generationId === "string" ? parsed.generationId : "";
+            const timestamp = typeof parsed?.timestamp === "number" ? parsed.timestamp : 0;
+
+            if (!generationId) {
+                clearPendingGenerationJob();
+                return;
+            }
+
+            if (timestamp && Date.now() - timestamp > PENDING_GENERATION_RESUME_WINDOW_MS) {
+                clearPendingGenerationJob();
+                return;
+            }
+
+            if (activeGenerationId === generationId) {
+                return;
+            }
+
+            toast({
+                title: locale === "zh" ? "正在恢复生成任务" : "Resuming your generation",
+                description: locale === "zh"
+                    ? "检测到一个尚未完成的任务，正在继续同步状态。"
+                    : "We found an unfinished generation and are syncing its status now.",
+            });
+
+            void pollGenerationUntilFinished(generationId, { initialDelayMs: 500, resume: true });
+        } catch {
+            clearPendingGenerationJob();
+        }
+    }, [activeGenerationId, currentUser, isGenerating, locale, toast]);
+
+    useEffect(() => {
+        return () => {
+            generationPollTokenRef.current += 1;
+        };
+    }, []);
+
+    useEffect(() => {
         pendingReferenceFilesRef.current = pendingReferenceFiles;
     }, [pendingReferenceFiles]);
 
@@ -666,6 +875,9 @@ export default function HomeHeroGenerator({ user, heroHeader }: HomeHeroGenerato
         setIsGenerating(true);
         setError(null);
         setShowLoginPrompt(false);
+        setActiveGenerationId(null);
+        setResultImages([]);
+        generationPollTokenRef.current += 1;
 
         try {
             const response = await fetch("/api/ai/text-to-image", {
@@ -686,36 +898,42 @@ export default function HomeHeroGenerator({ user, heroHeader }: HomeHeroGenerato
                 if (response.status === 402) {
                     saveStateForLater();
                     setIsRefillModalOpen(true);
+                    setIsGenerating(false);
                     return;
                 }
                 if (response.status === 401) {
                     saveStateForLater();
                     setShowLoginPrompt(true);
+                    setIsGenerating(false);
                     return;
                 }
                 throw new Error(errorData.error || "Generation failed");
             }
 
-            const data = await readResponseJson(response);
-            const images = Array.isArray(data.images) ? data.images : (data.url ? [data.url] : []);
+            const data = await readResponseJson(response) as SubmittedGenerationResponse;
 
-            if (images.length > 0) {
-                setResultImages(images);
-                await refetchCredits();
-                const confetti = (await import('canvas-confetti')).default;
-                confetti({
-                    particleCount: 100,
-                    spread: 64,
-                    origin: { y: 0.72 },
-                    colors: ['#ff6b2c', '#ffb347', '#ffe1bf'],
+            if (data.generationId) {
+                await pollGenerationUntilFinished(data.generationId, {
+                    initialDelayMs: data.pollAfterMs,
                 });
-            } else {
+                return;
+            }
+
+            const images = Array.isArray(data.images) ? data.images : (data.url ? [data.url] : []);
+            if (images.length === 0) {
                 throw new Error("No image returned from server");
             }
+
+            setResultImages(images);
+            setActivePreviewIndex(0);
+            setIsGenerating(false);
+            await refetchCredits();
+            await launchSuccessConfetti();
         } catch (requestError: any) {
             setError(requestError.message);
-        } finally {
             setIsGenerating(false);
+            setActiveGenerationId(null);
+            clearPendingGenerationJob();
         }
     };
 

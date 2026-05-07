@@ -83,7 +83,13 @@ CREATE TABLE IF NOT EXISTS public.generations (
     status text default 'pending',
     credits_cost integer default 10,
     metadata jsonb default '{}'::jsonb,
-    created_at timestamp with time zone default timezone('utc'::text, now()) not null
+    provider text,
+    provider_task_id text,
+    error_message text,
+    created_at timestamp with time zone default timezone('utc'::text, now()) not null,
+    completed_at timestamp with time zone,
+    refunded_at timestamp with time zone,
+    updated_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
 
 -- ============================================
@@ -104,6 +110,9 @@ CREATE TABLE IF NOT EXISTS public.processed_webhooks (
 CREATE INDEX IF NOT EXISTS customers_user_id_idx ON public.customers(user_id);
 CREATE UNIQUE INDEX IF NOT EXISTS customers_stripe_customer_id_idx ON public.customers(stripe_customer_id) WHERE stripe_customer_id IS NOT NULL;
 CREATE INDEX IF NOT EXISTS credits_history_customer_id_idx ON public.credits_history(customer_id);
+CREATE INDEX IF NOT EXISTS generations_status_idx ON public.generations(status);
+CREATE INDEX IF NOT EXISTS generations_user_id_created_at_idx ON public.generations(user_id, created_at DESC);
+CREATE UNIQUE INDEX IF NOT EXISTS generations_provider_task_id_key ON public.generations(provider_task_id) WHERE provider_task_id IS NOT NULL;
 CREATE INDEX IF NOT EXISTS generations_user_id_idx ON public.generations(user_id);
 CREATE UNIQUE INDEX IF NOT EXISTS processed_webhooks_action_key_idx ON public.processed_webhooks(action_key);
 CREATE UNIQUE INDEX IF NOT EXISTS subscriptions_stripe_subscription_id_idx ON public.subscriptions(stripe_subscription_id) WHERE stripe_subscription_id IS NOT NULL;
@@ -282,6 +291,73 @@ $$;
 
 -- 授权
 GRANT EXECUTE ON FUNCTION decrease_credits TO authenticated;
+
+CREATE OR REPLACE FUNCTION public.refund_generation_credits(
+  p_generation_id UUID,
+  p_description TEXT DEFAULT 'Refund: GPT Image 2 Generation Failed',
+  p_metadata jsonb DEFAULT '{}'::jsonb
+)
+RETURNS BOOLEAN
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+DECLARE
+  v_generation public.generations%ROWTYPE;
+  v_customer_id UUID;
+BEGIN
+  SELECT * INTO v_generation
+  FROM public.generations
+  WHERE id = p_generation_id
+  FOR UPDATE;
+
+  IF v_generation.id IS NULL THEN
+    RAISE EXCEPTION 'Generation % not found', p_generation_id;
+  END IF;
+
+  IF v_generation.refunded_at IS NOT NULL THEN
+    RETURN FALSE;
+  END IF;
+
+  IF COALESCE(v_generation.credits_cost, 0) <= 0 THEN
+    RETURN FALSE;
+  END IF;
+
+  SELECT id INTO v_customer_id
+  FROM public.customers
+  WHERE user_id = v_generation.user_id
+  FOR UPDATE;
+
+  IF v_customer_id IS NULL THEN
+    RAISE EXCEPTION 'Customer for generation % not found', p_generation_id;
+  END IF;
+
+  UPDATE public.customers
+  SET credits = credits + v_generation.credits_cost, updated_at = NOW()
+  WHERE id = v_customer_id;
+
+  INSERT INTO public.credits_history (customer_id, amount, type, description, created_at, metadata)
+  VALUES (
+    v_customer_id,
+    v_generation.credits_cost,
+    'add',
+    p_description,
+    NOW(),
+    COALESCE(p_metadata, '{}'::jsonb) || jsonb_build_object(
+      'action', 'generation_refund',
+      'generation_id', v_generation.id,
+      'provider_task_id', v_generation.provider_task_id
+    )
+  );
+
+  UPDATE public.generations
+  SET refunded_at = NOW(), updated_at = NOW()
+  WHERE id = v_generation.id;
+
+  RETURN TRUE;
+END;
+$$;
+
+GRANT EXECUTE ON FUNCTION public.refund_generation_credits(UUID, TEXT, jsonb) TO service_role;
 
 -- ============================================
 -- 11. 原子加积分与 Webhook 幂等发放

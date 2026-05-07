@@ -46,9 +46,8 @@ export default async function DashboardPage(props: { params: Promise<{ locale: s
 
     const { data: generationHistory } = await supabase
         .from("generations")
-        .select("id, prompt, image_url, status, credits_cost, created_at, metadata")
+        .select("id, prompt, image_url, status, credits_cost, created_at, metadata, error_message")
         .eq("user_id", user.id)
-        .eq("status", "succeeded")
         .order("created_at", { ascending: false })
         .limit(24);
 

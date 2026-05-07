@@ -158,6 +158,60 @@ export default function GLMImageGenerator({ user, locale = "en", t }: GLMImageGe
         }));
     };
 
+    const pollGenerationUntilFinished = async (generationId: string, initialDelayMs = 2000) => {
+        const startedAt = Date.now();
+        let attempt = 0;
+
+        while (Date.now() - startedAt < 12 * 60 * 1000) {
+            await new Promise((resolve) => window.setTimeout(resolve, attempt === 0 ? initialDelayMs : Math.min(2500 + attempt * 300, 6000)));
+            attempt += 1;
+
+            const response = await fetch(`/api/generations/${encodeURIComponent(generationId)}`, {
+                method: "GET",
+                cache: "no-store",
+            });
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.error || "Failed to fetch generation status");
+            }
+
+            const generation = data.generation;
+            if (!generation) {
+                throw new Error("Generation status is missing");
+            }
+
+            if (generation.status === "succeeded") {
+                const images = Array.isArray(generation.images)
+                    ? generation.images
+                    : (generation.imageUrl ? [generation.imageUrl] : []);
+
+                if (images.length === 0) {
+                    throw new Error("No image returned from server");
+                }
+
+                setResultImage(images[0]);
+                await refetchCredits();
+                confetti({
+                    particleCount: 80,
+                    spread: 60,
+                    origin: { y: 0.7 }
+                });
+                return;
+            }
+
+            if (generation.status === "failed") {
+                throw new Error(generation.error || "Generation failed");
+            }
+        }
+
+        throw new Error(
+            locale === "zh"
+                ? "生成时间超过预期，请稍后刷新或到控制台查看结果。"
+                : "This generation is taking longer than expected. Please refresh later or check your dashboard."
+        );
+    };
+
     const handleGenerate = async (force = false) => {
         // Validate prompt
         if (!prompt.trim()) {
@@ -223,6 +277,11 @@ export default function GLMImageGenerator({ user, locale = "en", t }: GLMImageGe
 
             const data = await response.json();
             console.log("Generation success:", data);
+
+            if (data.generationId) {
+                await pollGenerationUntilFinished(data.generationId, data.pollAfterMs);
+                return;
+            }
 
             if (data.url) {
                 setResultImage(data.url);

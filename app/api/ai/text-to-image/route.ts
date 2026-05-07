@@ -10,46 +10,20 @@ import {
     resolveResolution,
     validateResolutionForAspectRatio,
 } from "@/config/gpt-image";
+import {
+    KIE_IMAGE_TO_IMAGE_MODEL,
+    KIE_TEXT_TO_IMAGE_MODEL,
+    createKieTask,
+} from "@/utils/ai/kie";
+import {
+    createPendingGeneration,
+    markGenerationFailed,
+    markGenerationTaskSubmitted,
+} from "@/utils/ai/generations";
 
 // Use Node.js runtime for Vercel
 export const runtime = 'nodejs';
 export const maxDuration = 180;
-
-const KIE_API_BASE_URL = process.env.KIE_API_BASE_URL || "https://api.kie.ai";
-const KIE_TEXT_TO_IMAGE_MODEL = "gpt-image-2-text-to-image";
-const KIE_IMAGE_TO_IMAGE_MODEL = "gpt-image-2-image-to-image";
-const KIE_POLL_INTERVAL_MS = 2500;
-const KIE_TEXT_TO_IMAGE_TIMEOUT_MS = 90000;
-const KIE_IMAGE_TO_IMAGE_TIMEOUT_MS = 165000;
-const KIE_HIGH_RES_TEXT_TIMEOUT_MS = 170000;
-const KIE_MAX_RETRY_ATTEMPTS = 3;
-const KIE_RETRYABLE_ERROR_PATTERNS = [
-    "Internal Error, Please try again later.",
-    "internal error",
-    "server error",
-    "please try again later",
-] as const;
-
-interface KieCreateTaskResponse {
-    code: number;
-    msg: string;
-    data?: {
-        taskId?: string;
-    };
-}
-
-interface KieTaskRecordResponse {
-    code: number;
-    msg: string;
-    data?: {
-        taskId?: string;
-        model?: string;
-        state?: "waiting" | "queuing" | "generating" | "success" | "fail";
-        resultJson?: string;
-        failCode?: string;
-        failMsg?: string;
-    };
-}
 
 function optimizePrompt(prompt: string, locale: "zh" | "en") {
     if (locale === "zh") {
@@ -57,170 +31,6 @@ function optimizePrompt(prompt: string, locale: "zh" | "en") {
     }
 
     return `${prompt.trim()}, clear focal subject, cohesive composition, natural layered lighting, refined material detail, clean background separation, premium visual polish.`;
-}
-
-function sleep(ms: number) {
-    return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
-function parseKieResultUrls(resultJson?: string | null): string[] {
-    if (!resultJson) return [];
-
-    try {
-        const parsed = JSON.parse(resultJson);
-        if (Array.isArray(parsed?.resultUrls)) {
-            return parsed.resultUrls.filter(Boolean);
-        }
-        if (typeof parsed?.resultUrl === "string") {
-            return [parsed.resultUrl];
-        }
-        if (Array.isArray(parsed?.images)) {
-            return parsed.images.filter(Boolean);
-        }
-    } catch (error) {
-        console.error("Failed to parse Kie resultJson:", error);
-    }
-
-    return [];
-}
-
-async function generateWithKie({
-    prompt,
-    aspectRatio,
-    resolution,
-    inputUrls,
-}: {
-    prompt: string;
-    aspectRatio: string;
-    resolution: string;
-    inputUrls?: string[];
-}) {
-    const createTaskUrl = `${KIE_API_BASE_URL}/api/v1/jobs/createTask`;
-    const recordInfoBaseUrl = `${KIE_API_BASE_URL}/api/v1/jobs/recordInfo`;
-    const hasInputImage = Array.isArray(inputUrls) && inputUrls.length > 0;
-    const model = hasInputImage ? KIE_IMAGE_TO_IMAGE_MODEL : KIE_TEXT_TO_IMAGE_MODEL;
-    const input: Record<string, unknown> = {
-        prompt,
-        aspect_ratio: resolveAspectRatio(aspectRatio),
-        resolution: resolveResolution(resolution),
-        nsfw_checker: false,
-    };
-
-    if (hasInputImage) {
-        input.input_urls = inputUrls;
-    }
-
-    const createResponse = await fetch(createTaskUrl, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${process.env.KIE_API_KEY}`,
-        },
-        body: JSON.stringify({
-            model,
-            input,
-        }),
-    });
-
-    const createData = await createResponse.json() as KieCreateTaskResponse;
-    if (!createResponse.ok || createData.code !== 200 || !createData.data?.taskId) {
-        throw new Error(createData?.msg || `Kie task creation failed: ${createResponse.status}`);
-    }
-
-    const taskId = createData.data.taskId;
-    const startedAt = Date.now();
-    const isHighResolution = resolution === "2K" || resolution === "4K";
-    const pollTimeoutMs = hasInputImage
-        ? KIE_IMAGE_TO_IMAGE_TIMEOUT_MS
-        : isHighResolution
-            ? KIE_HIGH_RES_TEXT_TIMEOUT_MS
-            : KIE_TEXT_TO_IMAGE_TIMEOUT_MS;
-
-    while (Date.now() - startedAt < pollTimeoutMs) {
-        await sleep(KIE_POLL_INTERVAL_MS);
-
-        const recordInfoUrl = `${recordInfoBaseUrl}?taskId=${encodeURIComponent(taskId)}`;
-        const recordResponse = await fetch(recordInfoUrl, {
-            method: "GET",
-            headers: {
-                "Authorization": `Bearer ${process.env.KIE_API_KEY}`,
-            },
-            cache: "no-store",
-        });
-
-        const recordData = await recordResponse.json() as KieTaskRecordResponse;
-        if (!recordResponse.ok || recordData.code !== 200) {
-            throw new Error(recordData?.msg || `Kie task query failed: ${recordResponse.status}`);
-        }
-
-        const state = recordData.data?.state;
-        if (state === "success") {
-            const images = parseKieResultUrls(recordData.data?.resultJson);
-            if (images.length === 0) {
-                throw new Error("Kie task succeeded but returned no images");
-            }
-
-            return {
-                provider: "kie" as const,
-                taskId,
-                model,
-                images,
-                metadata: {
-                    provider: "kie",
-                    provider_model: model,
-                    provider_task_id: taskId,
-                    mode: hasInputImage ? "image-to-image" : "text-to-image",
-                    aspect_ratio: input.aspect_ratio,
-                    resolution: input.resolution,
-                    input_urls: hasInputImage ? inputUrls : null,
-                    nsfw_checker: false,
-                },
-            };
-        }
-
-        if (state === "fail") {
-            throw new Error(recordData.data?.failMsg || recordData.data?.failCode || "Kie generation failed");
-        }
-    }
-
-    throw new Error(
-        `Kie generation timed out while waiting for task completion (taskId: ${taskId}, resolution: ${resolution}, timeoutMs: ${pollTimeoutMs})`
-    );
-}
-
-function isRetryableKieError(error: unknown) {
-    const message = error instanceof Error ? error.message : String(error || "");
-    const normalized = message.toLowerCase();
-    return KIE_RETRYABLE_ERROR_PATTERNS.some((pattern) =>
-        normalized.includes(pattern.toLowerCase())
-    );
-}
-
-async function generateWithKieRetry(
-    params: Parameters<typeof generateWithKie>[0]
-) {
-    let lastError: unknown;
-
-    for (let attempt = 1; attempt <= KIE_MAX_RETRY_ATTEMPTS; attempt += 1) {
-        try {
-            return await generateWithKie(params);
-        } catch (error) {
-            lastError = error;
-
-            if (!isRetryableKieError(error) || attempt === KIE_MAX_RETRY_ATTEMPTS) {
-                throw error;
-            }
-
-            const retryDelayMs = 1500 * attempt;
-            console.warn(
-                `Retrying Kie generation after transient provider error (attempt ${attempt}/${KIE_MAX_RETRY_ATTEMPTS}):`,
-                error
-            );
-            await sleep(retryDelayMs);
-        }
-    }
-
-    throw lastError instanceof Error ? lastError : new Error("Kie generation failed after retries");
 }
 
 async function generateWithOpenAI({
@@ -430,14 +240,87 @@ export async function POST(request: NextRequest) {
             console.log("Input URLs:", validatedInputUrls.length);
             console.log("Count:", count);
 
-            const generationResult = provider === "kie"
-                ? await generateWithKieRetry({
-                    prompt: finalPrompt,
-                    aspectRatio: requestedAspectRatio,
-                    resolution: requestedResolution,
-                    inputUrls: validatedInputUrls,
-                })
-                : await generateWithOpenAI({
+            if (provider === "kie") {
+                let generation = null;
+
+                try {
+                    const requestedMode = validatedInputUrls.length > 0 ? "image-to-image" : "text-to-image";
+                    const requestedModel = requestedMode === "image-to-image"
+                        ? KIE_IMAGE_TO_IMAGE_MODEL
+                        : KIE_TEXT_TO_IMAGE_MODEL;
+
+                    generation = await createPendingGeneration({
+                        userId: user.id,
+                        prompt: trimmedPrompt,
+                        modelId: requestedModel,
+                        inputImageUrl: validatedInputUrls[0] || null,
+                        creditsCost: creditsRequired,
+                        provider: "kie",
+                        metadata: {
+                            provider: "kie",
+                            provider_model: requestedModel,
+                            mode: requestedMode,
+                            aspect_ratio: requestedAspectRatio,
+                            resolution: requestedResolution,
+                            input_urls: requestedMode === "image-to-image" ? validatedInputUrls : null,
+                            prompt_optimization,
+                            optimized_prompt: prompt_optimization ? finalPrompt : null,
+                            image_count_requested: count,
+                            submitted_at: new Date().toISOString(),
+                        },
+                    });
+
+                    const task = await createKieTask({
+                        prompt: finalPrompt,
+                        aspectRatio: requestedAspectRatio,
+                        resolution: requestedResolution,
+                        inputUrls: validatedInputUrls,
+                        generationId: generation.id,
+                    });
+
+                    const submittedGeneration = await markGenerationTaskSubmitted({
+                        generation,
+                        taskId: task.taskId,
+                        providerModel: task.model,
+                        metadata: {
+                            ...task.metadata,
+                            provider_task_id: task.taskId,
+                            submitted_at: new Date().toISOString(),
+                        },
+                    });
+
+                    return NextResponse.json({
+                        success: true,
+                        queued: true,
+                        generationId: submittedGeneration.id,
+                        status: submittedGeneration.status,
+                        provider,
+                        revisedPrompt: prompt_optimization ? finalPrompt : null,
+                        pollAfterMs: 2500,
+                    });
+                } catch (aiError: any) {
+                    if (generation) {
+                        await markGenerationFailed({
+                            generation,
+                            errorMessage: aiError?.message || "Kie generation submission failed",
+                            metadata: {
+                                provider_state: "submission_failed",
+                            },
+                            refundReason: "Refund: GPT Image 2 Generation Failed",
+                        });
+                    } else {
+                        await supabase.rpc('decrease_credits', {
+                            p_user_id: user.id,
+                            p_amount: -creditsRequired,
+                            p_description: 'Refund: GPT Image 2 Generation Failed'
+                        });
+                    }
+
+                    throw aiError;
+                }
+            }
+
+            const generationResult = await generateWithOpenAI({
                     prompt: finalPrompt,
                     aspectRatio: requestedAspectRatio,
                     count,
@@ -472,12 +355,13 @@ export async function POST(request: NextRequest) {
         } catch (aiError: any) {
             console.error("GPT Image 2 Service Error:", aiError);
 
-            // Refund credits on failure
-            await supabase.rpc('decrease_credits', {
-                p_user_id: user.id,
-                p_amount: -creditsRequired,
-                p_description: 'Refund: GPT Image 2 Generation Failed'
-            });
+            if (provider !== "kie") {
+                await supabase.rpc('decrease_credits', {
+                    p_user_id: user.id,
+                    p_amount: -creditsRequired,
+                    p_description: 'Refund: GPT Image 2 Generation Failed'
+                });
+            }
 
             return NextResponse.json({
                 error: "Generation failed, credits refunded",

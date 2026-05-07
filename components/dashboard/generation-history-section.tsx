@@ -16,6 +16,7 @@ type GenerationRecord = {
     prompt: string;
     image_url: string | null;
     status: string | null;
+    error_message?: string | null;
     credits_cost: number | null;
     created_at: string;
     metadata?: {
@@ -100,9 +101,10 @@ export function GenerationHistorySection({
                 </div>
             ) : (
                 <div className="overflow-hidden rounded-[20px] border border-orange-100">
-                    <div className="hidden grid-cols-[1.25fr_1fr_0.8fr_0.8fr_0.7fr_1fr] gap-4 bg-[#fff8f1] px-5 py-3 text-xs font-semibold uppercase tracking-[0.16em] text-slate-500 md:grid">
+                    <div className="hidden grid-cols-[1.2fr_0.9fr_0.8fr_0.8fr_0.7fr_0.7fr_1fr] gap-4 bg-[#fff8f1] px-5 py-3 text-xs font-semibold uppercase tracking-[0.16em] text-slate-500 md:grid">
                         <span>{isZh ? "提示词" : "Prompt"}</span>
                         <span>{isZh ? "时间" : "Created"}</span>
+                        <span>{isZh ? "状态" : "Status"}</span>
                         <span>{isZh ? "模式" : "Mode"}</span>
                         <span>{isZh ? "比例 / 分辨率" : "Aspect / Resolution"}</span>
                         <span>{isZh ? "积分" : "Credits"}</span>
@@ -121,7 +123,7 @@ export function GenerationHistorySection({
                                     key={item.id}
                                     className="px-4 py-4 sm:px-5"
                                 >
-                                    <div className="grid gap-4 md:grid-cols-[1.25fr_1fr_0.8fr_0.8fr_0.7fr_1fr] md:items-center">
+                                    <div className="grid gap-4 md:grid-cols-[1.2fr_0.9fr_0.8fr_0.8fr_0.7fr_0.7fr_1fr] md:items-center">
                                         <div className="min-w-0">
                                             <div className="mb-2 flex items-center gap-2 md:hidden">
                                                 <span className="rounded-full bg-orange-50 px-2.5 py-1 text-[11px] font-semibold text-orange-700">
@@ -139,6 +141,10 @@ export function GenerationHistorySection({
                                                 {isZh ? "时间 · " : "Created · "}
                                             </span>
                                             {formatDate(item.created_at, locale)}
+                                        </div>
+
+                                        <div className="hidden text-sm text-slate-600 md:block">
+                                            {statusLabel}
                                         </div>
 
                                         <div className="hidden text-sm text-slate-600 md:block">
@@ -202,6 +208,11 @@ export function GenerationHistorySection({
                                             )}
                                         </div>
                                     </div>
+                                    {item.status === "failed" && item.error_message ? (
+                                        <p className="mt-3 text-sm text-rose-600">
+                                            {item.error_message}
+                                        </p>
+                                    ) : null}
                                 </article>
                             );
                         })}
