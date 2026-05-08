@@ -1561,8 +1561,8 @@ export default function HomeHeroGenerator({ user, heroHeader }: HomeHeroGenerato
                                                         ? '上传完成后会自动继续图生图，无需重复点击。'
                                                         : 'The editor will continue automatically once the references finish uploading.')
                                                     : (locale === 'zh'
-                                                        ? '结果出来后会直接显示在这里，你可以继续预览和下载。'
-                                                        : 'Your result will appear here as soon as it is ready for preview and download.')}
+                                                        ? '生成过程预计耗时 1-2 分钟，请耐心等待。结果出来后会直接显示在这里，你可以继续预览和下载。'
+                                                        : 'Generation usually takes 1-2 minutes. Please wait while your result is prepared for preview and download.')}
                                             </p>
                                         </div>
                                     ) : (

@@ -38,7 +38,7 @@ const SHARE_REWARD_COPY = {
                 title: "生成并发布",
                 lines: [
                     "先用站内生成一张图，再发布到小红书。",
-                    "内容里请带上 GPT Image 2 或网站名。",
+                    "内容里请带上 GPT Image 2 和网站地址。",
                 ],
             },
             {
@@ -69,7 +69,7 @@ const SHARE_REWARD_COPY = {
         secondaryButton: "我知道了",
         ctaButton: "查看活动规则",
         successTitle: "晒出这张图，免费领 30 积分",
-        successDescription: "把作品发到小红书，带上 GPT Image 2 和帖子链接，审核通过后送你 30 积分。",
+        successDescription: "把作品发到小红书，带上 GPT Image 2 和网站链接，审核通过后赠送 30 积分。",
         refillTitle: "暂时不想购买？",
         refillDescription: "发一条小红书晒单，审核通过后可领 30 积分，再继续生成。",
         dashboardTitle: "分享作品赚 30 积分",
@@ -136,7 +136,7 @@ export function ShareRewardModal({
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="w-[min(94vw,960px)] overflow-hidden border-orange-100 bg-[linear-gradient(180deg,#fffdf9_0%,#fff7ef_100%)] p-0 sm:max-w-[960px]">
+            <DialogContent className="w-[min(92vw,920px)] max-h-[84vh] overflow-y-auto border-orange-100 bg-[linear-gradient(180deg,#fffdf9_0%,#fff7ef_100%)] p-0 sm:max-w-[920px]">
                 <div className="grid gap-0 lg:grid-cols-[1.08fr_0.92fr]">
                     <div className="p-6 sm:p-7">
                         <DialogHeader className="text-left">
