@@ -21,6 +21,7 @@ import Image from 'next/image';
 import { useToast } from '@/hooks/use-toast';
 import { useCredits } from '@/hooks/use-credits';
 import { createClient } from '@/utils/supabase/client';
+import { ShareRewardCta, ShareRewardModal } from '@/components/promotion/share-reward-prompt';
 import {
     ASPECT_RATIO_OPTIONS,
     DEFAULT_PROMPTS,
@@ -192,6 +193,7 @@ export default function HomeHeroGenerator({ user, heroHeader }: HomeHeroGenerato
     const [isGenerating, setIsGenerating] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [isRefillModalOpen, setIsRefillModalOpen] = useState(false);
+    const [isShareRewardModalOpen, setIsShareRewardModalOpen] = useState(false);
     const [showLoginPrompt, setShowLoginPrompt] = useState(false);
     const [currentUser, setCurrentUser] = useState<any>(user);
     const [activePreviewIndex, setActivePreviewIndex] = useState(0);
@@ -1053,6 +1055,11 @@ export default function HomeHeroGenerator({ user, heroHeader }: HomeHeroGenerato
     return (
         <>
             <QuickRefillModal isOpen={isRefillModalOpen} onClose={() => setIsRefillModalOpen(false)} />
+            <ShareRewardModal
+                open={isShareRewardModalOpen}
+                onOpenChange={setIsShareRewardModalOpen}
+                locale={locale}
+            />
             <AdaptiveAuthModal
                 isOpen={showLoginPrompt && !currentUser}
                 onOpenChange={setShowLoginPrompt}
@@ -1478,6 +1485,14 @@ export default function HomeHeroGenerator({ user, heroHeader }: HomeHeroGenerato
                                                     {locale === 'zh' ? '下载当前图片' : 'Download current image'}
                                                 </Button>
                                             </div>
+
+                                            {currentUser && locale === 'zh' ? (
+                                                <ShareRewardCta
+                                                    locale={locale}
+                                                    variant="success"
+                                                    onClick={() => setIsShareRewardModalOpen(true)}
+                                                />
+                                            ) : null}
 
                                             {resultImages.length > 1 && (
                                                 <div className="grid grid-cols-3 gap-3">
