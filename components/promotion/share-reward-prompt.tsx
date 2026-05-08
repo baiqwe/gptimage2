@@ -264,16 +264,13 @@ export function ShareRewardCta({
 
     if (variant === "dashboard") {
         return (
-            <div className={cn("mt-4 rounded-[20px] border border-dashed border-orange-200 bg-[#fffaf4] p-4", className)}>
-                <div className="flex flex-col gap-3">
-                    <div>
-                        <p className="text-sm font-semibold text-slate-900">{copy.dashboardTitle}</p>
-                        <p className="mt-1 text-sm leading-6 text-slate-600">{copy.dashboardDescription}</p>
-                    </div>
+            <div className={cn("mt-4 rounded-[18px] border border-dashed border-orange-200 bg-[#fffaf4] px-4 py-3", className)}>
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <p className="text-sm font-semibold text-slate-900">{copy.dashboardTitle}</p>
                     <Button
                         type="button"
                         variant="outline"
-                        className="w-full border-orange-200 bg-white text-orange-700 hover:bg-orange-50"
+                        className="shrink-0 border-orange-200 bg-white text-orange-700 hover:bg-orange-50"
                         onClick={onClick}
                     >
                         {copy.ctaButton}

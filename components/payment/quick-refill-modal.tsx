@@ -8,7 +8,6 @@ import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { ALL_PLANS, PLAN_PRO_MONTHLY, PLAN_STARTER, PricingPlan } from "@/config/pricing";
 import { PaymentProviderPanel } from "@/components/payment/payment-provider-panel";
-import { ShareRewardCta, ShareRewardModal } from "@/components/promotion/share-reward-prompt";
 
 interface QuickRefillModalProps {
     isOpen: boolean;
@@ -21,27 +20,18 @@ export function QuickRefillModal({ isOpen, onClose, currentPath }: QuickRefillMo
     const pathname = usePathname();
     const locale = pathname?.split("/")[1] === "zh" ? "zh" : "en";
     const [selectedPlan, setSelectedPlan] = useState<PricingPlan>(PLAN_STARTER);
-    const [isShareRewardModalOpen, setIsShareRewardModalOpen] = useState(false);
     const returnPath = currentPath || pathname || `/${locale}/create`;
 
     useEffect(() => {
         if (isOpen) {
             setSelectedPlan(PLAN_STARTER);
-        } else {
-            setIsShareRewardModalOpen(false);
         }
     }, [isOpen]);
 
     return (
-        <>
-            <ShareRewardModal
-                open={isShareRewardModalOpen}
-                onOpenChange={setIsShareRewardModalOpen}
-                locale={locale}
-            />
-            <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-                <DialogContent className="w-[min(96vw,1100px)] max-h-[92vh] overflow-y-auto p-0 sm:max-w-[1100px]">
-                    <div className="p-6 sm:p-7">
+        <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+            <DialogContent className="w-[min(96vw,1100px)] max-h-[92vh] overflow-y-auto p-0 sm:max-w-[1100px]">
+                <div className="p-6 sm:p-7">
                     <DialogHeader>
                         <DialogTitle className="flex items-center gap-2 text-xl">
                             <span className="text-2xl">⚡️</span>
@@ -112,15 +102,8 @@ export function QuickRefillModal({ isOpen, onClose, currentPath }: QuickRefillMo
                             />
                         </div>
                     </div>
-
-                    <ShareRewardCta
-                        locale={locale}
-                        variant="refill"
-                        onClick={() => setIsShareRewardModalOpen(true)}
-                    />
-                    </div>
-                </DialogContent>
-            </Dialog>
-        </>
+                </div>
+            </DialogContent>
+        </Dialog>
     );
 }
