@@ -51,20 +51,24 @@ type Props = {
 
 const planComparison = {
     en: [
-        ["Monthly image allowance", "40 images total", "100 images / month", "100 images / month"],
-        ["Resolution access", "1K", "1K, 2K, 4K", "1K, 2K, 4K"],
+        ["Standard-image credits", "1,000 total", "5,000 / month", "60,000 / year"],
+        ["1K equivalent", "About 100 total", "About 500 / month", "About 500 / month on average"],
+        ["Resolution access", "1K, 2K, 4K", "1K, 2K, 4K", "1K, 2K, 4K"],
+        ["Resolution pricing", "1K 10 · 2K 20 · 4K 40", "1K 10 · 2K 20 · 4K 40", "1K 10 · 2K 20 · 4K 40"],
         ["Text to image", "Included", "Included", "Included"],
         ["Image to image editing", "Included", "Included", "Included"],
         ["Commercial use", "Allowed", "Allowed", "Allowed"],
-        ["Best fit", "One short project", "Ongoing monthly work", "Lowest monthly effective price"],
+        ["Best fit", "One short project", "Ongoing monthly work", "Lowest effective annual price"],
     ],
     zh: [
-        ["每月可用图量", "总计 40 张", "每月 100 张", "每月 100 张"],
-        ["分辨率权限", "1K", "1K、2K、4K", "1K、2K、4K"],
+        ["标准图积分", "总计 1,000", "每月 5,000", "每年 60,000"],
+        ["1K 等价额度", "约 100 张总量", "约每月 500 张", "折合约每月 500 张"],
+        ["分辨率权限", "1K、2K、4K", "1K、2K、4K", "1K、2K、4K"],
+        ["分辨率扣分", "1K 10 · 2K 20 · 4K 40", "1K 10 · 2K 20 · 4K 40", "1K 10 · 2K 20 · 4K 40"],
         ["文生图", "包含", "包含", "包含"],
         ["图生图编辑", "包含", "包含", "包含"],
         ["商用使用", "支持", "支持", "支持"],
-        ["更适合谁", "短期单次项目", "持续的月度创作", "追求最低月均成本"],
+        ["更适合谁", "短期单次项目", "持续的月度创作", "追求最低年均成本"],
     ],
 };
 
@@ -84,8 +88,8 @@ export default async function PricingPage({ params }: Props) {
         {
             question: isZh ? "买断和订阅有什么区别？" : "What is the difference between one-time credits and a subscription?",
             answer: isZh
-                ? "买断更适合一次性项目或偶尔生成；订阅更适合持续性的设计、营销和内容工作流。年付的月均成本更低。"
-                : "A one-time pack is best for a short project or occasional use, while subscriptions fit recurring design, marketing, or content workflows. Annual billing gives the lowest effective monthly cost.",
+                ? "买断更适合一次性补充积分，且积分不过期；订阅更适合持续性的设计、营销和内容工作流，积分会在对应计费周期开始时补充。年付的年均成本更低。"
+                : "A one-time pack is best when you want to top up without an expiry date, while subscriptions fit recurring design, marketing, or content workflows and refresh at the start of each billing cycle. Annual billing gives the lowest effective long-term price.",
         },
         {
             question: isZh ? "生成的图片可以商用吗？" : "Can I use generated images commercially?",
@@ -108,8 +112,8 @@ export default async function PricingPage({ params }: Props) {
         {
             question: isZh ? "积分会过期吗？" : "Do credits expire?",
             answer: isZh
-                ? "一次性购买的积分不会过期。订阅型积分按周期发放，具体可用量以您当前的订阅状态和账户面板显示为准。"
-                : "One-time purchased credits do not expire. Subscription credits are issued per billing cycle, and your available balance is shown in your account dashboard.",
+                ? "一次性购买的积分不会过期。订阅型积分会在各自计费周期开始时补充，具体可用量以您当前订阅状态和账户面板显示为准。"
+                : "One-time purchased credits do not expire. Subscription balances refresh at the start of each billing cycle, and your available balance is shown in your account dashboard.",
         },
     ];
 
@@ -139,8 +143,8 @@ export default async function PricingPage({ params }: Props) {
                             </p>
                             <p>
                                 {isZh
-                                    ? "当前的 GPT Image 2 工作台把选择逻辑尽量做得简单：免费用户可以先体验完整流程，并在 1K 分辨率下验证提示词、比例和编辑方式；只要购买任意积分包或订阅，即可解锁 2K 和 4K，并在更高分辨率下完成海报、商品图、社媒封面或概念图的交付。"
-                                    : "The current GPT Image 2 workspace keeps the decision logic simple. Free users can validate prompts, ratios, and editing flow in 1K first. Any paid pack or subscription unlocks 2K and 4K, which makes the workspace more practical for deliverables such as posters, product visuals, social covers, and concept boards."}
+                                    ? "当前的 GPT Image 2 工作台把选择逻辑尽量做得简单：免费用户可以先体验完整流程，并在 1K 分辨率下验证提示词、比例和编辑方式；只要购买任意积分包或订阅，即可解锁 2K 和 4K。积分按标准图口径结算，1K 每张 10 分、2K 每张 20 分、4K 每张 40 分。"
+                                    : "The current GPT Image 2 workspace keeps the decision logic simple. Free users can validate prompts, ratios, and editing flow in 1K first. Any paid pack or subscription unlocks 2K and 4K. Credits are measured in a standard-image unit: 1K costs 10 credits, 2K costs 20, and 4K costs 40."}
                             </p>
                         </div>
                     </div>
@@ -153,8 +157,8 @@ export default async function PricingPage({ params }: Props) {
                         </h2>
                         <p className="mt-2 text-sm leading-7 text-slate-600">
                             {isZh
-                                ? "这个表格用更接近实际工作的维度来比较套餐：分辨率权限、图像模式、商用使用以及更适合的任务阶段。"
-                                : "This table compares plans by practical workflow dimensions such as resolution access, generation modes, commercial use, and the kind of work each plan fits best."}
+                                ? "这个表格用更接近实际工作的维度来比较套餐：标准图积分、高清消耗倍率、分辨率权限、图像模式以及更适合的任务阶段。"
+                                : "This table compares plans by practical workflow dimensions such as standard-image credits, high-resolution pricing, resolution access, generation modes, and the kind of work each plan fits best."}
                         </p>
                     </div>
                     <div className="overflow-x-auto">
@@ -212,8 +216,8 @@ export default async function PricingPage({ params }: Props) {
                         </h2>
                         <ul className="mt-4 space-y-3 text-sm leading-7 text-slate-600">
                             <li className="flex gap-3"><Check className="mt-1 h-4 w-4 shrink-0 text-emerald-500" />{isZh ? "如果你只是验证 prompt 方向，先用免费额度和 1K 足够。" : "If you are only validating prompt direction, free credits and 1K are usually enough to start."}</li>
-                            <li className="flex gap-3"><Check className="mt-1 h-4 w-4 shrink-0 text-emerald-500" />{isZh ? "如果你要做展示级海报、社媒封面或商品视觉，建议至少解锁 2K。" : "If you are producing presentation-grade posters, social covers, or product visuals, 2K is usually the better baseline."}</li>
-                            <li className="flex gap-3"><Check className="mt-1 h-4 w-4 shrink-0 text-emerald-500" />{isZh ? "如果你已经确定会持续使用，年付通常拥有更低的月均成本。" : "If you already know this will be part of a recurring workflow, annual billing usually gives the lowest effective monthly cost."}</li>
+                            <li className="flex gap-3"><Check className="mt-1 h-4 w-4 shrink-0 text-emerald-500" />{isZh ? "如果你要做展示级海报、社媒封面或商品视觉，建议至少解锁 2K；4K 更适合最终交付前的高清版本。" : "If you are producing presentation-grade posters, social covers, or product visuals, 2K is usually the better baseline, while 4K is better reserved for final high-resolution output."}</li>
+                            <li className="flex gap-3"><Check className="mt-1 h-4 w-4 shrink-0 text-emerald-500" />{isZh ? "如果你已经确定会持续使用，月付更适合稳定消耗，年付则拥有更低的长期成本。" : "If you already know this will be part of a recurring workflow, monthly billing fits steady usage, while annual billing gives the lower long-term cost."}</li>
                         </ul>
                     </div>
                 </section>
@@ -240,8 +244,8 @@ export default async function PricingPage({ params }: Props) {
                     </h2>
                     <p className="mx-auto mt-4 max-w-3xl text-base leading-8 text-slate-600">
                         {isZh
-                            ? "如果你还在犹豫，最好的方式不是反复比较文案，而是直接生成一个与你工作最接近的场景：商品图、社媒海报、UI 概念图或角色视觉。先在免费额度里验证流程，再决定是否需要更高分辨率或更稳定的月度用量。"
-                            : "If you are still deciding, the fastest way is not to compare copy endlessly but to generate one image that resembles your real workflow: a product visual, a social poster, a UI concept, or a character scene. Validate the flow with free credits first, then decide whether you need higher resolution or a steadier monthly allowance."}
+                            ? "如果你还在犹豫，最好的方式不是反复比较文案，而是直接生成一个与你工作最接近的场景：商品图、社媒海报、UI 概念图或角色视觉。先在免费额度里验证流程，再决定是否需要更高分辨率，以及你更适合一次性补充积分还是持续订阅。"
+                            : "If you are still deciding, the fastest way is not to compare copy endlessly but to generate one image that resembles your real workflow: a product visual, a social poster, a UI concept, or a character scene. Validate the flow with free credits first, then decide whether you need higher resolution and whether a top-up or a subscription fits you better."}
                     </p>
                     <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
                         <Link href={`${localePrefix}/create`} className="inline-flex min-w-[220px] items-center justify-center rounded-full bg-[#ff6b2c] px-8 py-4 text-lg font-semibold text-white shadow-[0_18px_36px_rgba(255,107,44,0.24)] transition-colors hover:bg-[#f86120]">

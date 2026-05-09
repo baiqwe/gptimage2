@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Loader2, CreditCard, Sparkles, ShieldCheck, ArrowRight } from "lucide-react";
 import type { PricingPlan } from "@/config/pricing";
-import { getLocalizedPlan } from "@/config/pricing";
+import { getCreditsPerImage, getEstimatedStandardImages, getLocalizedPlan } from "@/config/pricing";
 import { StripeEmbeddedCheckoutSection } from "@/components/payment/stripe-embedded-checkout";
 import { toast } from "@/hooks/use-toast";
 
@@ -26,6 +26,7 @@ export function PaymentProviderPanel({
   const [provider, setProvider] = useState<"stripe" | "creem">("stripe");
   const [isCreemLoading, setIsCreemLoading] = useState(false);
   const localizedPlan = getLocalizedPlan(plan, locale);
+  const standardImages = getEstimatedStandardImages(plan);
 
   const handleCreemCheckout = async () => {
     try {
@@ -116,7 +117,7 @@ export function PaymentProviderPanel({
             <p className="mt-1 font-semibold text-slate-900">${plan.price.toFixed(2)}</p>
           </div>
           <div>
-            <p className="text-slate-500">{locale === "zh" ? "积分" : "Credits"}</p>
+            <p className="text-slate-500">{locale === "zh" ? "标准图积分" : "Standard-image credits"}</p>
             <p className="mt-1 font-semibold text-slate-900">{plan.credits.toLocaleString()}</p>
           </div>
           <div>
@@ -135,6 +136,28 @@ export function PaymentProviderPanel({
                   : "One-time credits pack"}
             </p>
           </div>
+        </div>
+
+        <div className="mt-3 rounded-2xl border border-orange-100 bg-[#fffaf4] p-4 text-sm text-slate-600">
+          <p className="font-semibold text-slate-900">
+            {locale === "zh"
+              ? `约等于 ${standardImages} 张 1K 标准图额度`
+              : `About ${standardImages} standard 1K generations`}
+          </p>
+          <p className="mt-1 text-orange-700">
+            {locale === "zh"
+              ? `1K 每张 ${getCreditsPerImage("1K")} 分 · 2K 每张 ${getCreditsPerImage("2K")} 分 · 4K 每张 ${getCreditsPerImage("4K")} 分`
+              : `1K ${getCreditsPerImage("1K")} credits · 2K ${getCreditsPerImage("2K")} · 4K ${getCreditsPerImage("4K")}`}
+          </p>
+          <p className="mt-2 text-xs text-slate-500">
+            {plan.type === "subscription"
+              ? locale === "zh"
+                ? "订阅积分会在对应计费周期开始时补充，具体余额以账户面板显示为准。"
+                : "Subscription balances refresh at the start of each billing cycle, and your dashboard is the source of truth."
+              : locale === "zh"
+                ? "一次性购买的积分不过期，可随时用于 1K、2K 或 4K 生成。"
+                : "One-time credits do not expire and can be used for 1K, 2K, or 4K generations any time."}
+          </p>
         </div>
       </div>
 

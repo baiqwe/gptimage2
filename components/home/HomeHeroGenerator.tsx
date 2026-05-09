@@ -30,7 +30,7 @@ import {
     type ResolutionOption,
     validateResolutionForAspectRatio,
 } from '@/config/gpt-image';
-import { CREDITS_PER_GENERATION } from '@/config/pricing';
+import { getCreditsPerImage, getCreditsRequired } from '@/config/pricing';
 
 const QuickRefillModal = dynamic(
     () => import('@/components/payment/quick-refill-modal').then((mod) => mod.QuickRefillModal),
@@ -203,6 +203,7 @@ export default function HomeHeroGenerator({ user, heroHeader }: HomeHeroGenerato
     const [isUploadingReference, setIsUploadingReference] = useState(false);
     const [activeGenerationId, setActiveGenerationId] = useState<string | null>(null);
     const canUseHighResolution = Boolean(credits?.has_paid_access);
+    const currentGenerationCredits = getCreditsRequired(resolution, 1);
     const autoResumePendingRef = useRef(false);
     const pendingReferenceFilesRef = useRef<PendingReferenceFile[]>([]);
     const referenceImagesRef = useRef<ReferenceImage[]>([]);
@@ -836,7 +837,7 @@ export default function HomeHeroGenerator({ user, heroHeader }: HomeHeroGenerato
             return;
         }
 
-        if (!force && credits && credits.remaining_credits < CREDITS_PER_GENERATION) {
+        if (!force && credits && credits.remaining_credits < currentGenerationCredits) {
             saveStateForLater();
             setIsRefillModalOpen(true);
             return;
@@ -1388,6 +1389,11 @@ export default function HomeHeroGenerator({ user, heroHeader }: HomeHeroGenerato
                                                     ? '购买任意积分包或订阅后，即可解锁 2K 和 4K；Auto 仅支持 1K，1:1 不支持 4K。'
                                                     : 'Buy any credits pack or subscription to unlock 2K and 4K. Auto only supports 1K, and 1:1 does not support 4K.')}
                                         </p>
+                                        <p className="mt-2 text-[12px] leading-5 text-orange-700">
+                                            {locale === 'zh'
+                                                ? `1K 每张 ${getCreditsPerImage("1K")} 分 · 2K 每张 ${getCreditsPerImage("2K")} 分 · 4K 每张 ${getCreditsPerImage("4K")} 分`
+                                                : `1K ${getCreditsPerImage("1K")} credits · 2K ${getCreditsPerImage("2K")} · 4K ${getCreditsPerImage("4K")}`}
+                                        </p>
                                     </div>
 
                                     {currentUser ? (
@@ -1402,7 +1408,7 @@ export default function HomeHeroGenerator({ user, heroHeader }: HomeHeroGenerato
                                                 <p className="text-sm text-slate-500">
                                                     {locale === 'zh' ? '本次消耗' : 'This run'}
                                                 </p>
-                                                <p className="text-lg font-semibold text-orange-600">{CREDITS_PER_GENERATION} {locale === 'zh' ? '积分' : 'credits'}</p>
+                                                <p className="text-lg font-semibold text-orange-600">{currentGenerationCredits} {locale === 'zh' ? '积分' : 'credits'}</p>
                                             </div>
                                         </div>
                                     ) : (

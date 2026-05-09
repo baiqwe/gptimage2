@@ -1,15 +1,15 @@
 "use client";
 
-import { useTranslations } from 'next-intl';
 import { useState, useEffect } from 'react';
 import { Check, Sparkles, Zap, Crown, Clock } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import {
     ALL_PLANS,
-    CREDITS_PER_GENERATION,
     calculateCostPerGeneration,
     calculateDiscount,
+    getCreditsPerImage,
+    getEstimatedStandardImages,
     getLocalizedPlan,
     PricingPlan
 } from "@/config/pricing";
@@ -56,7 +56,6 @@ function DiscountTimer({ locale }: { locale: string }) {
 }
 
 export function PricingSection({ locale }: PricingSectionProps) {
-    const t = useTranslations('Pricing');
     const [selectedPlan, setSelectedPlan] = useState<PricingPlan | null>(null);
     const [isPaymentDialogOpen, setIsPaymentDialogOpen] = useState(false);
 
@@ -77,7 +76,7 @@ export function PricingSection({ locale }: PricingSectionProps) {
         const localizedPlan = getLocalizedPlan(plan, locale);
         const costPerGen = calculateCostPerGeneration(plan);
         const discount = calculateDiscount(plan);
-        const generations = Math.floor(plan.credits / CREDITS_PER_GENERATION);
+        const standardImages = getEstimatedStandardImages(plan);
 
         const icons = [
             <Zap key="zap" className="w-8 h-8 text-yellow-400" />,
@@ -154,8 +153,15 @@ export function PricingSection({ locale }: PricingSectionProps) {
                 <div className="mb-6 rounded-2xl border border-orange-100 bg-[#fff7ef] p-4 text-center">
                     <span className="block text-3xl font-bold text-slate-900">{plan.credits.toLocaleString()}</span>
                     <span className="text-sm text-slate-500">
-                        {locale === 'zh' ? '积分' : 'Credits'} ({generations} {locale === 'zh' ? '张图' : 'Images'})
+                        {locale === 'zh'
+                            ? `标准图积分（约 ${standardImages} 张 1K）`
+                            : `standard-image credits (~${standardImages} 1K images)`}
                     </span>
+                    <p className="mt-2 text-xs text-orange-700">
+                        {locale === 'zh'
+                            ? `1K ${getCreditsPerImage("1K")} 分 · 2K ${getCreditsPerImage("2K")} 分 · 4K ${getCreditsPerImage("4K")} 分`
+                            : `1K ${getCreditsPerImage("1K")} credits · 2K ${getCreditsPerImage("2K")} · 4K ${getCreditsPerImage("4K")}`}
+                    </p>
                 </div>
 
                 {/* Features */}
@@ -171,7 +177,7 @@ export function PricingSection({ locale }: PricingSectionProps) {
                 {/* Cost per image */}
                 <div className="mb-4 rounded-lg bg-[#fffaf4] py-2 text-center">
                     <span className="text-xs text-slate-500">
-                        {locale === 'zh' ? '单张成本：' : 'Per image: '}
+                        {locale === 'zh' ? '1K 等价单次成本：' : '1K equivalent: '}
                     </span>
                     <span className={cn(
                         "font-bold text-sm",
@@ -232,7 +238,9 @@ export function PricingSection({ locale }: PricingSectionProps) {
             {/* Bottom note */}
             <div className="mt-12 space-y-2 text-center">
                 <p className="text-sm text-slate-600">
-                    {locale === 'zh' ? '💰 所有套餐积分永久有效，无过期限制' : '💰 All credits never expire'}
+                    {locale === 'zh'
+                        ? '💰 一次性积分永不过期；订阅积分会在各自计费周期开始时补充。'
+                        : '💰 One-time credits never expire. Subscription balances refresh at the start of each billing cycle.'}
                 </p>
                 <p className="text-xs text-slate-400">
                     {locale === 'zh' ? 'Stripe 将按地区自动展示卡支付与可用钱包方式，Creem 可作为备用结账' : 'Stripe shows eligible card and wallet methods by region, with Creem available as a fallback'}

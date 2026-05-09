@@ -2,9 +2,10 @@ import Link from "next/link";
 import { Check, Crown, Sparkles, Zap } from "lucide-react";
 import {
   ALL_PLANS,
-  CREDITS_PER_GENERATION,
   calculateCostPerGeneration,
   calculateDiscount,
+  getCreditsPerImage,
+  getEstimatedStandardImages,
   getLocalizedPlan,
   type PricingPlan,
 } from "@/config/pricing";
@@ -35,7 +36,7 @@ function TeaserCard({
   plan: PricingPlan;
 }) {
   const localizedPlan = getLocalizedPlan(plan, locale);
-  const generations = Math.floor(plan.credits / CREDITS_PER_GENERATION);
+  const standardImages = getEstimatedStandardImages(plan);
   const discount = calculateDiscount(plan);
   const costPerImage = calculateCostPerGeneration(plan);
 
@@ -89,13 +90,20 @@ function TeaserCard({
 
       <div className="mt-5 rounded-2xl border border-orange-100 bg-[#fffaf4] p-4">
         <p className="text-sm font-semibold text-slate-900">
-          {plan.credits.toLocaleString()} {locale === "zh" ? "积分" : "credits"}
+          {plan.credits.toLocaleString()} {locale === "zh" ? "标准图积分" : "standard-image credits"}
         </p>
         <p className="mt-1 text-sm text-slate-500">
-          {generations} {locale === "zh" ? "张图的生成额度" : "image generations included"}
+          {locale === "zh"
+            ? `约等于 ${standardImages} 张 1K 生成额度`
+            : `About ${standardImages} standard 1K generations`}
         </p>
         <p className="mt-2 text-xs text-orange-700">
-          {locale === "zh" ? "单张成本" : "Per image"} ${costPerImage.toFixed(3)}
+          {locale === "zh"
+            ? `1K ${getCreditsPerImage("1K")} 分 · 2K ${getCreditsPerImage("2K")} 分 · 4K ${getCreditsPerImage("4K")} 分`
+            : `1K ${getCreditsPerImage("1K")} · 2K ${getCreditsPerImage("2K")} · 4K ${getCreditsPerImage("4K")} credits`}
+        </p>
+        <p className="mt-1 text-xs text-slate-500">
+          {locale === "zh" ? "1K 等价单次成本" : "1K equivalent"} ${costPerImage.toFixed(3)}
         </p>
       </div>
 

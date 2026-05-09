@@ -1,10 +1,18 @@
 // ============================================
 // GPT Image 2 Generator 定价策略
-// 核心：10积分/张，高额锚定原价，制造紧迫感
+// 核心：1K = 10 积分，2K = 20 积分，4K = 40 积分
 // ============================================
 
-// 每次生成消耗积分数
+import type { ResolutionOption } from "@/config/gpt-image";
+
+// 1K 标准图单次消耗积分数
 export const CREDITS_PER_GENERATION = 10;
+
+export const RESOLUTION_CREDIT_MULTIPLIERS: Record<ResolutionOption, number> = {
+    "1K": 1,
+    "2K": 2,
+    "4K": 4,
+};
 
 // 定价套餐接口
 export interface PricingPlan {
@@ -41,22 +49,22 @@ export const PLAN_STARTER: PricingPlan = {
     descriptionZh: '适合一个短期项目',
     price: 9.99,
     originalPrice: 19.99,
-    credits: 400,            // 40张
+    credits: 1000,
     type: 'one_time',
     productId: 'prod_7bP8ivuMhl76frU67YaQUQ',
     badge: 'Good for a quick project',
     badgeZh: '适合快速项目',
     features: [
-        '400 Credits (40 Images)',
-        'Best for one-off image needs',
-        'Commercial License',
-        'Never Expires'
+        '1,000 standard-image credits',
+        '1K: 10 credits · 2K: 20 · 4K: 40',
+        'Commercial use included',
+        'Never expires'
     ],
     featuresZh: [
-        '400 积分（40 张图）',
-        '适合一次性图片需求',
-        '商用授权',
-        '永不过期'
+        '1,000 标准图积分',
+        '1K 每张 10 分 · 2K 每张 20 分 · 4K 每张 40 分',
+        '包含商用授权',
+        '一次性积分永不过期'
     ]
 };
 
@@ -69,23 +77,23 @@ export const PLAN_PRO_MONTHLY: PricingPlan = {
     descriptionZh: '最平滑的持续升级方案',
     price: 19.99,
     originalPrice: 39.99,
-    credits: 1000,           // 100张
+    credits: 5000,
     type: 'subscription',
     interval: 'month',
     productId: 'prod_XthXgy0iASIXG84KRQOBb',
     badge: 'Most Flexible',
     badgeZh: '灵活升级',
     features: [
-        '1,000 Credits/Month (100 Images)',
+        '5,000 standard-image credits / month',
+        '1K: 10 credits · 2K: 20 · 4K: 40',
         'Priority Generation',
-        'Commercial Use Included',
-        'Ideal for recurring client work'
+        'Commercial use included'
     ],
     featuresZh: [
-        '每月 1,000 积分（100 张图）',
+        '每月 5,000 标准图积分',
+        '1K 每张 10 分 · 2K 每张 20 分 · 4K 每张 40 分',
         '优先生成队列',
-        '包含商用授权',
-        '适合持续型创作需求'
+        '包含商用授权'
     ]
 };
 
@@ -96,29 +104,28 @@ export const PLAN_PRO_YEARLY: PricingPlan = {
     nameZh: '专业年付',
     description: 'Best value for long-term creators',
     descriptionZh: '最适合长期创作团队',
-    price: 149.99,
-    originalPrice: 479.88,
-    credits: 12000,          // 1200张/年
+    price: 189.99,
+    originalPrice: 239.88,
+    credits: 60000,
     type: 'subscription',
     interval: 'year',
     productId: 'prod_2o3W4tsUlKR6BbpNbGOp2g',
     badge: 'Best Value',
     badgeZh: '最佳选择',
     isPopular: true,
-    discountOverride: 65,
-    priceNote: 'Billed annually at $149.99 ($12.49/month)',
-    priceNoteZh: '按年支付 $149.99（约 $12.49 / 月）',
+    priceNote: 'Billed annually at $189.99 ($15.83/month)',
+    priceNoteZh: '按年支付 $189.99（约 $15.83 / 月）',
     features: [
-        '12,000 Credits/Year (1,200 Images)',
-        'Equivalent to 100 images/month value',
+        '60,000 standard-image credits / year',
+        '1K: 10 credits · 2K: 20 · 4K: 40',
         'Highest Priority',
-        'Best price per image'
+        'Save 21% vs monthly billing'
     ],
     featuresZh: [
-        '年度 12,000 积分（1,200 张图）',
-        '折合每月 100 张图的额度价值',
+        '每年 60,000 标准图积分',
+        '1K 每张 10 分 · 2K 每张 20 分 · 4K 每张 40 分',
         '最高优先级',
-        '单张成本最低'
+        '相对月付节省 21%'
     ]
 };
 
@@ -154,9 +161,24 @@ export function getPlanByStripePriceId(priceId: string): PricingPlan | undefined
 export const PLAN_MINI = PLAN_STARTER;
 export const PLAN_ANCHOR = PLAN_PRO_YEARLY;
 
-// 计算单张成本
+export function getCreditsPerImage(resolution: ResolutionOption = "1K"): number {
+    return CREDITS_PER_GENERATION * RESOLUTION_CREDIT_MULTIPLIERS[resolution];
+}
+
+export function getCreditsRequired(
+    resolution: ResolutionOption = "1K",
+    count: number = 1
+): number {
+    return getCreditsPerImage(resolution) * Math.max(count, 1);
+}
+
+export function getEstimatedStandardImages(plan: PricingPlan): number {
+    return Math.floor(plan.credits / CREDITS_PER_GENERATION);
+}
+
+// 计算 1K 标准图等价单次成本
 export function calculateCostPerGeneration(plan: PricingPlan): number {
-    const generations = plan.credits / CREDITS_PER_GENERATION;
+    const generations = getEstimatedStandardImages(plan);
     return plan.price / generations;
 }
 

@@ -182,11 +182,11 @@ export default async function TermsPage(props: { params: Promise<{ locale: strin
                             <div className="space-y-4 text-slate-600">
                                 <p>{isZh ? '关于积分系统：' : 'About the credits system:'}</p>
                                 <ul className="list-disc list-inside space-y-2 ml-4">
-                                    <li>{isZh ? '每次图像生成消耗 10 积分' : 'Each image generation costs 10 credits'}</li>
+                                    <li>{isZh ? '1K 图像生成消耗 10 积分，2K 消耗 20 积分，4K 消耗 40 积分' : '1K image generations cost 10 credits, 2K costs 20, and 4K costs 40'}</li>
                                     <li>{isZh ? '新注册用户获得免费试用积分' : 'New users receive free trial credits'}</li>
                                     <li>{isZh ? '积分可通过购买套餐或订阅获得' : 'Credits can be obtained by purchasing packs or subscriptions'}</li>
                                     <li>{isZh ? '一次性积分包是否退款以实际购买政策和支付平台处理结果为准' : 'Whether one-time credit packs are refundable depends on the active purchase policy and payment-processor handling'}</li>
-                                    <li>{isZh ? '订阅型额度按周期发放，具体可用量以账户面板显示为准' : 'Subscription credits are issued per cycle, and the account dashboard is the source of truth for available balance'}</li>
+                                    <li>{isZh ? '一次性积分不过期；订阅积分会在对应计费周期开始时补充，具体可用量以账户面板显示为准' : 'One-time credits do not expire; subscription balances refresh at the start of each billing cycle, and the account dashboard is the source of truth for available balance'}</li>
                                 </ul>
                             </div>
                         </div>

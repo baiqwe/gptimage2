@@ -1,12 +1,18 @@
 "use client";
 
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
 import { useTranslations } from "next-intl";
 import { Zap } from "lucide-react";
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
-import { ALL_PLANS, PLAN_PRO_MONTHLY, PLAN_STARTER, PricingPlan } from "@/config/pricing";
+import {
+    ALL_PLANS,
+    getCreditsPerImage,
+    getEstimatedStandardImages,
+    PLAN_PRO_MONTHLY,
+    PLAN_STARTER,
+    PricingPlan
+} from "@/config/pricing";
 import { PaymentProviderPanel } from "@/components/payment/payment-provider-panel";
 
 interface QuickRefillModalProps {
@@ -57,7 +63,10 @@ export function QuickRefillModal({ isOpen, onClose, currentPath }: QuickRefillMo
                                         : "Choose a credits pack or subscription on the left and complete payment in the unified checkout panel."}
                                 </p>
                             </div>
-                            {ALL_PLANS.map((plan) => (
+                            {ALL_PLANS.map((plan) => {
+                                const standardImages = getEstimatedStandardImages(plan);
+
+                                return (
                                 <button
                                     key={plan.id}
                                     type="button"
@@ -81,8 +90,13 @@ export function QuickRefillModal({ isOpen, onClose, currentPath }: QuickRefillMo
                                             </div>
                                             <p className="mt-1 text-sm text-slate-500">
                                                 {plan.type === "subscription"
-                                                    ? `${plan.credits.toLocaleString()} credits · $${plan.price.toFixed(2)}/${plan.interval === "year" ? "yr" : "mo"}`
-                                                    : `${plan.credits.toLocaleString()} credits · $${plan.price.toFixed(2)}`}
+                                                    ? `${plan.credits.toLocaleString()} ${locale === "zh" ? "标准图积分" : "standard-image credits"} · $${plan.price.toFixed(2)}/${plan.interval === "year" ? "yr" : "mo"}`
+                                                    : `${plan.credits.toLocaleString()} ${locale === "zh" ? "标准图积分" : "standard-image credits"} · $${plan.price.toFixed(2)}`}
+                                            </p>
+                                            <p className="mt-1 text-xs text-orange-700">
+                                                {locale === "zh"
+                                                    ? `约 ${standardImages} 张 1K · 2K ${getCreditsPerImage("2K")} 分 · 4K ${getCreditsPerImage("4K")} 分`
+                                                    : `About ${standardImages}x 1K · 2K ${getCreditsPerImage("2K")} · 4K ${getCreditsPerImage("4K")}`}
                                             </p>
                                         </div>
                                         {plan.id === PLAN_PRO_MONTHLY.id ? (
@@ -90,7 +104,8 @@ export function QuickRefillModal({ isOpen, onClose, currentPath }: QuickRefillMo
                                         ) : null}
                                     </div>
                                 </button>
-                            ))}
+                                );
+                            })}
                         </div>
 
                         <div className="min-w-0">

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/utils/supabase/server";
-import { CREDITS_PER_GENERATION } from "@/config/pricing";
+import { getCreditsRequired } from "@/config/pricing";
 import {
     COUNT_OPTIONS,
     GPT_IMAGE_MODEL,
@@ -198,13 +198,13 @@ export async function POST(request: NextRequest) {
             }, { status: 400 });
         }
 
-        const creditsRequired = CREDITS_PER_GENERATION * count;
+        const creditsRequired = getCreditsRequired(requestedResolution, count);
 
         // 3. Deduct Credits
         const { data: deductSuccess, error: rpcError } = await supabase.rpc('decrease_credits', {
             p_user_id: user.id,
             p_amount: creditsRequired,
-            p_description: `GPT Image 2 Generation (${count} image${count > 1 ? "s" : ""})`
+            p_description: `GPT Image 2 Generation (${requestedResolution}, ${count} image${count > 1 ? "s" : ""})`
         });
 
         if (rpcError) {
