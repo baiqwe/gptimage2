@@ -3,6 +3,19 @@ import { NextResponse, type NextRequest } from 'next/server'
 import createIntlMiddleware from 'next-intl/middleware'
 import { routing } from './i18n/routing'
 
+function stripXDefaultFromLinkHeader(linkHeader: string | null) {
+  if (!linkHeader) return null
+
+  const linkValues = linkHeader.split(/,\s*(?=<)/g)
+  const filteredValues = linkValues.filter((value) => {
+    const isAlternate = /;\s*rel="?alternate"?/i.test(value)
+    const isXDefault = /;\s*hreflang="?x-default"?/i.test(value)
+    return !(isAlternate && isXDefault)
+  })
+
+  return filteredValues.join(', ')
+}
+
 export async function middleware(request: NextRequest) {
   try {
     if (request.nextUrl.pathname === '/') {
@@ -15,6 +28,15 @@ export async function middleware(request: NextRequest) {
     // 1. 将 intl 中间件初始化移入函数内部，防止顶层初始化崩溃导致整个模块加载失败
     const intlMiddleware = createIntlMiddleware(routing)
     let response = intlMiddleware(request)
+    const sanitizedLinkHeader = stripXDefaultFromLinkHeader(response.headers.get('link'))
+
+    if (sanitizedLinkHeader !== response.headers.get('link')) {
+      if (sanitizedLinkHeader) {
+        response.headers.set('link', sanitizedLinkHeader)
+      } else {
+        response.headers.delete('link')
+      }
+    }
 
     // 2. 初始化 Supabase 客户端
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
