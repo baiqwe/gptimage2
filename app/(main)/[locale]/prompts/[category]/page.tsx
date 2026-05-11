@@ -53,7 +53,6 @@ export async function generateMetadata(props: {
       languages: {
         en: `${siteConfig.url}/en/prompts/${category}`,
         zh: `${siteConfig.url}/zh/prompts/${category}`,
-        "x-default": `${siteConfig.url}/en/prompts/${category}`,
       },
     },
     openGraph: {

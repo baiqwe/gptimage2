@@ -21,7 +21,6 @@ export async function generateMetadata(props: { params: Promise<{ locale: string
             languages: {
                 en: `${siteConfig.url}/en/arena`,
                 zh: `${siteConfig.url}/zh/arena`,
-                'x-default': `${siteConfig.url}/en/arena`,
             },
         },
         openGraph: {
